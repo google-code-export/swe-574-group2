@@ -1,14 +1,14 @@
 #labels Phase-Requirements
 = 01.10.2012 = 
 
-* Creating Google Code project
-* Scope of the project
-* Development method: Agile Development
-* Scrum meetings - when, where, how?
-* High-level analysis
-* Organization of the team
-* Communication plan
-* Requirements & research update
+  * Creating Google Code project
+  * Scope of the project
+  * Development method: Agile Development
+  * Scrum meetings - when, where, how?
+  * High-level analysis
+  * Organization of the team
+  * Communication plan
+  * Requirements & research update
 
 *Decisions:*
 To be done until next meeting (08.10):
