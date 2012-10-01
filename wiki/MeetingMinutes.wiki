@@ -9,6 +9,8 @@
   * Organization of the team
   * Communication plan
   * Requirements & research update
+  * Communicate with Özlem Belir
+
 
 *Decisions:*
 To be done until next meeting (08.10):
