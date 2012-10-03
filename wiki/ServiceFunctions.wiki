@@ -1,4 +1,4 @@
-#Primitive Functions of Service Moule for project.
+
 
 = Service Functions =
 
