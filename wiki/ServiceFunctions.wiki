@@ -1,0 +1,47 @@
+#Primitive Functions of Service Moule for project.
+
+= Service Functions =
+
+This page describes service functions of service module.Function descriptions will be consistent with project requirements.
+
+
+= Function Details =
+
+1-insertEntry(imageMeta,location,username,category,reason,comment)
+
+Description: Used when submitting an image to the database 
+
+imageMeta: unique name, while uploading image can be rename with timestamp_userid_ prefix
+
+location: coordinates 
+username: id of the user
+category: id of category
+reason: id of reason
+comment: optional comment field
+
+Return: entryID
+
+2-getEntryByLocation(location)
+
+Description: Used when getting data from a specific location
+
+Return: JSON object containing  entryID,
+username,location,category,reason,comment,imageMeta,imageURL, upCount, downCount
+
+3-getEntriesByLocations(Array of locations)
+
+Description: Used when getting data from multiple locations
+
+Return: JSONArray of JSONObjects entryID , username,location,category,reason,comment,imageMeta,imageURL, upCount, downCount
+
+4-getEntries()
+Description: Used when getting data from multiple locations for web home page
+
+Return: JSONArray of JSONObjects entryID ,username,location,category,reason,comment,imageMeta,imageURL, upCount, downCount
+
+5-updateVote(entryID, vote)
+Description: change up or down vote count
+entryID: id for the inserted entry
+vote: indicated whether is up or down
+
+6-blockEntry(entryID)
