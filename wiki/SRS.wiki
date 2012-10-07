@@ -69,19 +69,3 @@ o	Change mail address or password.
 •	As an admin user, I want to delete registered users via web site. 
 •	As an admin user, I want to edit other users pinpoints via web site. 
 •	As an admin user, I want to delete other users pinpoints via web site.
-
-
-
-
-
-
-
-
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
