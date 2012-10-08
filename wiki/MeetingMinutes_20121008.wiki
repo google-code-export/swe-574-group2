@@ -1,1 +1,3 @@
 1. Kimin hangi entry'ye ne oy verdiğini kaydedecek miyiz? Ona göre veritabanı yapısını değiştirmek gerekecek.
+
+2. Service Functions'da, "abuse reporting" yapabilmek istiyosak, entry submit ederken userId de almalıyız parametre olarak. Class diagramları bu şekilde kurguladım.
