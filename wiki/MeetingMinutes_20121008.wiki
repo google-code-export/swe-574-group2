@@ -5,3 +5,12 @@
 3. Bir reason sadece bir category'ye ait olabilecekse, Entry tablosunda category tutmamıza gerek yok??
 
 4. User classı için signUp methodu ekledim.
+
+
+5- Deployment ortamında bize ne tahsis edeceklerini öğrenmemiz lazım.Bu belki mimari yapımızı etkileyebilir. (Web tarafı,web servis ve db deployment ortamlarını özellikle) 
+
+6- Resimleri binary olarak db de saklayabiliriz.(kb lar düzeyinde olması çok bir ağırlık yaratmaz) Fakat web sayfasında görüntülemeye çalışırken nasıl bir yol izleyeceğiz. Resimleri web serverin kendinde ayrıca saklayarak url bilgisini web servis aracılığıyla mı aktarırız yoksa binary datayı yollayım web tarafında mı hallederiz? (Tartışırız bunu) 
+
+7- Service function kısmında admin kullanıcı operasyonları eksik bunları eklemek gerekecek. 
+
+8- Dökümantasyon konusunda versiyonlama ve history gösterme konusunda nasıl bir yol izlenebilir?
