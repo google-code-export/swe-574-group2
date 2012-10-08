@@ -1,3 +1,4 @@
+#labels MeetingMinutes
 1. Kimin hangi entry'ye ne oy verdiğini kaydedecek miyiz? Ona göre veritabanı yapısını değiştirmek gerekecek.
 
 2. Service Functions'da, "abuse reporting" yapabilmek istiyosak, entry submit ederken userId de almalıyız parametre olarak. Class diagramları bu şekilde kurguladım.
@@ -14,3 +15,12 @@
 7- Service function kısmında admin kullanıcı operasyonları eksik bunları eklemek gerekecek. 
 
 8- Dökümantasyon konusunda versiyonlama ve history gösterme konusunda nasıl bir yol izlenebilir?
+
+-----AFTER LESSON-----
+1. Project name suggestions: "Fair Urban, Fair Urbanism (derived from "Fair Housing")". Also make a logo.
+2. Update home page at every significant change so that people can understand what it is about at first sight.
+3. Create the database by means of the class diagram & service functions.
+4. Create the SVN structure. Setup the development environment.
+5. Create end-to-end scenario mockups. Prepare all the screens the user will can possibly encounter while using the application and the website.
+6. Call Özlem Hanım! "So we are making a project about accessibility violations. Would you suggest anything that we might not come up with? Are there any real-world examples you can suggest us?"
+7. Find the IT guy of BOUN and ask about the deployment environment.
