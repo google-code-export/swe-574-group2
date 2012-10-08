@@ -1,0 +1,1 @@
+1. Kimin hangi entry'ye ne oy verdiğini kaydedecek miyiz? Ona göre veritabanı yapısını değiştirmek gerekecek.
