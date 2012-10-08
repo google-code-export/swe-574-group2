@@ -3,3 +3,5 @@
 2. Service Functions'da, "abuse reporting" yapabilmek istiyosak, entry submit ederken userId de almalıyız parametre olarak. Class diagramları bu şekilde kurguladım.
 
 3. Bir reason sadece bir category'ye ait olabilecekse, Entry tablosunda category tutmamıza gerek yok??
+
+4. User classı için signUp methodu ekledim.
