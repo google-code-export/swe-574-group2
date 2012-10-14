@@ -5,6 +5,7 @@ You can find the MySql - ER diagram in Downloads.
 
  * Database name: AccessibilityGroup2
  * Collation: utf8 - turkish - case insensitive
+ * Tables and relations can be seen in the model diagram.
 
 
 _Discussions - alterations on the Class Diagram:_
