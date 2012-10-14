@@ -1,0 +1,13 @@
+#labels MySql,database,er-diagram
+= MySql database for the project is created. =
+
+You can find the MySql - ER diagram in Downloads.
+
+* Database name: AccessibilityGroup2
+* Collation: utf8 - turkish - case insensitive
+
+
+Discussions - alterations on the Class Diagram:
+* A relation table between Entry and Reason is created as there can be more than one reason for an entry.
+
+* HandicapCategory table may not be necessary, we can use only the Reason table. A new column named "ParentReasonId" can be added. The parent reasons will correspond to the records in the HandicapCategory table and have NULL as ParentReasonId.
