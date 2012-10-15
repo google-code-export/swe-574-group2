@@ -5,7 +5,7 @@ _To be done until next Monday_
 
 1. "Severity of the accessibility violation (AV)" issue will be ignored. This can be abused easily and moreover, severity of a violation can be highly relative.
 
-2. An enumeration table (or an enumeration class) will be added for violation types. A column therefor will be added to the Reason class. These types include the following: 
+2. An enumeration class (and the corresponding database table if approved) will be added for violation types. A column therefor will be added to the Reason class. These types include the following: 
  * visually impaired
  * hearing impaired
  * difficulty for wheelchair
