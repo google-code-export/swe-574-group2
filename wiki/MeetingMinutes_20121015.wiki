@@ -25,4 +25,4 @@ These enumerations will be helpful for showing different pin images for differen
 
 7. First draft of the Design Specifications Document will be prepared.
 
-8. A strict deadline for the first milestone will be given to the instructor (*UNTIL WEEKEND AS REQUESTED BY THE INSTRUCTOR!*)
+8. A strict deadline for the first milestone and the contents of it will be given to the instructor (*UNTIL WEEKEND AS REQUESTED BY THE INSTRUCTOR!*)
