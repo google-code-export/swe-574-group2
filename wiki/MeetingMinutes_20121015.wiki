@@ -1,5 +1,5 @@
 #labels MeetingMinutes,Featured
-==Meeting decisions - 25th October, 2012==
+==Meeting decisions - 15th October, 2012==
 
 _To be done until next Monday_
 
