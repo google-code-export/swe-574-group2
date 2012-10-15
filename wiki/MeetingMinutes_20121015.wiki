@@ -21,7 +21,7 @@ These enumerations will be helpful for showing different pin images for differen
 
 5. Use-case diagram and its scenarios will be added to SRS accordingly and thus, the final version of the SRS will be finished.
 
-6. Google Maps API will be analyzed and and a demo will be
+6. Google Maps API will be analyzed and and a demo will be prepared.
 
 7. First draft of the Design Specifications Document will be prepared.
 
