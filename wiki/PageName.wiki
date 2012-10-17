@@ -1,7 +1,7 @@
 #summary One-sentence summary of this page.
 #labels Featured,Phase-Design
 
-= Possible Accesibilty Categories and Reasons =
+= Possible Accessibility Categories and Reasons =
 
 Since target audience are Turkish citizens, categories and reasons will be written in Turkish. Content is open to changes and updates.
 
