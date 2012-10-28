@@ -1,5 +1,5 @@
 #labels SRS,requirements,scenarios
-*Discussion on the latest version of SRS*
+*Discussion on the latest version of SRS: *
 http://code.google.com/p/swe-574-group2/downloads/detail?name=SRS.1.1.docx&can=2&q=#makechanges
 
 
