@@ -6,21 +6,21 @@
 
 
 === To-do for the website === 
- 1. Put the data fetched from web service into a dropdownlist.
+1. Put the data fetched from web service into a dropdownlist.
 
 http://testpalette.com:8080/RestAccessibilty/service/categories
 
 This method also takes an integer parameter (parentCategoryId) to bring the child categories to be put into a second dropdownlist.
 
- 2. Implement entry adding via web site. User pins the location of the violation on the map, selects a category (and an optional sub-category) from the dropdownlist, enters an optional comment and uploads an image of the violation
+2. Implement entry adding via web site. User pins the location of the violation on the map, selects a category (and an optional sub-category) from the dropdownlist, enters an optional comment and uploads an image of the violation
 
 
 
 === To-do for the web service === 
- 1. User login session issue will be analyzed.
+1. User login session issue will be analyzed.
 
- 2. New methods will be released; priority is VoteUp and VoteDown for an existing entry.
+2. New methods will be released; priority is VoteUp and VoteDown for an existing entry.
 
- 3. Put the web service code to the svn trunk.
+3. Put the web service code to the svn trunk.
 
- 4. Start implementing the admin operations.
+4. Start implementing the admin operations.
