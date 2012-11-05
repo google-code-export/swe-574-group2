@@ -115,8 +115,10 @@ if (navigator.geolocation) {
 function displayPosition(pos) {
     var mylat = pos.coords.latitude;
     var mylong = pos.coords.longitude;
+    var accuracy = pos.coords.accuracy;
     var thediv = document.getElementById('locationinfo');
-    thediv.innerHTML = '<p><strong>Koordinatlarýnýz: </strong>' + mylong + ' , ' + mylat + '</p>';
+    thediv.innerHTML = '<p><strong>Koordinatlarýnýz: </strong>' + mylong + ' , ' + mylat + '</p>'
+    	+ '<p><strong>Hassasiyet: </strong>' + accuracy + ' metre</p>';
 
 //Load Google Map
 var latlng = new google.maps.LatLng(mylat, mylong);
