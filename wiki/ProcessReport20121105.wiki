@@ -1,4 +1,4 @@
-#labels Featured,ProjectProcessReport
+#labels Featured,ProcessReport
 As of today, we've finished the requirements document and the initial database design, and started with the development. Our first prototype will basically include the following:
 
  * A mobile application and a web site will be present.
@@ -18,7 +18,6 @@ Since we are applying Agile-Driven Development, small details may change in the 
 Our system is based on the usual three-layer structure: There is a database, a web service, which gets the data from the database by an ORM tool and gives out to the mobile application and the web site. These two platforms consume the web service data. Web site mainly utilizes AJAX and jQuery to communicate with the web service as well as with other third party APIs, most importantly the Google Maps API, but of course prepares some more complicated data "at the back-end" using PHP.
 
 The address of the webservice is as follows:
-
 http://testpalette.com:8080/RestAccessibilty/service/categories (This one gets all of the categories defined in the database and returns them as JSON string)
 
 More web service method urls will be available soon and will be shared.
