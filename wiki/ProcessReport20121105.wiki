@@ -27,7 +27,7 @@ As of now, basic implementations such as showing all the violations on the map o
 You can access the following at our Google Code group: (http://code.google.com/p/swe-574-group2/)
  * Project plan (http://code.google.com/p/swe-574-group2/downloads/detail?name=plan1.pdf)
  * Last version of the SRS (http://code.google.com/p/swe-574-group2/downloads/detail?name=SRS.3.0.docx)
- * Database ER-Model (http://code.google.com/p/swe-574-group2/downloads/detail?name=database_er_model_1.1.png&can=2&q=#makechanges)
+ * Database ER-Model
  * Database scripts
  * Mock-up screens
  * Latest screenshots of the web site
