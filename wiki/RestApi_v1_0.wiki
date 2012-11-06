@@ -20,4 +20,4 @@ url pattern: {host}/RestAccessibilty/service/entries/add
 Sample form: http://testpalette.com:8080/RestAccessibilty/test.jsp
 Multipart form post
 
-( {host} = http://testpalette.com:8080/ [temporarily] )
+( {host} = http://testpalette.com:8080/ --> temporarily )
