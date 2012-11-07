@@ -21,21 +21,6 @@
     	<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
 
-<!-- 	<bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"> -->
-<!--     <property name="driverClassName" value="org.gjt.mm.mysql.Driver"/> -->
-<!--     <property name="url" value="jdbc:mysql://testpalette.com:3306/AccessibilityGroup"/> -->
-<!--     <property name="username" value="sweDBAdmin"/> -->
-<!--     <property name="password" value="swe574Admin!?"/> -->
-    
-<!--   </bean> -->
-  
-<!--   <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"> -->
-<!--     <property name="driverClassName" value="org.gjt.mm.mysql.Driver"/> -->
-<!--     <property name="url" value="jdbc:mysql://localhost:3306/AccessibilityGroup2"/> -->
-<!--     <property name="username" value="root"/> -->
-<!--     <property name="password" value="bo26GAZici"/> -->
-    
-<!--   </bean> -->
   
   <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
     <property name="driverClassName" value="${driverClassName}"/>
