@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+   xmlns="http://www.springframework.org/schema/security"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:beans="http://www.springframework.org/schema/beans"
+   xmlns:sec="http://www.springframework.org/schema/security"
+   xsi:schemaLocation="
+http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+ http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+ 
+  <sec:http entry-point-ref="authenticationEntryPoint">
+<!-- 	<sec:http> -->
+	
+	
+<!-- 	<sec:intercept-url pattern="/service/admin/**" access="ROLE_ADMIN" /> -->
+<!-- 	<sec:intercept-url pattern="/service/entries/add" access="ROLE_USER" /> -->
+<!-- 	<sec:intercept-url pattern="/service/entries/thumbs" access="ROLE_USER" /> -->
+<!-- 	<sec:intercept-url pattern="/service/categories/**" access="ROLE_USER" /> -->
+
+	<sec:http-basic/>
+	<sec:remember-me key="testkey" services-ref="remembermeServices"/>
+	<sec:anonymous/>
+	<sec:custom-filter ref="authenticationTokenProcessingFilter" position="FIRST"/>
+	
+<!-- 	<sec:logout invalidate-session="true" -->
+<!--             delete-cookies="JSESSIONID" /> -->
+ 
+	
+</sec:http>
+
+<beans:bean class="com.swe.filters.AuthenticationTokenProcessingFilter"
+    id="authenticationTokenProcessingFilter">
+    <beans:constructor-arg ref="authenticationManager" />
+</beans:bean>
+
+<beans:bean id="remembermeServices" class="com.swe.accessibilty.authentication.CustomTokenBasedRememberMeServices">
+  <beans:constructor-arg name="key"><beans:value>testkey</beans:value></beans:constructor-arg>
+  <beans:constructor-arg name="userDetailsService"><beans:ref bean="userDetailsService"/></beans:constructor-arg>
+</beans:bean>
+
+<beans:bean id="userDetailsService" class="com.swe.accessibilty.service.CustomUserDetailsService"></beans:bean>
+
+<beans:bean id="rememberMeFilter"
+class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
+<beans:property name="authenticationManager" ref="authenticationManager" />
+<beans:property name="rememberMeServices" ref="remembermeServices" />
+</beans:bean>
+
+<beans:bean id="rememberMeAuthenticationProvider" class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+  <beans:property name="key" value="testkey"/>
+</beans:bean>
+
+<beans:bean id="authenticationEntryPoint"
+class="com.swe.accessibilty.authentication.CustomAuthenticationEntryPoint"/>
+ 
+   <!--  beans:bean id="myFilter" class=
+    "org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+      <beans:property name="authenticationManager" ref="authenticationManager"/>
+      beans:property name="authenticationSuccessHandler" ref="mySuccessHandler"/>
+      </beans:bean> 
+      -->
+   
+   <sec:authentication-manager alias="authenticationManager">
+	   <sec:authentication-provider ref="myAuthenticationProvider">
+	   </sec:authentication-provider>
+	</sec:authentication-manager>
+
+    <beans:bean id="myAuthenticationProvider" class="com.swe.accessibilty.authentication.CustomAuthenticationProvider"/>
+ 
+ 	<beans:bean id="roleHierarchy" class="org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl">
+    <beans:property name="hierarchy">
+    	<beans:value>ROLE_ADMIN > ROLE_USER</beans:value>
+        
+    </beans:property>
+</beans:bean>
+
+<!-- <beans:bean id="rememberMeServices" class= -->
+<!--         "org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices"> -->
+<!--     <beans:property name="userDetailsService" ref="jpaUserDetailsService"/> -->
+<!--     <beans:property name="key" value="89dqj219dn910lsAc12"/> -->
+<!-- </beans:bean> -->
+   
+ 
+</beans:beans>
