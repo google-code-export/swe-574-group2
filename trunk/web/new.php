@@ -36,6 +36,7 @@ body {
 <!-- <script type="text/javascript" src="js/jquery.jsonp.js"></script> -->
 <script type="text/javascript">
 	$(document).ready(function() {
+
 		$('.uploader').ajaxupload({
 			url : 'upload.php',
 			finish : function(files) {
@@ -146,6 +147,7 @@ function errorFunction(pos) {
 
 </head>
 <body>
+	<div><?php include('master.php');?></div>
 	<p style="height: 20px;"></p>
 	<h2>Yeni Kayýt Giriþi</h2>
 	<hr width="1100px;">
@@ -171,11 +173,10 @@ function errorFunction(pos) {
 		<p style="height: 20px;"></p>
 		<div id="locationinfo"></div>
 		<p style="height: 20px;"></p>
-		<a href="default.html" style="font-weight:bold; text-decoration: underline;"><--Geri</a>
+		<a href="default.php" style="font-weight:bold; text-decoration: underline;"><--Geri</a>
 	</div>
 
-	<div id="map_canvas"
-		style="width: 650px; height: 500px; margin-right: 30px; float: right;"></div>
-	<p style="height: 30px;"></p>
+	<div id="map_canvas" style="width: 650px; height: 500px; margin-right: 30px; float: right;"></div>
+	<p style="height: 60px;"></p>
 </body>
 </html>
