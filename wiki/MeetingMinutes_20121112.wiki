@@ -1,0 +1,6 @@
+#labels Featured,MeetingMinutes
+==Meeting decisions - 12rd November, 2012==
+
+ ===To be discussed===
+
+1. As of now, the image information is stored as bytes in a column in the Entry table. In the new version, we can store the uploaded file physically in a folder in the server and make the name of the file unique (probably by renaming it as a unique identifier - string such as php's time()). To be able to do that, we should change the data type of the ImageMeta in the Entry table to string (VARCHAR(MAX)).
