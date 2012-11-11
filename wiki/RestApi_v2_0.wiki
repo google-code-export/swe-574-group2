@@ -1,6 +1,6 @@
 #labels Featured,RestAPI
 ==REST API Documentation==
-===Rev 1.0===
+===Rev 2.0===
 
 
 1. Get main categories
