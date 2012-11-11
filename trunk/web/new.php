@@ -37,15 +37,6 @@ body {
 <script type="text/javascript">
 	$(document).ready(function() {
 
-		$('.uploader').ajaxupload({
-			url : 'upload.php',
-			finish : function(files) {
-				alert('All images have been uploaded: ' + files);
-			},
-			success : function(fileName) {
-				alert('Upload successful!');
-			}
-		});
 
 		//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
 		var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
@@ -100,6 +91,39 @@ body {
 		selectChild.change(function() {
 
 		});
+
+//		var saveEntryUrl = 'http://testpalette.com:8080/RestAccessibilty/service/entries/add';
+		//
+//				$('#btnSave').click(function() {
+//					var valToSearch = 0;
+//					if(selectChild.val() == "0"){
+//						valToSearch = selectParent.val();
+//					}
+//					else{
+//						valToSearch = selectChild.val();
+//					}
+//					
+//					
+//					    $.ajax(
+//					    {
+//					        url: 'upload_new.php',
+//					        type: 'post',
+//					        dataType: 'json',
+//					        beforeSend: function(){
+//					        	$("#spinner").show();
+//							},
+//							complete: function(){
+//								$("#spinner").hide();
+//							},
+//					        success: function(data)
+//					        {
+//					        	alert('osman');
+//					        },
+//					        error: function(data){ alert("Bir hata oluþtu, lütfen tekrar deneyin.");}
+//					    });
+//					
+//				});
+		
 	});
 </script>
 
@@ -109,7 +133,7 @@ if (navigator.geolocation) {
     // Locate position
     navigator.geolocation.getCurrentPosition(displayPosition, errorFunction);
 } else {
-    alert('Bulunduðunuz yeri otomatik olarak algýlayabilmemiz için tarayýcýnýzýn Geolocation özelliðine izin vermesi gerekmektedir.');
+    alert('Bulunduðunuz yeri otomatik olarak algýlayabilmemiz için tarayýcýnýzýn GeoLocation özelliðine (HTML5) izin vermesi gerekmektedir.');
 }
 
 // Success callback function
@@ -120,6 +144,9 @@ function displayPosition(pos) {
     var thediv = document.getElementById('locationinfo');
     thediv.innerHTML = '<p><strong>Koordinatlarýnýz: </strong>' + mylong + ' , ' + mylat + '</p>'
     	+ '<p><strong>Hassasiyet: </strong>' + accuracy + ' metre</p>';
+
+    $('#hdnLng').val(mylong);
+    $('#hdnLat').val(mylat);
 
 //Load Google Map
 var latlng = new google.maps.LatLng(mylat, mylong);
@@ -141,22 +168,26 @@ var marker = new google.maps.Marker({
 
 // Error callback function
 function errorFunction(pos) {
-    alert('Error!');
+    alert('Yerinizi belirlerken bir hata oluþtu. Lütfen sayfayý yenileyin.');
 }
 </script>
 
 </head>
 <body>
+<form action="upload_new.php" method="post" enctype="multipart/form-data">
+	<input type="hidden" id="hdnLat" value="0" name="hdnLat" />
+	<input type="hidden" id="hdnLng" value="0" name="hdnLng" />
 	<div><?php include('master.php');?></div>
 	<p style="height: 20px;"></p>
 	<h2>Yeni Kayýt Giriþi</h2>
 	<hr width="1100px;">
 	<p style="height: 20px;"></p>
 	<div style="text-align: left; margin-left: 30px; float: left;">
-		<span style="font-weight: bold;">Kategori:</span> &nbsp; <select
-			id="ddlCategories">
+		<span style="font-weight: bold;">Kategori:</span> &nbsp; 
+		<select id="ddlCategories" name="ddlCategories">
 			<option value="0">Lütfen seçiniz...</option>
-		</select> <select id="ddlChildren" style="display: none">
+		</select>
+		<select id="ddlChildren" name="ddlChildren" style="display: none">
 			<!--<option value="0">Tamamý</option> -->
 		</select>
 		<p style="height: 10px;"></p>
@@ -166,17 +197,20 @@ function errorFunction(pos) {
 		<p style="height: 85px;"></p>
 		<span style="font-weight: bold;">Fotoðraf:</span>
 		<p></p>
-		<div class="uploader"></div>
+		<!-- <div class="uploader"></div> -->
+		<input type="file" name="file" id="file" /> 
 		<p style="height: 10px;"></p>
-		<input type="button" id="btnSave" name="btnSave" value="Kaydet"
+		<input type="submit" id="btnSave" name="submit" value="Kaydet"
 			style="font-weight: bold;" />
+		<span id="spinner" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="Kaydediliyor..."/></span>
 		<p style="height: 20px;"></p>
 		<div id="locationinfo"></div>
 		<p style="height: 20px;"></p>
-		<a href="default.php" style="font-weight:bold; text-decoration: underline;"><--Geri</a>
+		<a href="javascript: window.history.go(-1)" style="font-weight:bold; text-decoration: underline;"><--Geri</a>
 	</div>
 
 	<div id="map_canvas" style="width: 650px; height: 500px; margin-right: 30px; float: right;"></div>
 	<p style="height: 60px;"></p>
+</form>
 </body>
 </html>

@@ -122,6 +122,8 @@ body {
 				});
 				bindInfoWindow(marker, map, infoWindow, html);
 			}
+
+			$('#divCount').html("Sistemde toplam " + markers.length + " adet ihlâl var.");
 		});
 
 // 		var marker = new google.maps.Marker({
@@ -142,16 +144,7 @@ body {
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('.uploader').ajaxupload({
-			url : 'upload.php',
-			finish : function(files) {
-				alert('All images have been uploaded: ' + files);
-			},
-			success : function(fileName) {
-				alert('Upload successful!');
-			}
-		});
-
+		
 				//jQuery.support.cors = true;
 
 // 				$.ajax({
@@ -181,7 +174,7 @@ body {
 
 		//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
 		var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
-		var getEntriesByCategoryUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
+		var getEntriesByCategoryUrl = 'http://testpalette.com:8080/RestAccessibilty/service/entries?categoryId=';
 
 		var selectParent = $('#ddlCategories');
 		var selectChild = $('#ddlChildren');
@@ -237,12 +230,12 @@ body {
 			
 			if(selectParent.val() != "osman")
 			{
-				var scriptUrl = "markerInfo.php";
+				var scriptUrl = getEntriesByCategoryUrl + valToSearch;
 			    $.ajax(
 			    {
 			        url: scriptUrl,
 			        type: 'get',
-			        dataType: 'xml',
+			        dataType: 'json',
 			        beforeSend: function(){
 			        	$("#spinner").show();
 					},
@@ -251,7 +244,11 @@ body {
 					},
 			        success: function(data)
 			        {
-			        	var wheelChair = new google.maps.MarkerImage(
+			        	var dataS = data['data'];
+		        
+			        	$('#divCount').html("Filtreleme sonucu " + dataS.length + " adet sonuç bulundu.");
+				        
+			        	var pinImg = new google.maps.MarkerImage(
 			    				'images/markers/marker2.png',
 			    				// This marker is 129 pixels wide by 42 pixels tall.
 			    				new google.maps.Size(22, 32),
@@ -262,27 +259,23 @@ body {
 			        	
 			        	var infoWindow = new google.maps.InfoWindow;
 			        	
-			        	downloadUrl("markerInfo.php", function(data) {
-			    			var xml = data.responseXML;
-			    			var markers = xml.documentElement.getElementsByTagName("marker");
-			    			clearOverlays();
-			    			for ( var i = 0; i < markers.length; i++) {
-			    				var comment = markers[i].getAttribute("comment");
-			    				var entryId = markers[i].getAttribute("id");
-			    				var point = new google.maps.LatLng(parseFloat(markers[i]
-			    						.getAttribute("lat")), parseFloat(markers[i]
-			    						.getAttribute("lng")));
-			    				var html = "<b>Kayýt Id'si:</b> " + entryId
-			    						+ "<br/><b>Comment:</b> " + comment;
-			    				var marker = new google.maps.Marker({
-			    					map : map,
-			    					position : point,
-			    					icon : wheelChair
-			    				});
-			    				
-			    				bindInfoWindow(marker, map, infoWindow, html);
-			    			}
-			    		});
+			    		clearOverlays();
+
+			    		$.each(dataS, function(index, element) {
+			    			var comment = element.comment;
+		    				var entryId = element.id;
+		    				var point = new google.maps.LatLng(parseFloat(element.coordX), parseFloat(element.coordY));
+		    				var html = "<b>Kayýt Id'si:</b> " + entryId
+		    						+ "<br/><b>Comment:</b> " + comment;
+		    				var marker = new google.maps.Marker({
+		    					map : map,
+		    					position : point,
+		    					icon : pinImg
+		    				});
+		    				
+		    				bindInfoWindow(marker, map, infoWindow, html);
+
+					    });	
 			        },
 			        error: function(data){ alert("Bir hata oluþtu, lütfen tekrar deneyin.");}
 			    });
@@ -304,6 +297,8 @@ body {
 		</select>
 		<input type="button" id="btnSearch" name="formSearch" value="Ara"/>
 		<span id="spinner" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="Yükleniyor"/></span>
+		<p style="height: 7px"></p>
+		<div id="divCount" style="font-weight: bold;" ></div>
 	</div>
 	<p style="height: 20px"></p>
 	<div id="map_canvas" style="width: 900px; height: 700px; margin-left: 190px;"></div>
