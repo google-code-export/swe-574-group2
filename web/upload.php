@@ -199,27 +199,27 @@ if(isset($_FILES['ax-files']))
 					createThumbGD($fullPath, $thumbPath, $thumbPostfix, $thumbWidth, $thumbHeight, $thumbFormat);
 
 				/////////////////////////////////////////////////////////////////
-				$con = mysql_connect("localhost:3306","root","123456");
-				if (!$con)
-				{
-					die('Could not connect: ' . mysql_error());
-				}
-				else
-				{
-					mysql_select_db("accessibilitygroup2", $con);
+// 				$con = mysql_connect("localhost:3306","root","123456");
+// 				if (!$con)
+// 				{
+// 					die('Could not connect: ' . mysql_error());
+// 				}
+// 				else
+// 				{
+// 					mysql_select_db("accessibilitygroup2", $con);
 
-					$sql="INSERT INTO entry (Id, ImageMeta, SubmittedBy)
-					VALUES ('3', $fullPath, '1')";
+// 					$sql="INSERT INTO entry (Id, ImageMeta, SubmittedBy)
+// 					VALUES ('3', $fullPath, '1')";
 
-					if (!mysql_query($sql,$con))
-					{
-						die('Error: ' . mysql_error());
-					}
+// 					if (!mysql_query($sql,$con))
+// 					{
+// 						die('Error: ' . mysql_error());
+// 					}
 					
-					echo "1 record added...";
+// 					echo "1 record added...";
 
-					mysql_close($con);
-				}
+// 					mysql_close($con);
+// 				}
 				/////////////////////////////////////////////////////////////////
 
 				echo json_encode(array('name'=>basename($fullPath), 'size'=>filesize($fullPath), 'status'=>'uploaded', 'info'=>'File uploaded'));
@@ -253,26 +253,26 @@ elseif(isset($_REQUEST['ax-file-name']))
 		}
 		
 		/////////////////////////////////////////////////////////////////
-		$con = mysql_connect("localhost:3306","root","123456");
-		if (!$con)
-		{
-			die('Could not connect: ' . mysql_error());
-		}
-		else
-		{
-			mysql_select_db("accessibilitygroup2", $con);
+// 		$con = mysql_connect("localhost:3306","root","123456");
+// 		if (!$con)
+// 		{
+// 			die('Could not connect: ' . mysql_error());
+// 		}
+// 		else
+// 		{
+// 			mysql_select_db("accessibilitygroup2", $con);
 		
-			$sql="INSERT INTO accessibilitygroup2.entry (ImageMeta, SubmittedBy) VALUES ('$fullPath', 1)";
+// 			$sql="INSERT INTO accessibilitygroup2.entry (ImageMeta, SubmittedBy) VALUES ('$fullPath', 1)";
 		
-			if (!mysql_query($sql,$con))
-			{
-				die('Error: ' . mysql_error());
-			}
+// 			if (!mysql_query($sql,$con))
+// 			{
+// 				die('Error: ' . mysql_error());
+// 			}
 				
-			echo "1 record added...";
+// 			echo "1 record added...";
 		
-			mysql_close($con);
-		}
+// 			mysql_close($con);
+// 		}
 		/////////////////////////////////////////////////////////////////
 		
 		echo json_encode(array('name'=>basename($fullPath), 'size'=>$currByte, 'status'=>'uploaded', 'info'=>'File/chunk uploaded'));
