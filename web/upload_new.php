@@ -38,15 +38,17 @@ if ((($_FILES["file"]["type"] == "image/gif")
 // 		else
 // 		{
 
-			$categoryId = 0;
-			if( $_POST["ddlChildren"]  == 0)
-			{
-				$categoryId = $_POST["ddlCategories"];
-			}
-			else 
-			{
-				$categoryId = $_POST["ddlChildren"];
-			}
+			$categoryId = 1;
+// 			if( $_POST["ddlChildren"]  == 0)
+// 			{
+// 				$categoryId = $_POST["ddlCategories"];
+// 			}
+// 			else 
+// 			{
+// 				$categoryId = $_POST["ddlChildren"];
+// 			}
+			
+			
 		
 			$tmpArr2 = explode('.', $_FILES["file"]["name"]);
 			$fileName = current($tmpArr2);
@@ -60,7 +62,7 @@ if ((($_FILES["file"]["type"] == "image/gif")
 			
 			//echo $returnArray;
 			
-			$data = array('X' => floatval($_POST["hdnLat"]), 'Y' => floatval($_POST["hdnLng"]), 'Comment' => $_POST["txtDescription"], 'File' => $storagePath, 'Category' => $categoryId);
+			$data = array('coordX' => floatval($_POST["hdnLat"]), 'coordY' => floatval($_POST["hdnLng"]), 'comment' => $_POST["txtDescription"], 'file' => $storagePath, 'category' => $categoryId);
 			
 			$url = 'http://testpalette.com:8080/RestAccessibilty/service/entries/add';
 			
