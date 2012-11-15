@@ -37,10 +37,10 @@ body {
 <script type="text/javascript">
 	$(document).ready(function() {
 
-
 		//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
-		var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
-		var getEntriesByCategoryUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
+		//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
+		var getCategoriesUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/categories';
+		var getEntriesByCategoryUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/entries?categoryId=';
 
 		var selectParent = $('#ddlCategories');
 		var selectChild = $('#ddlChildren');
@@ -70,7 +70,7 @@ body {
 					if(data['data'].length > 0){
 						selectChild.empty();
 						selectChild.append(
-					        $('<option></option>').val(0).html("Alt kategori seçebilirsiniz...")
+					        $('<option></option>').val(0).html("Alt kategori seÃ§ebilirsiniz...")
 					    );
 						
 						$.each(data['data'], function(index, element) {
@@ -119,7 +119,7 @@ body {
 //					        {
 //					        	alert('osman');
 //					        },
-//					        error: function(data){ alert("Bir hata oluþtu, lütfen tekrar deneyin.");}
+//					        error: function(data){ alert("Bir hata oluÃ¾tu, lÃ¼tfen tekrar deneyin.");}
 //					    });
 //					
 //				});
@@ -133,7 +133,7 @@ if (navigator.geolocation) {
     // Locate position
     navigator.geolocation.getCurrentPosition(displayPosition, errorFunction);
 } else {
-    alert('Bulunduðunuz yeri otomatik olarak algýlayabilmemiz için tarayýcýnýzýn GeoLocation özelliðine (HTML5) izin vermesi gerekmektedir.');
+    alert('BulunduÃ°unuz yeri otomatik olarak algÃ½layabilmemiz iÃ§in tarayÃ½cÃ½nÃ½zÃ½n GeoLocation Ã¶zelliÃ°ine (HTML5) izin vermesi gerekmektedir.');
 }
 
 // Success callback function
@@ -142,7 +142,7 @@ function displayPosition(pos) {
     var mylong = pos.coords.longitude;
     var accuracy = pos.coords.accuracy;
     var thediv = document.getElementById('locationinfo');
-    thediv.innerHTML = '<p><strong>Koordinatlarýnýz: </strong>' + mylong + ' , ' + mylat + '</p>'
+    thediv.innerHTML = '<p><strong>KoordinatlarÃ½nÃ½z: </strong>' + mylong + ' , ' + mylat + '</p>'
     	+ '<p><strong>Hassasiyet: </strong>' + accuracy + ' metre</p>';
 
     $('#hdnLng').val(mylong);
@@ -162,13 +162,13 @@ var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 var marker = new google.maps.Marker({
 	     position: latlng, 
 	     map: map, 
-	     title:"Buradasýnýz"
+	     title:"BuradasÃ½nÃ½z"
 	 });
 }
 
 // Error callback function
 function errorFunction(pos) {
-    alert('Yerinizi belirlerken bir hata oluþtu. Lütfen sayfayý yenileyin.');
+    alert('Yerinizi belirlerken bir hata oluÃ¾tu. LÃ¼tfen sayfayÃ½ yenileyin.');
 }
 </script>
 
@@ -179,23 +179,23 @@ function errorFunction(pos) {
 	<input type="hidden" id="hdnLng" value="0" name="hdnLng" />
 	<div><?php include('master.php');?></div>
 	<p style="height: 20px;"></p>
-	<h2>Yeni Kayýt Giriþi</h2>
+	<h2>Yeni KayÃ½t GiriÃ¾i</h2>
 	<hr width="1100px;">
 	<p style="height: 20px;"></p>
 	<div style="text-align: left; margin-left: 30px; float: left;">
 		<span style="font-weight: bold;">Kategori:</span> &nbsp; 
 		<select id="ddlCategories" name="ddlCategories">
-			<option value="0">Lütfen seçiniz...</option>
+			<option value="0">LÃ¼tfen seÃ§iniz...</option>
 		</select>
 		<select id="ddlChildren" name="ddlChildren" style="display: none">
-			<!--<option value="0">Tamamý</option> -->
+			<!--<option value="0">TamamÃ½</option> -->
 		</select>
 		<p style="height: 10px;"></p>
-		<span style="font-weight: bold;">Açýklama:</span>
+		<span style="font-weight: bold;">AÃ§Ã½klama:</span>
 		<textarea class="txtDescription" name="txtDescription"
 			id="txtDescription" cols="40" rows="4" style="margin-bottom: -70px;"></textarea>
 		<p style="height: 85px;"></p>
-		<span style="font-weight: bold;">Fotoðraf:</span>
+		<span style="font-weight: bold;">FotoÃ°raf:</span>
 		<p></p>
 		<!-- <div class="uploader"></div> -->
 		<input type="file" name="file" id="file" /> 
