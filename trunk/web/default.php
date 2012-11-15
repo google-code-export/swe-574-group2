@@ -113,7 +113,7 @@ body {
 				var point = new google.maps.LatLng(parseFloat(markers[i]
 						.getAttribute("lat")), parseFloat(markers[i]
 						.getAttribute("lng")));
-				var html = "<b>Kayýt Id'si:</b> " + entryId
+				var html = "<b>KayÃ½t Id'si:</b> " + entryId
 						+ "<br/> ''" + comment + "''";
 				var marker = new google.maps.Marker({
 					map : map,
@@ -123,7 +123,7 @@ body {
 				bindInfoWindow(marker, map, infoWindow, html);
 			}
 
-			$('#divCount').html("Sistemde toplam " + markers.length + " adet ihlâl var.");
+			$('#divCount').html("Sistemde toplam " + markers.length + " adet ihlÃ¢l var.");
 		});
 
 // 		var marker = new google.maps.Marker({
@@ -172,9 +172,10 @@ body {
 // 		            }
 // 		        });
 
-		//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
-		var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
-		var getEntriesByCategoryUrl = 'http://testpalette.com:8080/RestAccessibilty/service/entries?categoryId=';
+    //var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
+		//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
+		var getCategoriesUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/categories';
+		var getEntriesByCategoryUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/entries?categoryId=';
 
 		var selectParent = $('#ddlCategories');
 		var selectChild = $('#ddlChildren');
@@ -202,7 +203,7 @@ body {
 			{
 				selectChild.empty();
 				selectChild.append(
-			        $('<option></option>').val(0).html("Tamamý")
+			        $('<option></option>').val(0).html("TamamÃ½")
 			    );
 				$.getJSON(getCategoriesUrl + "/" + selectParent.find(":selected").val(), function(data) {
 					$.each(data['data'], function(index, element) {
@@ -246,7 +247,7 @@ body {
 			        {
 			        	var dataS = data['data'];
 		        
-			        	$('#divCount').html("Filtreleme sonucu " + dataS.length + " adet sonuç bulundu.");
+			        	$('#divCount').html("Filtreleme sonucu " + dataS.length + " adet sonuÃ§ bulundu.");
 				        
 			        	var pinImg = new google.maps.MarkerImage(
 			    				'images/markers/marker2.png',
@@ -265,7 +266,7 @@ body {
 			    			var comment = element.comment;
 		    				var entryId = element.id;
 		    				var point = new google.maps.LatLng(parseFloat(element.coordX), parseFloat(element.coordY));
-		    				var html = "<b>Kayýt Id'si:</b> " + entryId
+		    				var html = "<b>KayÃ½t Id'si:</b> " + entryId
 		    						+ "<br/><b>Comment:</b> " + comment;
 		    				var marker = new google.maps.Marker({
 		    					map : map,
@@ -277,7 +278,7 @@ body {
 
 					    });	
 			        },
-			        error: function(data){ alert("Bir hata oluþtu, lütfen tekrar deneyin.");}
+			        error: function(data){ alert("Bir hata oluÃ¾tu, lÃ¼tfen tekrar deneyin.");}
 			    });
 			}
 		});
@@ -290,13 +291,13 @@ body {
 	<div>
 		<h4>Kategori filtreleme:</h4>
 		<select id="ddlCategories">
-			<option value="0">Tamamý</option>
+			<option value="0">TamamÃ½</option>
 		</select>
 		<select id="ddlChildren" style="display:none">
-			<!--<option value="0">Tamamý</option> -->
+			<!--<option value="0">TamamÃ½</option> -->
 		</select>
 		<input type="button" id="btnSearch" name="formSearch" value="Ara"/>
-		<span id="spinner" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="Yükleniyor"/></span>
+		<span id="spinner" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="YÃ¼kleniyor"/></span>
 		<p style="height: 7px"></p>
 		<div id="divCount" style="font-weight: bold;" ></div>
 	</div>
@@ -304,9 +305,9 @@ body {
 	<div id="map_canvas" style="width: 900px; height: 700px; margin-left: 190px;"></div>
 	<p style="height: 20px;"></p>
 	<div>
-		<a href="new.php" style="font-weight:bold; text-decoration: underline;">Bulunduðum lokasyona yeni giriþ</a>
+		<a href="new.php" style="font-weight:bold; text-decoration: underline;">BulunduÃ°um lokasyona yeni giriÃ¾</a>
 		&nbsp;&nbsp;||&nbsp;&nbsp;
-		<a href="#" style="font-weight:bold; text-decoration: underline;">Seçeceðim lokasyona yeni giriþ</a>
+		<a href="#" style="font-weight:bold; text-decoration: underline;">SeÃ§eceÃ°im lokasyona yeni giriÃ¾</a>
 	</div>
 	<p style="height: 20px"></p>
 </body>
