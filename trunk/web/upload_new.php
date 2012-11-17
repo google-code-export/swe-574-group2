@@ -55,6 +55,7 @@ if ((($_FILES["file"]["type"] == "image/gif")
 			$extension = end($tmpArr2);
 			
 			$storagePath = $target . $fileName . "_" . time() . "." . $extension;
+			//$storagePath = "test";
 		
 			//move_uploaded_file($_FILES["file"]["tmp_name"], $storagePath);
 			

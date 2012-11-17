@@ -22,8 +22,7 @@ body {
 </style>
 <link rel="stylesheet" href="css/baseTheme/style.css" type="text/css"
 	media="all" />
-<link rel="stylesheet" href="css/basic.css" type="text/css"
-	media="all" />
+<link rel="stylesheet" href="css/basic.css" type="text/css" media="all" />
 
 <script type="text/javascript"
 	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCg0FRVSu5XHjjkG1NV1tev04MaGOTg5Jo&sensor=false"></script>
@@ -71,20 +70,22 @@ body {
 		});
 	}
 
+	var entryDetailUrl = "entry.php?id=";
+
 	// Set the Map variable
 	var map;
 	function initialize() {
 		var myOptions = {
 			zoom : 12,
 			mapTypeId : google.maps.MapTypeId.ROADMAP,
-			scrollwheel: false
+			scrollwheel: true
 		};
 
 		//Define Marker properties
-		var wheelChair = new google.maps.MarkerImage(
-				'images/markers/wheelchair.png',
+		var markerImg = new google.maps.MarkerImage(
+				'images/markers/marker2.png',
 				// This marker is 129 pixels wide by 42 pixels tall.
-				new google.maps.Size(129, 42),
+				new google.maps.Size(22, 32),
 				// The origin for this image is 0,0.
 				new google.maps.Point(0, 0),
 				// The anchor for this image is the base of the flagpole at 18,42.
@@ -104,27 +105,50 @@ body {
 			};
 		}
 
-		downloadUrl("markerInfo.php", function(data) {
-			var xml = data.responseXML;
-			var markers = xml.documentElement.getElementsByTagName("marker");
-			for ( var i = 0; i < markers.length; i++) {
-				var comment = markers[i].getAttribute("comment");
-				var entryId = markers[i].getAttribute("id");
-				var point = new google.maps.LatLng(parseFloat(markers[i]
-						.getAttribute("lat")), parseFloat(markers[i]
-						.getAttribute("lng")));
-				var html = "<b>KayÃ½t Id'si:</b> " + entryId
-						+ "<br/> ''" + comment + "''";
+		// downloadUrl("markerInfo.php", function(data) {
+//		var xml = data.responseXML;
+//		var markers = xml.documentElement.getElementsByTagName("marker");
+//		for ( var i = 0; i < markers.length; i++) {
+//			var comment = markers[i].getAttribute("comment");
+//			var entryId = markers[i].getAttribute("id");
+//			var point = new google.maps.LatLng(parseFloat(markers[i]
+//					.getAttribute("lat")), parseFloat(markers[i]
+//					.getAttribute("lng")));
+//			var html = "<img src='http://physicsworld.com/blog/Guetamala%20hole.jpg'>"
+//					+ "<br/><b>''" + comment + "''</b> <br/> <a style='text-decoration: underline' href='" 
+//					+ entryDetailUrl + entryId + "'>Detay...</a>";
+//			var marker = new google.maps.Marker({
+//				map : map,
+//				position : point,
+//				icon : markerImg
+//			});
+//			bindInfoWindow(marker, map, infoWindow, html);
+//		}
+//
+//		$('#divCount').html("Sistemde toplam " + markers.length + " adet ihlâl var.");
+//	});
+
+		var getAllEntriesUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries";
+		
+		$.getJSON(getAllEntriesUrl, function(data) {
+			$.each(data['data'], function(index, element) {
+				var comment = element.comment;
+				var entryId = element.id;
+				var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
+				var point = new google.maps.LatLng(parseFloat(element.coordX), parseFloat(element.coordY));
+				var html = "<img width='70%' height='70%' src='" + image + "'>"
+						+ "<br/><b>''" + comment + "''</b> <br/> <a style='text-decoration: underline' href='" 
+						+ entryDetailUrl + entryId + "'>Detay...</a>";
 				var marker = new google.maps.Marker({
 					map : map,
 					position : point,
-					icon : wheelChair
+					icon : markerImg
 				});
 				bindInfoWindow(marker, map, infoWindow, html);
-			}
+			 });
 
-			$('#divCount').html("Sistemde toplam " + markers.length + " adet ihlÃ¢l var.");
-		});
+			 $('#divCount').html("Sistemde toplam " + data['data'].length + " adet ihlâl var.");
+		 });
 
 // 		var marker = new google.maps.Marker({
 // 			position : map.getCenter(),
@@ -203,7 +227,7 @@ body {
 			{
 				selectChild.empty();
 				selectChild.append(
-			        $('<option></option>').val(0).html("TamamÃ½")
+			        $('<option></option>').val(0).html("Tamamý")
 			    );
 				$.getJSON(getCategoriesUrl + "/" + selectParent.find(":selected").val(), function(data) {
 					$.each(data['data'], function(index, element) {
@@ -229,8 +253,7 @@ body {
 				valToSearch = selectChild.val();
 			}
 			
-			if(selectParent.val() != "osman")
-			{
+			
 				var scriptUrl = getEntriesByCategoryUrl + valToSearch;
 			    $.ajax(
 			    {
@@ -247,12 +270,12 @@ body {
 			        {
 			        	var dataS = data['data'];
 		        
-			        	$('#divCount').html("Filtreleme sonucu " + dataS.length + " adet sonuÃ§ bulundu.");
+			        	$('#divCount').html("Filtreleme sonucu " + dataS.length + " adet ihlâl bulundu.");
 				        
 			        	var pinImg = new google.maps.MarkerImage(
-			    				'images/markers/marker2.png',
+			    				'images/markers/wheelchair.png',
 			    				// This marker is 129 pixels wide by 42 pixels tall.
-			    				new google.maps.Size(22, 32),
+			    				new google.maps.Size(129, 42),
 			    				// The origin for this image is 0,0.
 			    				new google.maps.Point(0, 0),
 			    				// The anchor for this image is the base of the flagpole at 18,42.
@@ -266,8 +289,10 @@ body {
 			    			var comment = element.comment;
 		    				var entryId = element.id;
 		    				var point = new google.maps.LatLng(parseFloat(element.coordX), parseFloat(element.coordY));
-		    				var html = "<b>KayÃ½t Id'si:</b> " + entryId
-		    						+ "<br/><b>Comment:</b> " + comment;
+		    				var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
+		    				var html = "<img width='70%' height='70%' src='" + image + "'>"
+		    						+ "<br/><b>''" + comment + "''</b> <br/> <a style='text-decoration: underline' href='" 
+		    						+ entryDetailUrl + entryId + "'>Detay...</a>";
 		    				var marker = new google.maps.Marker({
 		    					map : map,
 		    					position : point,
@@ -278,36 +303,41 @@ body {
 
 					    });	
 			        },
-			        error: function(data){ alert("Bir hata oluÃ¾tu, lÃ¼tfen tekrar deneyin.");}
+			        error: function(data){ alert("Bir hata oluþtu, lütfen tekrar deneyin.");}
 			    });
-			}
+			
 		});
 		
 	});
 </script>
 
 <body>
-	<div><?php include('master.php');?></div>
+	<div>
+		<?php include('master.php');?>
+	</div>
 	<div>
 		<h4>Kategori filtreleme:</h4>
 		<select id="ddlCategories">
-			<option value="0">TamamÃ½</option>
-		</select>
-		<select id="ddlChildren" style="display:none">
-			<!--<option value="0">TamamÃ½</option> -->
-		</select>
-		<input type="button" id="btnSearch" name="formSearch" value="Ara"/>
-		<span id="spinner" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="YÃ¼kleniyor"/></span>
+			<option value="0">Tamamý</option>
+		</select> <select id="ddlChildren" style="display: none">
+			<!--<option value="0">Tamamý</option> -->
+		</select> <input type="button" id="btnSearch" name="formSearch"
+			value="Ara" /> <span id="spinner" class="spinner"
+			style="display: none;"><img id="img-spinner" src="images/spinner.gif"
+			alt="YÃ¼kleniyor" /> </span>
 		<p style="height: 7px"></p>
-		<div id="divCount" style="font-weight: bold;" ></div>
+		<div id="divCount" style="font-weight: bold;"></div>
 	</div>
 	<p style="height: 20px"></p>
-	<div id="map_canvas" style="width: 900px; height: 700px; margin-left: 190px;"></div>
+	<div id="map_canvas"
+		style="width: 900px; height: 700px; margin-left: 190px;"></div>
 	<p style="height: 20px;"></p>
 	<div>
-		<a href="new.php" style="font-weight:bold; text-decoration: underline;">BulunduÃ°um lokasyona yeni giriÃ¾</a>
-		&nbsp;&nbsp;||&nbsp;&nbsp;
-		<a href="#" style="font-weight:bold; text-decoration: underline;">SeÃ§eceÃ°im lokasyona yeni giriÃ¾</a>
+		<a href="new.php"
+			style="font-weight: bold; text-decoration: underline;">Bulunduðum
+			lokasyona yeni giriþ</a> &nbsp;&nbsp;||&nbsp;&nbsp; <a href="new_manual.php"
+			style="font-weight: bold; text-decoration: underline;">Seçeceðim
+			lokasyona yeni giriþ</a>
 	</div>
 	<p style="height: 20px"></p>
 </body>
