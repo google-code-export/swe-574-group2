@@ -134,11 +134,23 @@ body {
 			$.each(data['data'], function(index, element) {
 				var comment = element.comment;
 				var entryId = element.id;
+				var upVote = element.upVoteCount;
+				var downVote = element.downVoteCount;
 				var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
 				var point = new google.maps.LatLng(parseFloat(element.coordX), parseFloat(element.coordY));
 				var html = "<img width='70%' height='70%' src='" + image + "'>"
-						+ "<br/><b>''" + comment + "''</b> <br/> <a style='text-decoration: underline' href='" 
+						+ "<p></p><b>''" + comment + "''</b> <p></p>"
+						+ upVote + " olumlu oy &nbsp;&nbsp;" 
+						+ "<a rel='" + entryId + "' id='lnkUpVote' href='javascript:voteUp(" + entryId + ");'"
+						+ "><img width='25' height='25'" 
+						+ "src='images/upArrow.png' title='Olumlu oy ver'></a>&nbsp;&nbsp;&nbsp;"
+						+ "<a rel='" + entryId + "' id='lnkDownVote' href='javascript:voteDown(" + entryId + ");'>"
+						+ "<img width='25' height='25'"
+						+ "src='images/downArrow.png' title='Olumsuz oy ver'></a>"
+						+ "&nbsp;&nbsp;" + downVote + " olumsuz oy <p></p>" 
+						+ "<a style='text-decoration: underline' href='" 
 						+ entryDetailUrl + entryId + "'>Detay...</a>";
+						
 				var marker = new google.maps.Marker({
 					map : map,
 					position : point,
@@ -164,6 +176,30 @@ body {
 
 	// Initializes the Google Map
 	google.maps.event.addDomListener(window, 'load', initialize);
+
+	var voteUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries/thumbs";
+
+	function voteUp(entryId) {
+		$.ajax({
+		    url: voteUrl,
+		    type: 'post',
+		    data: {entryId: entryId, up: true}
+		}).done(function(){
+		    var upp = $('#lblUpVote').val();
+		    $('#lblUpVote').val(parseInt(upp) + 1);
+		});
+	};
+
+	function voteDown(entryId) {
+		$.ajax({
+		    url: voteUrl,
+		    type: 'post',
+		    data: {entryId: entryId, up: false}
+		}).done(function(){
+		    var upp = $('#lblUpVote').val();
+		    $('#lblUpVote').val(parseInt(upp) + 1);
+		});
+	};
 </script>
 
 <script type="text/javascript">
@@ -307,6 +343,45 @@ body {
 			    });
 			
 		});
+
+		var voteUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries/thumbs";
+		
+		$("#lnkUpVote").click(function() {
+			alert($("#lnkUpVote").attr('rel'));
+			$.ajax({
+			    url: voteUrl,
+			    type: 'post',
+			    data: {entryId: $("#lnkUpVote").attr('rel'), up: true}
+			}).done(function(){
+			    alert($("#lnkUpVote").attr('rel'));
+			    var upp = $('#lblUpVote').val();
+			    $('#lblUpVote').val(parseInt(upp) + 1);
+			});
+		});
+		
+		$("#lnkDownVote").click(function() {
+			if ($('#lnkDownVote').hasClass('disabled')) return;
+			$('#lblVote').html('Down vote verildi');
+			$('#msgVote').hide().fadeIn("slow", "linear");
+			var upp = $('#hdnDownVote').val();
+		    $('#lblDownVote').html(parseInt(upp) - 1);
+		    $('#lnkDownVote').addClass('disabled');    
+		});
+
+		function voteUp(entryId) {
+			alert(entryId);
+			$.ajax({
+			    url: voteUrl,
+			    type: 'post',
+			    data: {entryId: $("#lnkUpVote").attr('rel'), up: true}
+			}).done(function(){
+			    alert($("#lnkUpVote").attr('rel'));
+			    var upp = $('#lblUpVote').val();
+			    $('#lblUpVote').val(parseInt(upp) + 1);
+			});
+		};
+
+		
 		
 	});
 </script>

@@ -19,6 +19,8 @@ body {
 #map_canvas {
 	height: 100%
 }
+
+a.disabled { color:gray; }
 </style>
 <link rel="stylesheet" href="css/baseTheme/style.css" type="text/css"
 	media="all" />
@@ -88,7 +90,7 @@ body {
 	geocoder = new google.maps.Geocoder();
 	function initialize() {
 		var myOptions = {
-			zoom : 12,
+			zoom : 18,
 			mapTypeId : google.maps.MapTypeId.ROADMAP,
 			scrollwheel: false
 		};
@@ -140,6 +142,8 @@ body {
 					$('#lblUpVote').html(upVote);
 					$('#lblDownVote').html(downVote);
 					$('#lblUser').html(user);
+					$('#hdnUpVote').val(upVote);
+					$('#hdnDownVote').val(downVote);
 					$('#imgEntry').attr('src', image);
 
 					// Set the center of the map
@@ -161,6 +165,35 @@ body {
 
 	// Initializes the Google Map
 	google.maps.event.addDomListener(window, 'load', initialize);
+
+	var voteUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries/thumbs";
+	
+	
+	$(document).ready(function() {
+
+		var entryId = getParameterByName('id');
+		
+		$("#lnkUpVote").click(function() {
+			$.ajax({
+			    url: voteUrl,
+			    type: 'post',
+			    data: {entryId:entryId, up:true}
+			}).done(function(){
+			    alert("up vote verildi!");
+			    var upp = $('#lblUpVote').val();
+			    $('#lblUpVote').val(parseInt(upp) + 1);
+			});
+		});
+		
+		$("#lnkDownVote").click(function() {
+			if ($('#lnkDownVote').hasClass('disabled')) return;
+			$('#lblVote').html('Down vote verildi');
+			$('#msgVote').hide().fadeIn("slow", "linear");
+			var upp = $('#hdnDownVote').val();
+		    $('#lblDownVote').html(parseInt(upp) - 1);
+		    $('#lnkDownVote').addClass('disabled');    
+		});
+	});
 </script>
 
 <body>
@@ -172,6 +205,8 @@ body {
 	<hr width="1100px;">
 	<p style="height: 20px;"></p>
 	<div style="text-align: left; margin-left: 30px; float: left;">
+		<input type="hidden" id="hdnUpVote" value="0" name="hdnUpVote" />
+		<input type="hidden" id="hdnDownVote" value="0" name="hdnUpVote" />
 		<img border="1" src="" id="imgEntry">
 		<p style="height: 10px;"></p>
 		<span style="font-weight: bold;">Adres:</span>
@@ -183,16 +218,20 @@ body {
 		<span style="font-weight: bold;">Kategori:</span>
 		<span id="lblCategory"></span>
 		<p style="height: 10px;"></p>
-		<span style="font-weight: bold;">Olumlu Oy Sayýsý:</span>
+		<span style="font-weight: bold;">Olumlu Oy:</span>
 		<span id="lblUpVote"></span>
 		<p style="height: 10px;"></p>
-		<span style="font-weight: bold;">Olumsuz Oy Sayýsý:</span>
+		<span style="font-weight: bold;">Olumsuz Oy:</span>
 		<span id="lblDownVote"></span>
 		<p style="height: 10px;"></p>
 		<span style="font-weight: bold;">Giriþi yapan:</span>
 		<span id="lblUser"></span>
-		<p style="height: 20px;"></p>
-		<div id="locationinfo"></div>
+		<p style="height: 10px;"></p>
+		<a id="lnkUpVote" href="javascript:"><img width="50" height="50" 
+			src="images/upArrow.png" title="Olumlu oy ver"></a>&nbsp;&nbsp;&nbsp;
+		<a id="lnkDownVote" href="javascript:"><img width="50" height="50" 
+			src="images/downArrow.png" title="Olumsuz oy ver"></a>&nbsp;&nbsp;&nbsp;
+		<p id="msgVote"><span id="lblVote"></span></p>
 		<p style="height: 20px;"></p>
 		<a href="javascript: window.history.go(-1)" style="font-weight:bold; text-decoration: underline;"><--Geri</a>
 	</div>
