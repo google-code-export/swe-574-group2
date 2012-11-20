@@ -10,11 +10,11 @@
 3. Category filtering will be implemented for mobile app.
 
 4. The following data will be shown on the entry detail screen that will be opened when the pinpoint is clicked:
-   - Comment
-   - Category, also child category if available
-   - Violation type
-   - Image
-   - Vote counts; vote up - vote down buttons
+   * Comment
+   * Category, also child category if available
+   * Violation type
+   * Image
+   * Vote counts; vote up - vote down buttons
 
 5. Image resizing will be made at service - side.
 
