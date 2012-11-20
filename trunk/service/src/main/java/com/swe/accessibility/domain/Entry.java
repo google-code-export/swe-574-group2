@@ -31,7 +31,7 @@ public class Entry implements Serializable {
 	private int id;
 	
 	@Column(name="ImageMeta")
-	private byte[] imageMeta;
+	private String imageMeta;
 	
 	@Column(name="CoordX")
 	private BigDecimal coordX;
@@ -48,7 +48,7 @@ public class Entry implements Serializable {
 	@Column(name="DownVoteCount")
 	private int downVoteCount;
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="submittedBy")
 	private User user;
 	
@@ -75,11 +75,11 @@ public class Entry implements Serializable {
 		this.reasons = reasons;
 	}
 
-	public byte[] getImageMeta() {
+	public String getImageMeta() {
 		return imageMeta;
 	}
 
-	public void setImageMeta(byte[] imageMeta) {
+	public void setImageMeta(String imageMeta) {
 		this.imageMeta = imageMeta;
 	}
 
