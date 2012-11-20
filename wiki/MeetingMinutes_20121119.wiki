@@ -7,7 +7,7 @@
 
 2. Different users should be able to add new comments to an existing entry and to see the comments of other users. So, a new intermediary db table (EntryComment) will be created.
 
-3. Wording of the web site should be corrected (i.e. not "olumlu oy" and "olumsuz oy", a more appropriate word should be used).
+3. Wording of the web site should be corrected (i.e. not "olumlu oy" and "olumsuz oy" but a more appropriate word should be used).
 
 4. In the initial opening of the home page, all of the entries will be shown on the map. When clicked on the markers for these entries, category and child category data should also be displayed in the marker info window.
 
