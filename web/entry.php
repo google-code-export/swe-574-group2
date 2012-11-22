@@ -177,7 +177,17 @@ a.disabled { color:gray; }
 			$.ajax({
 			    url: voteUrl,
 			    type: 'post',
-			    data: {entryId:entryId, up:true}
+			    //headers: {'AuthToken':'testuser:a74ff09c24dbf421a3e1d6be58c48f44867a85d4'},
+			    data: JSON.stringify({entryId:entryId, up:true}),
+			    dataType: 'json',
+			    contentType: "application/json;charset=utf-8",
+			    crossDomain: true,
+			    success: function(response) {
+			         alert("success");
+			     },
+			     error: function(xhr, errorThrown) {
+			         alert('Error!  Status = ' + xhr.status + " Message = " + errorThrown);
+			     }
 			}).done(function(){
 			    alert("up vote verildi!");
 			    var upp = $('#lblUpVote').val();

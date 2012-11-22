@@ -60,6 +60,9 @@ body {
 		 });
 		
 		selectParent.change(function() {
+
+			$('#category').val(selectParent.find(":selected").val());
+			
 			if(selectParent.find(":selected").val() == "0")
 			{
 				selectChild.hide();
@@ -89,6 +92,15 @@ body {
 		});
 		
 		selectChild.change(function() {
+
+			if(selectChild.find(":selected").val() != 0)
+			{
+				$('#category').val(selectChild.find(":selected").val());
+			}
+			else
+			{
+				$('#category').val(selectParent.find(":selected").val());
+			}
 
 		});
 
@@ -145,8 +157,8 @@ function displayPosition(pos) {
     thediv.innerHTML = '<p><strong>Koordinatlarýnýz: </strong>' + mylong + ' , ' + mylat + '</p>'
     	+ '<p><strong>Hassasiyet: </strong>' + accuracy + ' metre</p>';
 
-    $('#hdnLng').val(mylong);
-    $('#hdnLat').val(mylat);
+    $('#coordX').val(mylong);
+    $('#coordY').val(mylat);
 
 //Load Google Map
 var latlng = new google.maps.LatLng(mylat, mylong);
@@ -174,9 +186,10 @@ function errorFunction(pos) {
 
 </head>
 <body>
-<form action="http://testpalette.com:8080/RestAccessibilty/service/entries/add" method="post" enctype="multipart/form-data">
-	<input type="hidden" id="hdnLat" value="0" name="hdnLat" />
-	<input type="hidden" id="hdnLng" value="0" name="hdnLng" />
+<form action="http://swe.cmpe.boun.edu.tr:8180/rest/service/entries/add" method="post" enctype="multipart/form-data">
+	<input type="hidden" id="coordX" value="0" name="coordX" />
+	<input type="hidden" id="coordY" value="0" name="coordY" />
+	<input type="hidden" id="category" value="0" name="category" />
 	<div><?php include('master.php');?></div>
 	<p style="height: 20px;"></p>
 	<h2>Yeni Kayýt Giriþi</h2>
@@ -192,8 +205,8 @@ function errorFunction(pos) {
 		</select>
 		<p style="height: 10px;"></p>
 		<span style="font-weight: bold;">Açýklama:</span>
-		<textarea class="txtDescription" name="txtDescription"
-			id="txtDescription" cols="40" rows="4" style="margin-bottom: -70px;"></textarea>
+		<textarea class="comment" name="comment"
+			id="comment" cols="40" rows="4" style="margin-bottom: -70px;"></textarea>
 		<p style="height: 85px;"></p>
 		<span style="font-weight: bold;">Fotoðraf:</span>
 		<p></p>
