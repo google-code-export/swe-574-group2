@@ -1,5 +1,6 @@
 #labels RestAPI,Featured,WebService
 ==REST API Documentation==
+
 ===Rev 3.0===
 
 ===Changes since the last revision (2.0) are indicated _in italic_.===
@@ -46,6 +47,7 @@ Multipart form post
 ----------------------------------
 
 7. _Login_
+
 url pattern: {host}/service/login/sigin
 Send json body {username: ,password:}
 Result: {status: error: username: }
