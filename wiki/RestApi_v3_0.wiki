@@ -11,17 +11,21 @@
 
 url pattern: {host}/service/categories
 
+
 2. Get sub categories
 
 url pattern: {host}/service/categories/{mainCategoryId}
+
 
 3. Get entries
 
 url pattern: {host}/service/entries 
 
+
 4. Get entry by location
 
 url pattern: {host}/service/entries?x={xCoord}&y={yCoord}
+
 
 5. _Get entry by id_
 
