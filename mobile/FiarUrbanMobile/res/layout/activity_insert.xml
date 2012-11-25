@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <EditText
+        android:id="@+id/txtComment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="63dp"
+        android:ems="10"
+        android:hint="Açıklama" />
+
+    <Button
+        android:id="@+id/btnInsert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/txtComment"
+        android:layout_marginBottom="42dp"
+        android:text="OK" />
+
+    <Button
+        android:id="@+id/btnSelectPhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnInsert"
+        android:layout_alignBottom="@+id/btnInsert"
+        android:layout_alignLeft="@+id/txtComment"
+        android:text="İmajı Seç" />
+
+    <ImageView
+        android:id="@+id/imgPhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnInsert"
+        android:layout_alignLeft="@+id/txtComment"
+        android:layout_alignRight="@+id/txtComment"
+        android:layout_below="@+id/txtComment"
+        android:layout_marginTop="17dp" />
+
+</RelativeLayout>
