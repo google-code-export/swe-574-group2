@@ -2,7 +2,7 @@
 ==REST API Documentation==
 ===Rev 3.0===
 
-===Changes since the last revision (2.0) are indicated in italic.===
+===Changes since the last revision (2.0) are indicated _in italic_.===
 
 ===Main host: http://swe.cmpe.boun.edu.tr:8180/rest===
 
