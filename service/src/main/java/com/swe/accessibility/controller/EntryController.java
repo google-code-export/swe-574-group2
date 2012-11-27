@@ -28,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,6 +41,7 @@ import com.swe.accessibility.domain.InsertEntryResult;
 import com.swe.accessibility.domain.SubReason;
 import com.swe.accessibility.domain.User;
 import com.swe.accessibility.domain.proxy.EntryList;
+import com.swe.accessibility.domain.proxy.EntryProxy;
 import com.swe.accessibility.domain.proxy.ThumbsObject;
 import com.swe.accessibility.domain.proxy.UpdateResult;
 import com.swe.accessibilty.service.EntryService;
@@ -196,6 +198,64 @@ public class EntryController {
 
 	}
 	
+	
+	@RequestMapping(value = "/add/web", method = RequestMethod.POST, headers={"content-type=multipart/form-data"},produces={"application/json"})
+	public  String  insertEntryWeb(MultipartHttpServletRequest request,
+			HttpSession session, Principal principal) {
+		
+		String page = null;
+		
+		int categoryId = Integer.parseInt(request.getParameter("category"));
+		DecimalFormat format = new DecimalFormat();
+		format.setParseBigDecimal(true);
+		BigDecimal coordX;
+		BigDecimal coordY;
+		
+		
+		String username = null;
+		if (principal == null)
+		
+			username = "anonymousUser";
+		else
+			username = principal.getName();
+		try {
+			coordX = (BigDecimal) format.parse(request.getParameter("coordX"));
+			coordY = (BigDecimal) format.parse(request.getParameter("coordY"));
+			
+			User currentUser = userService.getUserByName(username);
+			String comment = request.getParameter("comment");
+			Entry entry = new Entry();
+			Set<SubReason> reasons = new  HashSet<SubReason>();
+			
+			SubReason reason = reasonService.getSubReason(categoryId);
+			
+			reasons.add(reason);
+			
+			String uri = saveFile(request);
+			entry.setComment(comment);
+			entry.setCoordX(coordX);
+			entry.setCoordY(coordY);
+			entry.setReasons(reasons);
+			entry.setImageMeta(uri);
+			entry.setUser(currentUser);
+			
+			
+			entryService.addEntry(entry);
+			
+			page = "success.html";
+			
+			
+		} catch (Exception e) {
+			
+			page = "error.html";
+			
+		} 
+		
+		
+		return page;
+
+	}
+	
 //	@RequestMapping(method={RequestMethod.GET},produces={"application/json"})
 //	public  ResponseEntity<EntryList> getEntries(){
 //		
@@ -240,7 +300,7 @@ public class EntryController {
 	}
 
 	@RequestMapping(method={RequestMethod.GET},produces={"application/json"})
-	public  ResponseEntity<EntryList> getEntry(@RequestParam(required=false) String x, @RequestParam(required=false) String y,@RequestParam(required=false) String categoryId,@RequestParam(required=false) String typeId){
+	public  ResponseEntity<EntryList> getEntries(@RequestParam(required=false) String x, @RequestParam(required=false) String y,@RequestParam(required=false) String categoryId,@RequestParam(required=false) String typeId){
 		
 		
 		HttpHeaders responseHeaders = makeCORS();
@@ -272,6 +332,20 @@ public class EntryController {
 		
 		
 		ResponseEntity<EntryList> entity = new ResponseEntity<EntryList>(result,responseHeaders,HttpStatus.OK );
+		return entity;
+	}
+	
+	@RequestMapping(value="/{id}",method={RequestMethod.GET},produces={"application/json"})
+	public  ResponseEntity<EntryProxy> getEntry(@PathVariable int id){
+		
+		
+		HttpHeaders responseHeaders = makeCORS();
+		
+		EntryProxy result = null;
+		
+		result = entryService.getEntryById(id);
+		
+		ResponseEntity<EntryProxy> entity = new ResponseEntity<EntryProxy>(result,responseHeaders,HttpStatus.OK );
 		return entity;
 	}
 	
