@@ -204,33 +204,34 @@ body {
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		//testuser - swe574TEST!
+		
+
+		$("#submit").click(function() {
+			$('#frmlogin').submit(function() {
+				alert($(this).serialize());
+				$.ajax({
+					type: 'POST',
+		            url: 'http://swe.cmpe.boun.edu.tr:8180/rest/service/login/sigin',
+		          	//data: "{'username': 'testuser', 'password': 'swe574TEST!'}",
+		          	//data: "{}",
+			   		//contentType: "application/json; charset=utf-8",
+		    		//dataType: 'json',
+		          	//username: 'testuser',
+		          	//password: 'swe574TEST!',
+		            success: function(msg) {
+		                  alert(msg.loggedIn);
+		            },
+		            error:function(e){
+			            alert(e.message);
+		                //alert(e.message);
+		            }
+		        });
+				  return false;
+				});
+			});
 		
 				//jQuery.support.cors = true;
-
-// 				$.ajax({
-// 					type: 'GET',
-// 		            //url: 'http://testpalette.com:8080/RestAccessibilty/service/categories',
-// 		            url: 'http://172.20.2.5:8080/RestAccessibilty/service/categories',
-// 		          	//jsonpCallback: 'data',
-// 		          	data: "{}",
-// 		    		contentType: "application/json; charset=utf-8",
-// 		    		dataType: 'json',
-// 		          	username: 'testuser',
-// 		          	password: 'swe574TEST!',
-// 		//           	dataFilter: function (data, dataType) {
-// 		//                 if (dataType == "json") {
-// 		//                   alert('osman');
-// 		//                 } else {
-// 		//                   return data;
-// 		//                 }
-// 		//             },
-// 		            success: function(msg) {
-// 		                  alert(msg);
-// 		            },
-// 		            error:function(){
-// 		                alert("hata!");
-// 		            }
-// 		        });
 
     //var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
 		//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
@@ -415,6 +416,14 @@ body {
 			lokasyona yeni giriþ</a>
 	</div>
 	<p style="height: 20px"></p>
+	<form id="frmlogin" action="http://swe.cmpe.boun.edu.tr:8180/rest/service/login/sigin" method="post">
+		<table>
+	        <tr><td>User:</td><td><input type='text' name='username' value=''></td></tr>
+	        <tr><td>Password:</td><td><input type='password' name='password'></td></tr>
+	        <tr><td colspan='2'><input name="submit" type="submit" id ="submit"></td></tr>
+	        <tr><td colspan='2'><input name="reset" type="reset"></td></tr>
+	      </table>
+	</form>
 </body>
 
 
