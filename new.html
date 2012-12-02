@@ -32,15 +32,17 @@ body {
 <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
 
 <script type="text/javascript" src="js/ajaxupload-min.js"></script>
-
+<script type="text/javascript" src="js/common.js"></script>
 <!-- <script type="text/javascript" src="js/jquery.jsonp.js"></script> -->
 <script type="text/javascript">
 	$(document).ready(function() {
+		
+		loadContent("#header","master.html");
 
-		//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
+		var getCategoriesUrl = './service/categories';
 		//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
-		var getCategoriesUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/categories';
-		var getEntriesByCategoryUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/entries?categoryId=';
+		//var getCategoriesUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/categories';
+		var getEntriesByCategoryUrl = './service/entries?categoryId=';
 
 		var selectParent = $('#ddlCategories');
 		var selectChild = $('#ddlChildren');
@@ -145,7 +147,7 @@ if (navigator.geolocation) {
     // Locate position
     navigator.geolocation.getCurrentPosition(displayPosition, errorFunction);
 } else {
-    alert('Bulunduðunuz yeri otomatik olarak algýlayabilmemiz için tarayýcýnýzýn GeoLocation özelliðine (HTML5) izin vermesi gerekmektedir.');
+    alert('Bulunduðunuz yeri otomatik olarak algýlayabilmemiz için tarayýcýnýzýn GeoLocation iletiþimine (HTML5) izin vermesi gerekmektedir.');
 }
 
 // Success callback function
@@ -157,8 +159,9 @@ function displayPosition(pos) {
     thediv.innerHTML = '<p><strong>Koordinatlarýnýz: </strong>' + mylong + ' , ' + mylat + '</p>'
     	+ '<p><strong>Hassasiyet: </strong>' + accuracy + ' metre</p>';
 
-    $('#coordX').val(mylong);
-    $('#coordY').val(mylat);
+    $('#coordX').val(mylat);
+    $('#coordY').val(mylong);
+   
 
 //Load Google Map
 var latlng = new google.maps.LatLng(mylat, mylong);
@@ -180,19 +183,19 @@ var marker = new google.maps.Marker({
 
 // Error callback function
 function errorFunction(pos) {
-    alert('Yerinizi belirlerken bir hata oluþtu. Lütfen sayfayý yenileyin.');
+    alert('Yerinizi belirlerken bir hata oluþtu. Lütfen sayfanýzý yenileyin.');
 }
 </script>
 
 </head>
 <body>
-<form action="http://swe.cmpe.boun.edu.tr:8180/rest/service/entries/add" method="post" enctype="multipart/form-data">
+<form action="./service/entries/add/web" method="post" enctype="multipart/form-data">
 	<input type="hidden" id="coordX" value="0" name="coordX" />
 	<input type="hidden" id="coordY" value="0" name="coordY" />
 	<input type="hidden" id="category" value="0" name="category" />
-	<div><?php include('master.php');?></div>
+	<div id="header"></div>
 	<p style="height: 20px;"></p>
-	<h2>Yeni Kayýt Giriþi</h2>
+	<h2>Yeni Kayï¿½t Giriï¿½i</h2>
 	<hr width="1100px;">
 	<p style="height: 20px;"></p>
 	<div style="text-align: left; margin-left: 30px; float: left;">
@@ -201,14 +204,14 @@ function errorFunction(pos) {
 			<option value="0">Lütfen seçiniz...</option>
 		</select>
 		<select id="ddlChildren" name="ddlChildren" style="display: none">
-			<!--<option value="0">Tamamý</option> -->
+			<!--<option value="0">Tamamï¿½</option> -->
 		</select>
 		<p style="height: 10px;"></p>
 		<span style="font-weight: bold;">Açýklama:</span>
 		<textarea class="comment" name="comment"
 			id="comment" cols="40" rows="4" style="margin-bottom: -70px;"></textarea>
 		<p style="height: 85px;"></p>
-		<span style="font-weight: bold;">Fotoðraf:</span>
+		<span style="font-weight: bold;">Fotoï¿½raf:</span>
 		<p></p>
 		<!-- <div class="uploader"></div> -->
 		<input type="file" name="file" id="file" /> 
