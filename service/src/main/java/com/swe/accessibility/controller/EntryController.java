@@ -13,8 +13,10 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,6 +24,7 @@ import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpHeaders;
@@ -37,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.swe.accessibility.domain.Entry;
+import com.swe.accessibility.domain.EntryReason;
 import com.swe.accessibility.domain.InsertEntryResult;
 import com.swe.accessibility.domain.SubReason;
 import com.swe.accessibility.domain.User;
@@ -44,6 +48,7 @@ import com.swe.accessibility.domain.proxy.EntryList;
 import com.swe.accessibility.domain.proxy.EntryProxy;
 import com.swe.accessibility.domain.proxy.ThumbsObject;
 import com.swe.accessibility.domain.proxy.UpdateResult;
+import com.swe.accessibilty.service.CommentService;
 import com.swe.accessibilty.service.EntryService;
 import com.swe.accessibilty.service.ReasonService;
 import com.swe.accessibilty.service.UserService;
@@ -65,70 +70,10 @@ public class EntryController {
 	private UserService userService;
 	
 	
-	
-//	@RequestMapping(value = "/add", method = RequestMethod.POST, headers={"content-type=multipart/form-data","Access-Control-Allow-Origin:*"},produces={"application/json"})
-//	public @ResponseBody InsertEntryResult  insertEntry(MultipartHttpServletRequest request,
-//			HttpSession session, Principal principal) {
-//		
-//		InsertEntryResult entryResult = new InsertEntryResult();
-//		int categoryId = Integer.parseInt(request.getParameter("category"));
-//		DecimalFormat format = new DecimalFormat();
-//		format.setParseBigDecimal(true);
-//		BigDecimal coordX;
-//		BigDecimal coordY;
-//		
-//		MultipartFile file = request.getFile("file");
-//		String username = principal.getName();
-//		try {
-//			coordX = (BigDecimal) format.parse(request.getParameter("coordX"));
-//			coordY = (BigDecimal) format.parse(request.getParameter("coordX"));
-//			
-//			User currentUser = userService.getUserByName(username);
-//			String comment = request.getParameter("comment");
-//			Entry entry = new Entry();
-//			Set<SubReason> reasons = new  HashSet<SubReason>();
-//			
-//			SubReason reason = reasonService.getSubReason(categoryId);
-//			
-//			reasons.add(reason);
-//			
-//			entry.setComment(comment);
-//			entry.setCoordX(coordX);
-//			entry.setCoordY(coordY);
-//			entry.setReasons(reasons);
-//			entry.setImageMeta(file.getBytes());
-//			entry.setUser(currentUser);
-//			
-//			
-//			int entryId = entryService.addEntry(entry);
-//			
-//			entryResult.setEntryId(entryId);
-//			entryResult.setResultId(1);
-//			entryResult.setResultStatus("Success");
-//			
-//			
-//		} catch (ParseException e) {
-//			
-//			entryResult.setResultStatus("Parse error for coordinate values");
-//			entryResult.setResultId(2);
-//			
-//		} catch (IOException e) {
-//			
-//			entryResult.setResultStatus("Not a valid file");
-//			entryResult.setResultId(3);
-//		}
-//		
-//		
-//		
-//		
-//		
-//		
-//		return entryResult;
-//
-//	}
+	@Resource(name="commentService")
+	private CommentService commentService;
 	
 	
-
 	@RequestMapping(value = "/add", method = RequestMethod.POST, headers={"content-type=multipart/form-data"},produces={"application/json"})
 	public  ResponseEntity<InsertEntryResult>  insertEntry(MultipartHttpServletRequest request,
 			HttpSession session, Principal principal) {
@@ -152,22 +97,30 @@ public class EntryController {
 			coordY = (BigDecimal) format.parse(request.getParameter("coordY"));
 			
 			User currentUser = userService.getUserByName(username);
+		
 			String comment = request.getParameter("comment");
 			Entry entry = new Entry();
-			Set<SubReason> reasons = new  HashSet<SubReason>();
+			
+		
 			
 			SubReason reason = reasonService.getSubReason(categoryId);
 			
-			reasons.add(reason);
+			
+			
 			
 			String uri = saveFile(request);
 			entry.setComment(comment);
 			entry.setCoordX(coordX);
 			entry.setCoordY(coordY);
-			entry.setReasons(reasons);
 			entry.setImageMeta(uri);
 			entry.setUser(currentUser);
 			
+			
+			EntryReason entryReason = new EntryReason();
+			entryReason.setReason(reason);
+			entryReason.setEntry(entry);
+			
+			entry.getEntryReasons().add(entryReason);
 			
 			int entryId = entryService.addEntry(entry);
 			
@@ -200,7 +153,7 @@ public class EntryController {
 	
 	
 	@RequestMapping(value = "/add/web", method = RequestMethod.POST, headers={"content-type=multipart/form-data"},produces={"application/json"})
-	public  String  insertEntryWeb(MultipartHttpServletRequest request,
+	public  void  insertEntryWeb(MultipartHttpServletRequest request, HttpServletResponse response,
 			HttpSession session, Principal principal) {
 		
 		String page = null;
@@ -225,51 +178,50 @@ public class EntryController {
 			User currentUser = userService.getUserByName(username);
 			String comment = request.getParameter("comment");
 			Entry entry = new Entry();
-			Set<SubReason> reasons = new  HashSet<SubReason>();
+			
 			
 			SubReason reason = reasonService.getSubReason(categoryId);
-			
-			reasons.add(reason);
+		
+		
 			
 			String uri = saveFile(request);
 			entry.setComment(comment);
 			entry.setCoordX(coordX);
 			entry.setCoordY(coordY);
-			entry.setReasons(reasons);
 			entry.setImageMeta(uri);
 			entry.setUser(currentUser);
 			
 			
+			EntryReason entryReason = new EntryReason();
+			entryReason.setReason(reason);
+			entryReason.setEntry(entry);
+			
+			entry.getEntryReasons().add(entryReason);
+			
 			entryService.addEntry(entry);
 			
-			page = "success.html";
+			page = "success";
 			
 			
 		} catch (Exception e) {
 			
-			page = "error.html";
+			e.printStackTrace();
+			page = "error";
 			
 		} 
 		
-		
-		return page;
+		String redirect = request.getContextPath() + "/" + page + ".html";
+		try {
+			response.sendRedirect(redirect);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 
 	}
 	
-//	@RequestMapping(method={RequestMethod.GET},produces={"application/json"})
-//	public  ResponseEntity<EntryList> getEntries(){
-//		
-//		
-//		EntryList result = new EntryList();
-//		
-//		result.setData(entryService.loadEntries());
-//		
-//		
-//		
-//		HttpHeaders responseHeaders = makeCORS();
-//		ResponseEntity<EntryList> entity = new ResponseEntity<EntryList>(result,responseHeaders,HttpStatus.OK );
-//		return entity;
-//	}
+
 	
 	private String saveFile(MultipartHttpServletRequest request) throws IOException {
 		
@@ -287,8 +239,8 @@ public class EntryController {
 		 }
 		BufferedImage image = ImageIO.read(iis);
 		
-		int scaledWidth = image.getHeight() / 4;
-		int scaledHeight = image.getWidth() / 4;
+		int scaledWidth = image.getHeight() / 2;
+		int scaledHeight = image.getWidth() / 2;
 		
 		BufferedImage resizedImage = createResizedCopy(image, scaledWidth, scaledHeight, true);
 		String fileURL = UUID.randomUUID().toString() + "." + format;
@@ -336,16 +288,20 @@ public class EntryController {
 	}
 	
 	@RequestMapping(value="/{id}",method={RequestMethod.GET},produces={"application/json"})
-	public  ResponseEntity<EntryProxy> getEntry(@PathVariable int id){
+	public  ResponseEntity<EntryList> getEntry(@PathVariable int id){
 		
 		
 		HttpHeaders responseHeaders = makeCORS();
 		
-		EntryProxy result = null;
+		EntryList result = new EntryList();
+		EntryProxy obj = entryService.getEntryById(id);
+		obj.setComments(commentService.listComment(id));
+		List<EntryProxy> data = new ArrayList<EntryProxy>();
+		data.add(obj);
 		
-		result = entryService.getEntryById(id);
-		
-		ResponseEntity<EntryProxy> entity = new ResponseEntity<EntryProxy>(result,responseHeaders,HttpStatus.OK );
+		result.setData(data);
+		commentService.listComment(id);
+		ResponseEntity<EntryList> entity = new ResponseEntity<EntryList>(result,responseHeaders,HttpStatus.OK );
 		return entity;
 	}
 	
@@ -430,25 +386,7 @@ public class EntryController {
 		return result;
 	}
 
-//	@RequestMapping(value="/get",method={RequestMethod.GET},produces={"application/json"},headers={"Access-Control-Allow-Origin:*"})
-//	public @ResponseBody EntryList getEntry(@RequestParam String x, @RequestParam String y){
-//		
-//		BigDecimal coordX;
-//		BigDecimal coordY;
-//		DecimalFormat format = new DecimalFormat();
-//		format.setParseBigDecimal(true);
-//		EntryList result = new EntryList();
-//		try{
-//			coordX = (BigDecimal) format.parse(x);
-//			coordY = (BigDecimal) format.parse(y);
-//			result.setData(entryService.getEntry(coordX, coordY));
-//		}catch(ParseException e){
-//			
-//		}
-//		
-//		return result;
-//	}
-	
+
 	
 	private static HttpHeaders makeCORS(){
 		
