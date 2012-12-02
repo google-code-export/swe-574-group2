@@ -29,4 +29,8 @@ public interface EntryService {
 	public abstract List<EntryProxy> getEntriesByCategory(String categoryId);
 
 	public abstract void updateEntryVote(int id, boolean up);
+
+	public abstract EntryProxy getEntryById(int id);
+
+	Entry getRawEntry(int id);
 }

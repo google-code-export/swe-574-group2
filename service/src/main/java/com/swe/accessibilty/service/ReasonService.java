@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.swe.accessibility.domain.Reason;
 import com.swe.accessibility.domain.SubReason;
 import com.swe.accessibility.domain.proxy.EntryProxy;
+import com.swe.accessibility.domain.proxy.SubReasonProxy;
 
 public interface ReasonService {
 
@@ -14,7 +15,7 @@ public interface ReasonService {
 	public abstract List<Reason> getReasons();
 
 	@Transactional
-	public abstract List<SubReason> getSubReasons(int id);
+	public abstract List<SubReasonProxy> getSubReasons(int id);
 
 	@Transactional
 	public abstract SubReason getSubReason(int id);

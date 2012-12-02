@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.swe.accessibility.domain.ReasonList;
-import com.swe.accessibility.domain.SubReasonList;
+import com.swe.accessibility.domain.proxy.SubReasonList;
 import com.swe.accessibility.domain.proxy.TypeList;
 import com.swe.accessibilty.service.ReasonService;
 import com.swe.accessibilty.service.TypeService;
