@@ -1,21 +1,31 @@
 package com.swe.fairurban.UI;
 
+import java.lang.reflect.Type;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
+import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
+import com.google.gson.reflect.TypeToken;
 import com.swe.fairurban.R;
 import com.swe.fairurban.Data.POIData;
+import com.swe.fairurban.Helpers.CategoryReceivedEvent;
+import com.swe.fairurban.Helpers.EntryCategoriesRetriever;
+import com.swe.fairurban.Helpers.JSONHelper;
 import com.swe.fairurban.Helpers.LocationHelper;
 import com.swe.fairurban.Helpers.OnServiceConnectionFinishedEvent;
 import com.swe.fairurban.Helpers.POIXMLParser;
 import com.swe.fairurban.Helpers.ServiceConnector;
 import com.swe.fairurban.Helpers.ServiceHelper;
 import com.swe.fairurban.Helpers.UserHelper;
+import com.swe.fairurban.JSONClasses.EntryCategory;
+import com.swe.fairurban.JSONClasses.JSONDataContainer;
+import com.swe.fairurban.JSONClasses.ListEntry;
 import com.swe.fairurban.Map.MyItemizedOverlay;
 
 import android.location.Location;
@@ -27,6 +37,7 @@ import android.provider.Settings;
 import android.provider.SyncStateContract.Constants;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,8 +48,12 @@ import android.graphics.drawable.Drawable;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 public class Map extends MapActivity {
@@ -50,6 +65,10 @@ public class Map extends MapActivity {
 	Boolean locUpdated = false;
 	LocationManager locationManager;
 	LocationListener locationListener;
+	
+	Spinner spnMainCategories, spnSubCategories;
+	
+	ProgressDialog pd;
 	
 	double currentLatitude, currentLongitude;
 	
@@ -64,11 +83,57 @@ public class Map extends MapActivity {
 		
 		btnRefresh = (Button) findViewById(R.id.btnRefresh);
 		
+		spnMainCategories = (Spinner) findViewById(R.id.spnMainCategories);
+		
+		spnSubCategories = (Spinner) findViewById(R.id.spnSubCategories);
+		
+		
 		btnAddNewToCurrentLocation = (Button) findViewById(R.id.btnAddCurrentLocation);
 		
 		appContext = this;
 		
+		pd = new ProgressDialog(this);
 		
+		pd.setCancelable(false);
+		
+		pd.setMessage("Sunucudan ana kategorilerin listesi alýnýyor.");
+		
+		pd.show();
+		
+		EntryCategoriesRetriever retriever = new EntryCategoriesRetriever();
+		
+		retriever.RetrieveAllCategories(new CategoryReceivedEvent() {
+			
+			@Override
+			public void ErrorOccured() {
+				runOnUiThread(new Runnable() {
+					public void run() {
+						pd.dismiss();
+						Toast tGetError = Toast.makeText(appContext, "Beklenmeyen bir hata oluþtu. Yazýlmý yeniden baþlatýn.",1000);
+						tGetError.show();
+					}
+				});
+				
+			}
+			
+			@Override
+			public void CategoriesReceived(List<EntryCategory> cats) {
+				
+				runOnUiThread(new Runnable() {
+					
+					public void run() {
+						pd.dismiss();
+						SetupMapView();
+					}
+				});
+			}
+		});
+		
+		
+	}
+	
+	protected void SetupMapView()
+	{
 		btnRefresh.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View arg0) {
@@ -151,29 +216,104 @@ public class Map extends MapActivity {
 		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
 
-		RefreshMap();
+		EntryCategoriesRetriever retriever = new EntryCategoriesRetriever();
 		
+		List<EntryCategory> mainCategories =  new LinkedList<EntryCategory>();
+		
+		mainCategories.addAll(retriever.GetMainCategories());
+		
+		EntryCategory allCats = new EntryCategory();
+		allCats.id = -1;
+		allCats.title = "Hepsi";
+		allCats.parentReasonId = -1;
+		
+		mainCategories.add(0, allCats);
+
+	    ArrayAdapter<EntryCategory> spnMainCategoriesArrayAdapter = new ArrayAdapter<EntryCategory>(this,android.R.layout.simple_spinner_item, mainCategories);
+
+	    spnMainCategories.setAdapter(spnMainCategoriesArrayAdapter);  
+	    
+	    spnMainCategories.setSelection(0);
+	    
+	    
+	    List<EntryCategory> subCategories = new LinkedList<EntryCategory>();
+	    
+	    EntryCategory allCatsSub = new EntryCategory();
+		allCats.id = -1;
+		allCats.title = "Hepsi";
+		allCats.parentReasonId = -1;
+		
+		subCategories.add(allCatsSub);
+		
+		ArrayAdapter<EntryCategory> spnSubCategoriesArrayAdapter = new ArrayAdapter<EntryCategory>(this,android.R.layout.simple_spinner_item, subCategories);
+
+		spnSubCategories.setAdapter(spnSubCategoriesArrayAdapter);  
+		    
+		spnSubCategories.setSelection(0);
+		
+		spnMainCategories.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			public void onItemSelected(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				EntryCategory catSelected = (EntryCategory) arg0.getSelectedItem();
+				
+				PopulateSubCategoriesSpinner(catSelected.id);
+			}
+
+			public void onNothingSelected(AdapterView<?> arg0) {
+				
+			}
+			
+		});
+	    
+
+		RefreshMap();
 		
 	}
 	
-	 protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-		    super.onActivityResult(requestCode, resultCode, imageReturnedIntent); 
-
-		    switch(requestCode) { 
-		    case ACTIVITY_RESULT_CODE_INSERT:
-		        if(resultCode == RESULT_OK){  
-		            RefreshMap();
-		        	runOnUiThread(new Runnable() {
-						
-						public void run() {
-							// TODO Auto-generated method stub
-							Toast tConnectionException = Toast.makeText(appContext, "Kayýt baþarýyla eklendi.",1000);
-							tConnectionException.show();
-						}
-					});
-		        }
-		    }
+	
+	protected void PopulateSubCategoriesSpinner(Integer parentCategoryId)
+	{
+		EntryCategoriesRetriever retriever = new EntryCategoriesRetriever();
+		
+		List<EntryCategory> subCategories =  new LinkedList<EntryCategory>();
+		
+		if (parentCategoryId != -1) {
+			subCategories.addAll(retriever.GetSubCategories(parentCategoryId));
 		}
+		
+		EntryCategory allCats = new EntryCategory();
+		allCats.id = -1;
+		allCats.title = "Hepsi";
+		allCats.parentReasonId = -1;
+		
+		subCategories.add(0, allCats);
+
+	    ArrayAdapter<EntryCategory> spnSubCategoriesArrayAdapter = new ArrayAdapter<EntryCategory>(this,android.R.layout.simple_spinner_item, subCategories);
+
+	    spnSubCategories.setAdapter(spnSubCategoriesArrayAdapter);  
+	    
+	    spnSubCategories.setSelection(0);
+	}
+	
+	 protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+	    super.onActivityResult(requestCode, resultCode, imageReturnedIntent); 
+
+	    switch(requestCode) { 
+	    case ACTIVITY_RESULT_CODE_INSERT:
+	        if(resultCode == RESULT_OK){  
+	            RefreshMap();
+	        	runOnUiThread(new Runnable() {
+					
+					public void run() {
+						// TODO Auto-generated method stub
+						Toast tConnectionException = Toast.makeText(appContext, "Kayýt baþarýyla eklendi.",1000);
+						tConnectionException.show();
+					}
+				});
+	        }
+	    }
+	}
 	
 	private void RefreshMap()
 	{
@@ -216,8 +356,25 @@ public class Map extends MapActivity {
 
 	private void GetData(double latitude, double longitude) {
 	
+		pd.setMessage("Sunucudan engeller listesi alýnýyor.");
 		
-		ServiceConnector conn = new ServiceConnector(ServiceHelper.GetListDataUrl(latitude, longitude));
+		pd.show();
+		
+		String url = null;
+		
+		EntryCategory selectedSubCategory = (EntryCategory) spnSubCategories.getSelectedItem();
+		
+		if (selectedSubCategory.id != null && selectedSubCategory.id != -1) {
+			url = ServiceHelper.GetListDataForCategoryUrl(selectedSubCategory.id);
+		}
+		else {
+			url = ServiceHelper.GetListDataUrl();
+		}
+		
+		ServiceConnector conn = new ServiceConnector(url);
+		
+		conn.SetPostRequest(false);
+		
 		conn.AddListener(new OnServiceConnectionFinishedEvent() {
 			
 			@Override
@@ -227,6 +384,7 @@ public class Map extends MapActivity {
 					
 					public void run() {
 						// TODO Auto-generated method stub
+						pd.dismiss();
 						Toast tConnectionException = Toast.makeText(appContext, "Baðlantý hatasý",1000);
 						tConnectionException.show();
 					}
@@ -242,9 +400,16 @@ public class Map extends MapActivity {
 					
 					public void run() {
 						// TODO Auto-generated method stub
-						POIXMLParser xmlParser = new POIXMLParser();
-						List<POIData> data = xmlParser.ParseXML(result);
-						DrawPOIsOnMap(data);
+						
+						Type listType = new TypeToken<JSONDataContainer<ListEntry>>() {}.getType();
+						
+						JSONDataContainer<ListEntry> data = null;
+						
+						data = (JSONDataContainer<ListEntry>)JSONHelper.FromJson(result,listType);	
+					
+						DrawPOIsOnMap(data.data);
+						
+						pd.dismiss();
 					}
 				});
 			
@@ -254,24 +419,35 @@ public class Map extends MapActivity {
 		conn.Connect();
 	}
 	
-	private void DrawPOIsOnMap(List<POIData> data)
+	private void DrawPOIsOnMap(List<ListEntry> data)
 	{
+		
 		List< Overlay > mapOverlays = map.getOverlays();
 		
 		mapOverlays.clear();
 		
-		Drawable drawable = this.getResources().getDrawable(R.drawable.marker);
+		if (data.size() > 0) {
+			Drawable drawable = this.getResources().getDrawable(R.drawable.marker);
 
-		MyItemizedOverlay itemizedoverlay = new MyItemizedOverlay(drawable, this);
+			MyItemizedOverlay itemizedoverlay = new MyItemizedOverlay(drawable, this);
 
-		for (POIData poiData : data) {
-			GeoPoint point = LocationHelper.CreateGeoPoint(poiData.Latitude, poiData.Longitude);
-			OverlayItem overlayitem = new OverlayItem(point, "", poiData.Name);
+			for (ListEntry poiData : data) {
+				GeoPoint point = LocationHelper.CreateGeoPoint(poiData.coordX, poiData.coordY);
+				OverlayItem overlayitem = new OverlayItem(point, "", poiData.comment);
+				
+				itemizedoverlay.addOverlay(overlayitem);
+			}
 			
-			itemizedoverlay.addOverlay(overlayitem);
+			mapOverlays.add(itemizedoverlay);
 		}
 		
-		mapOverlays.add(itemizedoverlay);
+		
+		MyLocationOverlay myLoc = new MyLocationOverlay(this, map);
+		
+		myLoc.enableMyLocation();
+		mapOverlays.add(myLoc);
+		
+		map.invalidate();
 	}
 
 	@Override
