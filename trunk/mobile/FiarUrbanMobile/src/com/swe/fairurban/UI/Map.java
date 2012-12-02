@@ -1,5 +1,11 @@
 package com.swe.fairurban.UI;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,25 +33,51 @@ import com.swe.fairurban.JSONClasses.EntryCategory;
 import com.swe.fairurban.JSONClasses.JSONDataContainer;
 import com.swe.fairurban.JSONClasses.ListEntry;
 import com.swe.fairurban.Map.MyItemizedOverlay;
+import com.swe.fairurban.Map.TappedLocationOverlay;
 
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.provider.SyncStateContract.Constants;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.IntentSender.SendIntentException;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.content.res.Resources.Theme;
 import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnDoubleTapListener;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -74,11 +106,22 @@ public class Map extends MapActivity {
 	
 	public static final int ACTIVITY_RESULT_CODE_INSERT = 1;
 	
+	TappedLocationOverlay tappedLocationOverlay = null;
+	
+	GeoPoint tappedPoint = null;
+	
+	private GestureDetector gestureDetector;
+	
+	
+	long lastTappedTime = -1;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_map);
 
+	
+		
 		map = (MapView) findViewById(R.id.map);
 		
 		btnRefresh = (Button) findViewById(R.id.btnRefresh);
@@ -265,6 +308,69 @@ public class Map extends MapActivity {
 			}
 			
 		});
+		
+	
+		
+		
+		 map.setOnTouchListener(new View.OnTouchListener() {
+
+
+				public boolean onTouch(View v, MotionEvent event) {
+					
+					if(event.getAction() != MotionEvent.ACTION_UP)
+					{
+						return false;
+					}
+					
+					
+					long newTapTime = System.currentTimeMillis();
+					
+					if (lastTappedTime == -1) {
+						lastTappedTime = newTapTime;
+						return false;
+					}
+					else {
+						if (newTapTime - lastTappedTime > 200) {
+							lastTappedTime = newTapTime;
+							return false;
+						}
+					}
+				
+					GeoPoint p = null;
+
+		            if (event.getAction() == MotionEvent.ACTION_UP) {
+		                p = map.getProjection().fromPixels((int) event.getX(),
+		                        (int) event.getY());
+		               
+		                List< Overlay > mapOverlays = map.getOverlays();
+	                	
+		                
+		                Drawable drawable = appContext.getResources().getDrawable(R.drawable.tappedmarker);
+		                
+		                if (tappedLocationOverlay != null) {
+		                	
+		                	mapOverlays.remove(tappedLocationOverlay);
+		                	
+						}
+		                
+		                tappedLocationOverlay = new TappedLocationOverlay(drawable, appContext);
+		                
+		                tappedPoint = p;
+		            
+	    				OverlayItem overlayitem = new OverlayItem(p, "", "Kullanýcý tarafýndan seçilen lokasyon");
+	    				
+	    				tappedLocationOverlay.addOverlay(overlayitem);
+		    			
+		    			mapOverlays.add(tappedLocationOverlay);
+		                
+		    			map.invalidate();
+		    			
+		                return true;
+		           
+		            }
+		            return false;
+				}
+		    });
 	    
 
 		RefreshMap();
@@ -446,6 +552,13 @@ public class Map extends MapActivity {
 		
 		myLoc.enableMyLocation();
 		mapOverlays.add(myLoc);
+		
+		
+		if (tappedLocationOverlay != null) {
+			
+  			mapOverlays.add(tappedLocationOverlay);
+              
+		}
 		
 		map.invalidate();
 	}
