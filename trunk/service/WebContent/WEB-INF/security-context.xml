@@ -13,7 +13,8 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 	
 	
 <!-- 	<sec:intercept-url pattern="/service/admin/**" access="ROLE_ADMIN" /> -->
-	<sec:intercept-url pattern="/service/entries/add" access="ROLE_USER" />
+	<sec:intercept-url pattern="/service/comments/add" access="ROLE_USER" />
+	<sec:intercept-url pattern="/service/entries/add/*" access="ROLE_USER" />
 	<sec:intercept-url pattern="/service/entries/thumbs" access="ROLE_USER" />
 	<sec:intercept-url pattern="/service/login/success" access="ROLE_USER" />
 <!-- 	<sec:intercept-url pattern="/service/categories/**" access="ROLE_USER" /> -->
@@ -38,7 +39,7 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 	<beans:property name="authenticationSuccessHandler" ref="authenticationSuccessHandler"></beans:property>
 </beans:bean>
 
-<beans:bean id="authenticationSuccessHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+<beans:bean id="authenticationSuccessHandler" class="com.swe.accessibilty.authentication.AuthenticationSuccessHandler">
 	<beans:property name="defaultTargetUrl" value="/service/login/success"></beans:property>
 </beans:bean>
  <beans:bean id="sas"
