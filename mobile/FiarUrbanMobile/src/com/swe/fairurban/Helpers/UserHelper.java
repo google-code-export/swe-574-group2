@@ -5,9 +5,8 @@ import com.swe.fairurban.Data.User;
 public class UserHelper {
 	public static User CurrentUser;
 	
-	public final static String Username = "swe";
-	public final static String Password = "swe";
+	
 
-//	public final static String Username = "testuser";
-//	public final static String Password = "swe574TEST!";
+	public final static String Username = "testuser";
+	public final static String Password = "swe574TEST!";
 }

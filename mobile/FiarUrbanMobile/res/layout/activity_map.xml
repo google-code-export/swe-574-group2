@@ -12,7 +12,6 @@
         android:layout_alignParentTop="true"
         android:apiKey="0VEur5TryZYaEAQVon0_69DTFNuCN_Ozc-WOw7g"
         android:clickable="true" >
-
     </com.google.android.maps.MapView>
 
     <Button
@@ -21,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="85dp"
         android:layout_marginLeft="73dp"
         android:text="Güncelle" />
 
@@ -34,5 +33,21 @@
         android:layout_marginLeft="20dp"
         android:layout_toRightOf="@+id/btnRefresh"
         android:text="Ekle" />
+
+    <Spinner
+        android:id="@+id/spnMainCategories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/btnAddCurrentLocation"
+        android:layout_marginLeft="40dp" />
+
+    <Spinner
+        android:id="@+id/spnSubCategories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spnMainCategories"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="14dp" />
 
 </RelativeLayout>
