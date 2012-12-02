@@ -107,7 +107,26 @@ public class EntryServiceImpl implements EntryService {
 		entryDao.update(entry);
 		
 	}
+
+	@Override
+	public EntryProxy getEntryById(int id) {
 		
+		Entry entry =  entryDao.getById(id);
+		
+		EntryProxy result = new EntryProxy(entry);
+		
+		//result.setComments(entry.getComments());
+		
+		return result;
+	
+		
+	}
+	
+	@Override
+	public Entry getRawEntry(int id){
+		
+		return entryDao.getById(id);
+	}
 	
 	
 	

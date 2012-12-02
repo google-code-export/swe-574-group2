@@ -2,23 +2,14 @@ package com.swe.accessibility.domain.proxy;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlElement;
 
+import com.swe.accessibility.domain.Comment;
 import com.swe.accessibility.domain.Entry;
+import com.swe.accessibility.domain.EntryReason;
+import com.swe.accessibility.domain.SubReason;
 
 
 public class EntryProxy implements Serializable {
@@ -29,9 +20,12 @@ public class EntryProxy implements Serializable {
 	private static final long serialVersionUID = 3786243773940227607L;
 	
 	
+	private static String imageHost = "http://testpalette.com/";
+	
 	private int id;
 	
-	private byte[] imageMeta;
+	private String imageMeta;
+	
 	
 	
 	private BigDecimal coordX;
@@ -48,11 +42,21 @@ public class EntryProxy implements Serializable {
 	private int downVoteCount;
 	
 	private String userName;
+	
+	
+	private List<CommentProxy> comments;
+	
+	private List<SubReason> reasons;
+	
+	
+	public EntryProxy() {
+		
+	}
 
 	public EntryProxy(Entry entry) {
 		
 		this.id = entry.getId();
-		this.imageMeta = entry.getImageMeta();
+		setImageMeta(entry.getImageMeta());
 		this.coordX = entry.getCoordX();
 		this.coordY = entry.getCoordY();
 		this.comment = entry.getComment();
@@ -60,14 +64,15 @@ public class EntryProxy implements Serializable {
 		this.upVoteCount = entry.getUpVoteCount();
         if (entry.getUser() != null)
         	this.setUserName(entry.getUser().getUsername());
+       
 	}
 
-	public byte[] getImageMeta() {
+	public String getImageMeta() {
 		return imageMeta;
 	}
 
-	public void setImageMeta(byte[] imageMeta) {
-		this.imageMeta = imageMeta;
+	public void setImageMeta(String imageMeta) {
+		this.imageMeta = imageHost+imageMeta;
 	}
 
 	public int getId() {
@@ -129,5 +134,16 @@ public class EntryProxy implements Serializable {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+
+	public List<CommentProxy> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<CommentProxy> comments) {
+		this.comments = comments;
+	}
+
+	
+	
 
 }

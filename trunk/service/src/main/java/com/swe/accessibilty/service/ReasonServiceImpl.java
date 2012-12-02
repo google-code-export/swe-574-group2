@@ -12,6 +12,7 @@ import com.swe.accessibility.domain.Entry;
 import com.swe.accessibility.domain.Reason;
 import com.swe.accessibility.domain.SubReason;
 import com.swe.accessibility.domain.proxy.EntryProxy;
+import com.swe.accessibility.domain.proxy.SubReasonProxy;
 
 @Service("reasonService")
 @Transactional
@@ -35,9 +36,13 @@ public class ReasonServiceImpl implements ReasonService {
 	 */
 	@Override
 	@Transactional
-	public List<SubReason> getSubReasons(int id){
+	public List<SubReasonProxy> getSubReasons(int id){
 		
-		return reasonDao.getSubAll(id);
+		List<SubReasonProxy> reasons = new ArrayList<SubReasonProxy>();
+		for (SubReason reason : reasonDao.getSubAll(id)){
+			reasons.add(new SubReasonProxy(reason));
+		}
+		return reasons;
 	}
 	
 	/* (non-Javadoc)
@@ -57,9 +62,9 @@ public class ReasonServiceImpl implements ReasonService {
 		SubReason reason = reasonDao.getEntriesBySub(id);
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
 		
-		for (Entry entry : reason.getEntries()){
-			entries.add(new EntryProxy(entry));
-		}
+//		for (Entry entry : reason.getEntries()){
+//			entries.add(new EntryProxy(entry));
+//		}
 		
 		return entries;
 	}
