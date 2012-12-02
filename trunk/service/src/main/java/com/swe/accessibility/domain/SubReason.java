@@ -11,7 +11,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cascade;
 
 
 
@@ -36,30 +39,28 @@ public class SubReason implements Serializable{
 	@Column(name="ParentReasonId")
 	private int parentReasonId;
 	
-	@ManyToMany(cascade = {CascadeType.ALL},targetEntity=ViolationType.class,fetch=FetchType.LAZY,mappedBy="reasons")
-	private Set<ViolationType> violationTypes;
+//	@ManyToMany(cascade = {CascadeType.ALL},targetEntity=ViolationType.class,fetch=FetchType.EAGER,mappedBy="reasons")
+//	private Set<ViolationType> violationTypes;
+//	
+//	public Set<ViolationType> getViolationTypes() {
+//		return violationTypes;
+//	}
+//
+//	public void setViolationTypes(Set<ViolationType> violationTypes) {
+//		this.violationTypes = violationTypes;
+//	}
 	
-	public Set<ViolationType> getViolationTypes() {
-		return violationTypes;
-	}
 
-	public void setViolationTypes(Set<ViolationType> violationTypes) {
-		this.violationTypes = violationTypes;
-	}
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "er.reason", cascade = 
+	    {CascadeType.PERSIST, CascadeType.MERGE})
+	    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, 
+	    org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
+	private Set<EntryReason> entryReasons;
+
 	
 
-	@ManyToMany(cascade = {CascadeType.ALL},targetEntity=Entry.class,fetch=FetchType.LAZY)
-    @JoinTable(name="EntryReason",
-                joinColumns={@JoinColumn(name="EntryId")},
-                inverseJoinColumns={@JoinColumn(name="ReasonId")})
-	private Set<Entry> entries;
-
-	public Set<Entry> getEntries() {
-		return entries;
-	}
-
-	public void setEntries(Set<Entry> entries) {
-		this.entries = entries;
+	public void setEntries(Set<EntryReason> entryReasons) {
+		this.entryReasons = entryReasons;
 	}
 	
 	

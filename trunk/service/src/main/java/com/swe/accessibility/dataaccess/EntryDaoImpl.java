@@ -11,12 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.swe.accessibility.domain.Entry;
+import com.swe.accessibility.domain.User;
 
 @Component
 public class EntryDaoImpl implements EntryDao {
 
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	@Autowired
+	private UserDao userDao;
 	
 	@Override
 	public int insert(Entry entry) {
@@ -86,8 +90,8 @@ public class EntryDaoImpl implements EntryDao {
 	@Override
 	public List<Entry> getEntriesByType(String id){
 		
-		String queryStr = "SELECT e.id,e.comment,e.coordX,e.coordY,e.upVoteCount,e.downVoteCount from ViolationType v join ReasonViolationType rv on rv.ViolationTypeId = v.id join Reason r on rv.ReasonId = r.id join EntryReason er on er.ReasonId = r.id join Entry e on er.EntryId = e.id " +
-				"where v.id = :id";
+		String queryStr = "SELECT e.id,e.comment,e.coordX,e.coordY,e.upVoteCount,e.imageMeta,e.downVoteCount,e.imageMeta,u.username from ViolationType v  join ReasonViolationType rv on rv.ViolationTypeId = v.id join Reason r on rv.ReasonId = r.id join EntryReason er on er.ReasonId = r.id join Entry e on er.EntryId = e.id " +
+				"join User u on e.submittedBy = u.id where v.id = :id";
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(queryStr);
 		query.setParameter("id", id);
 		
@@ -103,6 +107,8 @@ public class EntryDaoImpl implements EntryDao {
 			entr.setCoordY((BigDecimal) arr[3]);
 			entr.setUpVoteCount((Integer) arr[4]);
 			entr.setDownVoteCount((Integer) arr[5]);
+			entr.setImageMeta((String) arr[6]);
+			entr.setUser(new User(arr[7].toString()));
 			
 			entries.add(entr);
 		}
@@ -112,8 +118,8 @@ public class EntryDaoImpl implements EntryDao {
 	@Override
 	public List<Entry> getEntriesByCategory(String id){
 		
-		String queryStr = "SELECT e.id,e.comment,e.coordX,e.coordY,e.upVoteCount,e.downVoteCount from Reason r join EntryReason er on er.ReasonId = r.id join Entry e on er.EntryID = e.id  " +
-				"where r.id = :id";
+		String queryStr = "SELECT e.id,e.comment,e.coordX,e.coordY,e.upVoteCount,e.downVoteCount,e.imageMeta,u.username from Reason r  join EntryReason er on er.ReasonId = r.id join Entry e on er.EntryID = e.id  " +
+				"join User u on e.submittedBy = u.id where r.id = :id";
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(queryStr);
 		query.setParameter("id", id);
 		Iterator<Object[]> iter = query.list().iterator();
@@ -128,6 +134,8 @@ public class EntryDaoImpl implements EntryDao {
 			entr.setCoordY((BigDecimal) arr[3]);
 			entr.setUpVoteCount((Integer) arr[4]);
 			entr.setDownVoteCount((Integer) arr[5]);
+			entr.setImageMeta((String) arr[6]);
+			entr.setUser(new User(arr[7].toString()));
 			
 			entries.add(entr);
 		}

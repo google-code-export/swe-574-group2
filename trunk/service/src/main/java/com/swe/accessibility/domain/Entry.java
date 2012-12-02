@@ -2,6 +2,8 @@ package com.swe.accessibility.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -15,7 +17,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Cascade;
 
 @Table(name="Entry")
 @Entity
@@ -26,39 +31,43 @@ public class Entry implements Serializable {
 	 */
 	private static final long serialVersionUID = 3786243773940227607L;
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
 	private int id;
 	
-	@Column(name="ImageMeta")
+
 	private String imageMeta;
 	
-	@Column(name="CoordX")
+	
 	private BigDecimal coordX;
 	
-	@Column(name="CoordY")
+	
 	private BigDecimal coordY;
 	
-	@Column(name="Comment")
+	
 	private String comment;
 	
-	@Column(name="UpVoteCount")
+	
 	private int upVoteCount;
 	
-	@Column(name="DownVoteCount")
+	
 	private int downVoteCount;
 	
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="submittedBy")
+	
 	private User user;
 	
-	@ManyToMany(targetEntity=SubReason.class,mappedBy="entries")
-	private Set<SubReason> reasons;
+	
+	private Set<EntryReason> entryReasons = new HashSet<EntryReason>();
 	
 	@ManyToMany(cascade={CascadeType.ALL})
 	@JoinTable(name="EntryAbuse",joinColumns={@JoinColumn(name="EntryId")},inverseJoinColumns={@JoinColumn(name="AbuseId")})
 	private Set<Abuse> abuses;
+	
+	@OneToMany(mappedBy="entry",fetch=FetchType.LAZY)
+	private List<Comment> comments;
 
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public int getId() {
 		return id;
 	}
@@ -67,14 +76,8 @@ public class Entry implements Serializable {
 		this.id = id;
 	}
 
-	public Set<SubReason> getReasons() {
-		return reasons;
-	}
 
-	public void setReasons(Set<SubReason> reasons) {
-		this.reasons = reasons;
-	}
-
+	@Column(name="ImageMeta")
 	public String getImageMeta() {
 		return imageMeta;
 	}
@@ -83,6 +86,7 @@ public class Entry implements Serializable {
 		this.imageMeta = imageMeta;
 	}
 
+	@Column(name="CoordX")
 	public BigDecimal getCoordX() {
 		return coordX;
 	}
@@ -91,6 +95,7 @@ public class Entry implements Serializable {
 		this.coordX = coordX;
 	}
 
+	@Column(name="CoordY")
 	public BigDecimal getCoordY() {
 		return coordY;
 	}
@@ -99,6 +104,7 @@ public class Entry implements Serializable {
 		this.coordY = coordY;
 	}
 
+	@Column(name="Comment")
 	public String getComment() {
 		return comment;
 	}
@@ -107,6 +113,7 @@ public class Entry implements Serializable {
 		this.comment = comment;
 	}
 
+	@Column(name="UpVoteCount")
 	public int getUpVoteCount() {
 		return upVoteCount;
 	}
@@ -115,6 +122,7 @@ public class Entry implements Serializable {
 		this.upVoteCount = upVoteCount;
 	}
 
+	@Column(name="DownVoteCount")
 	public int getDownVoteCount() {
 		return downVoteCount;
 	}
@@ -123,13 +131,36 @@ public class Entry implements Serializable {
 		this.downVoteCount = downVoteCount;
 	}
 	
-	
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="submittedBy")
 	public User getUser() {
 		return user;
 	}
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	@OneToMany(mappedBy="entry",cascade=CascadeType.ALL)
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "er.entry", cascade = 
+	    {CascadeType.PERSIST, CascadeType.MERGE})
+	    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, 
+	    org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
+	public Set<EntryReason> getEntryReasons() {
+		return entryReasons;
+	}
+
+	
+	public void setEntryReasons(Set<EntryReason> entryReasons) {
+		this.entryReasons = entryReasons;
 	}
 
 }
