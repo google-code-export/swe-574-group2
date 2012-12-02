@@ -32,7 +32,7 @@ a.disabled { color:gray; }
 	src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 
 <script type="text/javascript" src="js/ajaxupload-min.js"></script>
-
+<script type="text/javascript" src="js/common.js"></script>
 <!-- <script type="text/javascript" src="js/jquery.jsonp.js"></script> -->
 
 <script type="text/javascript">
@@ -106,7 +106,7 @@ a.disabled { color:gray; }
 				// The anchor for this image is the base of the flagpole at 18,42.
 				new google.maps.Point(18, 42));
 
-		var getAllEntriesUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries";
+		var getAllEntriesUrl = "./service/entries";
 		var entryId = getParameterByName('id');
 		var coordX = 0;
 		var coordY = 0;
@@ -121,7 +121,7 @@ a.disabled { color:gray; }
 					var user = element.userName;
 					var category = "parent - will be added to web service";
 					var childCat = "child - will be added to web service";
-					var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg";
+					var image = element.imageMeta;
 					coordX = element.coordX;
 					coordY = element.coordY;
 					var point = new google.maps.LatLng(parseFloat(coordX), parseFloat(coordY));
@@ -166,11 +166,12 @@ a.disabled { color:gray; }
 	// Initializes the Google Map
 	google.maps.event.addDomListener(window, 'load', initialize);
 
-	var voteUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries/thumbs";
+	var voteUrl = "./service/entries/thumbs";
 	
 	
 	$(document).ready(function() {
 
+		loadContent("#header","master.html");
 		var entryId = getParameterByName('id');
 		
 		$("#lnkUpVote").click(function() {
@@ -183,32 +184,53 @@ a.disabled { color:gray; }
 			    contentType: "application/json;charset=utf-8",
 			    crossDomain: true,
 			    success: function(response) {
-			         alert("success");
+			        
 			     },
 			     error: function(xhr, errorThrown) {
 			         alert('Error!  Status = ' + xhr.status + " Message = " + errorThrown);
 			     }
 			}).done(function(){
-			    alert("up vote verildi!");
-			    var upp = $('#lblUpVote').val();
+				if ($('#lnkDownVote').hasClass('disabled')) return;
+				$('#lblVote').html('Up vote verildi');
+				$('#msgVote').hide().fadeIn("slow", "linear");
+				var upp = $('#lblUpVote').val();
 			    $('#lblUpVote').val(parseInt(upp) + 1);
+			    $('#lnkDownVote').addClass('disabled');   
+			    
 			});
 		});
 		
 		$("#lnkDownVote").click(function() {
-			if ($('#lnkDownVote').hasClass('disabled')) return;
-			$('#lblVote').html('Down vote verildi');
-			$('#msgVote').hide().fadeIn("slow", "linear");
-			var upp = $('#hdnDownVote').val();
-		    $('#lblDownVote').html(parseInt(upp) - 1);
-		    $('#lnkDownVote').addClass('disabled');    
+			$.ajax({
+			    url: voteUrl,
+			    type: 'post',
+			    //headers: {'AuthToken':'testuser:a74ff09c24dbf421a3e1d6be58c48f44867a85d4'},
+			    data: JSON.stringify({entryId:entryId, up:false}),
+			    dataType: 'json',
+			    contentType: "application/json;charset=utf-8",
+			    crossDomain: true,
+			    success: function(response) {
+			        
+			     },
+			     error: function(xhr, errorThrown) {
+			         alert('Error!  Status = ' + xhr.status + " Message = " + errorThrown);
+			     }
+			}).done(function(){
+				if ($('#lnkDownVote').hasClass('disabled')) return;
+				$('#lblVote').html('Down vote verildi');
+				$('#msgVote').hide().fadeIn("slow", "linear");
+				var upp = $('#hdnDownVote').val();
+			    $('#lblDownVote').html(parseInt(upp) - 1);
+			    $('#lnkDownVote').addClass('disabled');   
+			    
+			});
+			 
 		});
 	});
 </script>
 
 <body>
-	<div>
-		<?php include('master.php');?>
+	<div id="header">
 	</div>
 	<p style="height: 20px;"></p>
 	<h2>Detay</h2>

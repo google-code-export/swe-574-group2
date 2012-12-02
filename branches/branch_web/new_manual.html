@@ -30,14 +30,15 @@ body {
 <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
 
 <script type="text/javascript" src="js/ajaxupload-min.js"></script>
-
+<script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 
+		loadContent("#header","master.html");
 		//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
 		//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
-		var getCategoriesUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/categories';
-		var getEntriesByCategoryUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/entries?categoryId=';
+		var getCategoriesUrl = './service/categories';
+		var getEntriesByCategoryUrl = './service/entries?categoryId=';
 
 		var selectParent = $('#ddlCategories');
 		var selectChild = $('#ddlChildren');
@@ -50,6 +51,8 @@ body {
 		 });
 		
 		selectParent.change(function() {
+			$('#category').val(selectParent.find(":selected").val());
+			
 			if(selectParent.find(":selected").val() == "0")
 			{
 				selectChild.hide();
@@ -79,6 +82,15 @@ body {
 		});
 		
 		selectChild.change(function() {
+			
+			if(selectChild.find(":selected").val() != 0)
+			{
+				$('#category').val(selectChild.find(":selected").val());
+			}
+			else
+			{
+				$('#category').val(selectParent.find(":selected").val());
+			}
 
 		});
 	});
@@ -108,8 +120,8 @@ function codeLatLng(latLng) {
           var latlngStr = latLong.split(",",2);
 		  var lat = parseFloat(latlngStr[0]);
 		  var lng = parseFloat(latlngStr[1]);
-		  $('#hdnLat').val(lat);
-		  $('#hdnLng').val(lng);
+		  $('#coordX').val(lat);
+		  $('#coordY').val(lng);
         }
       } else {
         alert("Adres bulma hatasý: " + status);
@@ -171,12 +183,13 @@ google.maps.event.addDomListener(window, 'load', initialize);
 </head>
 <body>
 	<form
-		action="http://testpalette.com:8080/RestAccessibilty/service/entries/add"
+		action="./service/entries/add/web"
 		method="post" enctype="multipart/form-data">
-		<input type="hidden" id="hdnLat" value="0" name="hdnLat" /> 
-		<input type="hidden" id="hdnLng" value="0" name="hdnLng" />
-		<div>
-			<?php include('master.php');?>
+		<input type="hidden" id="coordX"  name="coordX" />
+		<input type="hidden" id="coordY"  name="coordY" />
+		<input type="hidden" id="category" name="category" />
+		<div id="header">
+			
 		</div>
 		<p style="height: 20px;"></p>
 		<h2>Yeni Kayýt Giriþi</h2>
@@ -194,8 +207,8 @@ google.maps.event.addDomListener(window, 'load', initialize);
 			</select>
 			<p style="height: 10px;"></p>
 			<span style="font-weight: bold;">Açýklama:</span>
-			<textarea class="txtDescription" name="txtDescription"
-				id="txtDescription" cols="40" rows="4" style="margin-bottom: -70px;"></textarea>
+			<textarea class="txtDescription" name="comment"
+				id="comment" cols="40" rows="4" style="margin-bottom: -70px;"></textarea>
 			<p style="height: 85px;"></p>
 			<span style="font-weight: bold;">Fotoðraf:</span>
 			<p></p>

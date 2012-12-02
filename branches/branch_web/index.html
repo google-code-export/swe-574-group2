@@ -30,6 +30,7 @@ body {
 	src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 
 <script type="text/javascript" src="js/ajaxupload-min.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
 
 <!-- <script type="text/javascript" src="js/jquery.jsonp.js"></script> -->
 
@@ -70,7 +71,7 @@ body {
 		});
 	}
 
-	var entryDetailUrl = "entry.php?id=";
+	var entryDetailUrl = "entry.html?id=";
 
 	// Set the Map variable
 	var map;
@@ -125,10 +126,10 @@ body {
 //			bindInfoWindow(marker, map, infoWindow, html);
 //		}
 //
-//		$('#divCount').html("Sistemde toplam " + markers.length + " adet ihlâl var.");
+//		$('#divCount').html("Sistemde toplam " + markers.length + " adet ihlï¿½l var.");
 //	});
 
-		var getAllEntriesUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries";
+		var getAllEntriesUrl = "./service/entries";
 		
 		$.getJSON(getAllEntriesUrl, function(data) {
 			$.each(data['data'], function(index, element) {
@@ -136,7 +137,7 @@ body {
 				var entryId = element.id;
 				var upVote = element.upVoteCount;
 				var downVote = element.downVoteCount;
-				var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
+				var image = element.imageMeta;
 				var point = new google.maps.LatLng(parseFloat(element.coordX), parseFloat(element.coordY));
 				var html = "<img width='70%' height='70%' src='" + image + "'>"
 						+ "<p></p><b>''" + comment + "''</b> <p></p>"
@@ -159,7 +160,7 @@ body {
 				bindInfoWindow(marker, map, infoWindow, html);
 			 });
 
-			 $('#divCount').html("Sistemde toplam " + data['data'].length + " adet ihlâl var.");
+			 $('#divCount').html("Sistemde toplam " + data['data'].length + " adet ihlali var.");
 		 });
 
 // 		var marker = new google.maps.Marker({
@@ -177,13 +178,16 @@ body {
 	// Initializes the Google Map
 	google.maps.event.addDomListener(window, 'load', initialize);
 
-	var voteUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries/thumbs";
+	var voteUrl = "./service/entries/thumbs";
 
 	function voteUp(entryId) {
 		$.ajax({
 		    url: voteUrl,
 		    type: 'post',
-		    data: {entryId: entryId, up: true}
+		    data: JSON.stringify({entryId:entryId,up:true}),
+		    dataType: 'json',
+		    contentType: "application/json;charset=utf-8",
+		    crossDomain: true,
 		}).done(function(){
 		    var upp = $('#lblUpVote').val();
 		    $('#lblUpVote').val(parseInt(upp) + 1);
@@ -194,7 +198,10 @@ body {
 		$.ajax({
 		    url: voteUrl,
 		    type: 'post',
-		    data: {entryId: entryId, up: false}
+		    data: JSON.stringify({entryId: entryId, up: false}),
+		    dataType: 'json',
+		    contentType: "application/json;charset=utf-8",
+		    crossDomain: true,
 		}).done(function(){
 		    var upp = $('#lblUpVote').val();
 		    $('#lblUpVote').val(parseInt(upp) + 1);
@@ -206,38 +213,46 @@ body {
 	$(document).ready(function() {
 		//testuser - swe574TEST!
 		
-
-		$("#submit").click(function() {
+		loadContent("#header","master.html");
+		//$("#submit").click(function() {
 			$('#frmlogin').submit(function() {
-				alert($(this).serialize());
+				
+				//alert($("#frmlogin").serialize())
 				$.ajax({
 					type: 'POST',
-		            url: 'http://swe.cmpe.boun.edu.tr:8180/rest/service/login/sigin',
+					data: $("#frmlogin").serialize(),
+		            //url: 'http://swe.cmpe.boun.edu.tr:8180/rest/service/login/sigin',
+		          	url: './service/login/sigin',
+		          	crossDomain: true,
+		          	xhrFields: {
+   						withCredentials: true
+					},
 		          	//data: "{'username': 'testuser', 'password': 'swe574TEST!'}",
 		          	//data: "{}",
 			   		//contentType: "application/json; charset=utf-8",
 		    		//dataType: 'json',
 		          	//username: 'testuser',
 		          	//password: 'swe574TEST!',
-		            success: function(msg) {
-		                  alert(msg.loggedIn);
+		            success: function(msg,textStatus) {
+		            	alert("Authentication Success");   
 		            },
-		            error:function(e){
-			            alert(e.message);
-		                //alert(e.message);
+		            error:function(jqXHR, textStatus, errorThrown){
+			          alert("Authentication failed");
+		              alert(errorThrown);
 		            }
 		        });
 				  return false;
-				});
 			});
+		//});
 		
 				//jQuery.support.cors = true;
 
-    //var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
+    	var getCategoriesUrl = './service/categories';
 		//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
-		var getCategoriesUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/categories';
-		var getEntriesByCategoryUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/entries?categoryId=';
-
+		//var getCategoriesUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/categories';
+		//var getEntriesByCategoryUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/entries?categoryId=';
+		var getEntriesByCategoryUrl = './service/entries?categoryId=';
+		
 		var selectParent = $('#ddlCategories');
 		var selectChild = $('#ddlChildren');
 		$.getJSON(getCategoriesUrl, function(data) {
@@ -307,7 +322,7 @@ body {
 			        {
 			        	var dataS = data['data'];
 		        
-			        	$('#divCount').html("Filtreleme sonucu " + dataS.length + " adet ihlâl bulundu.");
+			        	$('#divCount').html("Filtreleme sonucu " + dataS.length + " adet ihlal bulundu.");
 				        
 			        	var pinImg = new google.maps.MarkerImage(
 			    				'images/markers/wheelchair.png',
@@ -326,7 +341,7 @@ body {
 			    			var comment = element.comment;
 		    				var entryId = element.id;
 		    				var point = new google.maps.LatLng(parseFloat(element.coordX), parseFloat(element.coordY));
-		    				var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
+		    				var image = element.imageMeta;
 		    				var html = "<img width='70%' height='70%' src='" + image + "'>"
 		    						+ "<br/><b>''" + comment + "''</b> <br/> <a style='text-decoration: underline' href='" 
 		    						+ entryDetailUrl + entryId + "'>Detay...</a>";
@@ -345,14 +360,17 @@ body {
 			
 		});
 
-		var voteUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries/thumbs";
+		var voteUrl = "./service/entries/thumbs";
 		
 		$("#lnkUpVote").click(function() {
-			alert($("#lnkUpVote").attr('rel'));
+			var entry = $("#lnkUpVote").attr('rel');
 			$.ajax({
 			    url: voteUrl,
 			    type: 'post',
-			    data: {entryId: $("#lnkUpVote").attr('rel'), up: true}
+			    data: JSON.stringify({entryId:entryId, up:true}),
+			    dataType: 'json',
+			    contentType: "application/json;charset=utf-8",
+			    crossDomain: true,
 			}).done(function(){
 			    alert($("#lnkUpVote").attr('rel'));
 			    var upp = $('#lblUpVote').val();
@@ -374,7 +392,10 @@ body {
 			$.ajax({
 			    url: voteUrl,
 			    type: 'post',
-			    data: {entryId: $("#lnkUpVote").attr('rel'), up: true}
+			    data: {entryId: $("#lnkUpVote").attr('rel'), up: true},
+			    dataType: 'json',
+			    contentType: "application/json;charset=utf-8",
+			    crossDomain: true,
 			}).done(function(){
 			    alert($("#lnkUpVote").attr('rel'));
 			    var upp = $('#lblUpVote').val();
@@ -388,15 +409,16 @@ body {
 </script>
 
 <body>
-	<div>
-		<?php include('master.php');?>
+	<div id="header">
+		
+		
 	</div>
 	<div>
 		<h4>Kategori filtreleme:</h4>
 		<select id="ddlCategories">
 			<option value="0">Tamamý</option>
 		</select> <select id="ddlChildren" style="display: none">
-			<!--<option value="0">Tamamý</option> -->
+			<!--<option value="0">Tamamï¿½</option> -->
 		</select> <input type="button" id="btnSearch" name="formSearch"
 			value="Ara" /> <span id="spinner" class="spinner"
 			style="display: none;"><img id="img-spinner" src="images/spinner.gif"
@@ -409,18 +431,18 @@ body {
 		style="width: 900px; height: 700px; margin-left: 190px;"></div>
 	<p style="height: 20px;"></p>
 	<div>
-		<a href="new.php"
-			style="font-weight: bold; text-decoration: underline;">Bulunduðum
-			lokasyona yeni giriþ</a> &nbsp;&nbsp;||&nbsp;&nbsp; <a href="new_manual.php"
-			style="font-weight: bold; text-decoration: underline;">Seçeceðim
-			lokasyona yeni giriþ</a>
+		<a href="new.html"
+			style="font-weight: bold; text-decoration: underline;">Bulunduï¿½um
+			lokasyona yeni giriï¿½</a> &nbsp;&nbsp;||&nbsp;&nbsp; <a href="new_manual.html"
+			style="font-weight: bold; text-decoration: underline;">Seï¿½eceï¿½im
+			lokasyona yeni giriï¿½</a>
 	</div>
 	<p style="height: 20px"></p>
-	<form id="frmlogin" action="http://swe.cmpe.boun.edu.tr:8180/rest/service/login/sigin" method="post">
+	<form id="frmlogin" action="" method="post">
 		<table>
 	        <tr><td>User:</td><td><input type='text' name='username' value=''></td></tr>
 	        <tr><td>Password:</td><td><input type='password' name='password'></td></tr>
-	        <tr><td colspan='2'><input name="submit" type="submit" id ="submit"></td></tr>
+	        <tr><td colspan='2'><input type="submit" name="submit" value="submit"/></td></tr>
 	        <tr><td colspan='2'><input name="reset" type="reset"></td></tr>
 	      </table>
 	</form>
