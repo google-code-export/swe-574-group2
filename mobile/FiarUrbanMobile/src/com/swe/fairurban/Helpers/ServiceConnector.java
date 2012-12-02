@@ -9,6 +9,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
@@ -28,9 +29,14 @@ public class ServiceConnector {
 
 	public String FileParameterName = "";
 	
+	private static HttpClient hc = new DefaultHttpClient();
+	
 	private LinkedList<NameValuePair> parameterPairs = new LinkedList<NameValuePair>();
 	
 	private String url;
+	
+	private Boolean PostRequest = true;
+	
 	
 	public void AddListener(OnServiceConnectionFinishedEvent event)
 	{
@@ -60,8 +66,11 @@ public class ServiceConnector {
 	{
 		this.url = url;
 	}
-
-
+	
+	public void SetPostRequest(Boolean req)
+	{
+		PostRequest = req;
+	}
 	
 	public void AddParameter(String name, String value)
 	{
@@ -77,10 +86,12 @@ public class ServiceConnector {
 				public void run() {
 					// TODO Auto-generated method stub
 					
-			        HttpClient hc = new DefaultHttpClient();
+			        
 			        String message;
 
-			        HttpPost p = new HttpPost(url);
+			        HttpResponse resp = null;
+			        
+			        
 //			        JSONObject object = new JSONObject();
 			        try {
 //			        	if (pairs != null) {
@@ -101,18 +112,34 @@ public class ServiceConnector {
 //
 //			        p.setEntity(new StringEntity(message, "UTF8"));
 //			        p.setHeader("Content-type", "application/json");
-			        
-		        	if (parameterPairs.size() > 0) {
-			    	    p.setEntity(new UrlEncodedFormEntity(parameterPairs));
-			     	}
-			    
-			        
-			     
-			        HttpResponse resp = hc.execute(p);
-			        if (resp != null) {
-			            if (resp.getStatusLine().getStatusCode() == 200)
-			                BroadcastConnectionFinished(EntityUtils.toString(resp.getEntity()));
-			            }
+			        	
+			        	if (PostRequest) {
+			        		HttpPost p = new HttpPost(url);
+					        
+				        	if (parameterPairs.size() > 0) {
+					    	    p.setEntity(new UrlEncodedFormEntity(parameterPairs));
+					     	}
+				
+					        resp = hc.execute(p);
+						}
+			        	else {
+			        		HttpGet get = new HttpGet(url);
+			        		
+			        		resp = hc.execute(get);
+						}
+			        	
+				        
+				        
+				        
+				        if (resp != null) {
+				            if (resp.getStatusLine().getStatusCode() == 200)
+				                BroadcastConnectionFinished(EntityUtils.toString(resp.getEntity()));
+				            else
+				            	BroadcastException();
+				        }
+				        else {
+							BroadcastException();
+						}
 
 			        } catch (Exception e) {
 			            e.printStackTrace();
@@ -124,6 +151,47 @@ public class ServiceConnector {
 		   
 		   
 		   thConnection.start();
+	}
+	
+	public String SyncConnect()
+	{	        
+        String message = null;
+
+        HttpResponse resp = null;
+        
+        try {
+
+        	if (PostRequest) {
+        		HttpPost p = new HttpPost(url);
+		        
+	        	if (parameterPairs.size() > 0) {
+		    	    p.setEntity(new UrlEncodedFormEntity(parameterPairs));
+		     	}
+	
+		        resp = hc.execute(p);
+			}
+        	else {
+        		HttpGet get = new HttpGet(url);
+        		
+        		resp = hc.execute(get);
+			}
+        	
+	        
+	        
+	        
+	        if (resp != null) {
+	            if (resp.getStatusLine().getStatusCode() == 200)
+	            	message = EntityUtils.toString(resp.getEntity());
+	          
+	        }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            BroadcastException();
+        }
+        
+        
+        return message;
 	}
 	
 	public void MultipartConnect()
@@ -139,7 +207,7 @@ public class ServiceConnector {
 				try {
 					
 					
-			         HttpClient client = new DefaultHttpClient();  
+			         HttpClient client = hc;  
 			  
 			         HttpPost post = new HttpPost(url);
 			         
