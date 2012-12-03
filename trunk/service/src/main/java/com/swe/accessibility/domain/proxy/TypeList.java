@@ -3,9 +3,10 @@ package com.swe.accessibility.domain.proxy;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sun.xml.internal.txw2.annotation.XmlElement;
+
 import com.swe.accessibility.domain.ViolationType;
 
 @XmlRootElement(name="types")
