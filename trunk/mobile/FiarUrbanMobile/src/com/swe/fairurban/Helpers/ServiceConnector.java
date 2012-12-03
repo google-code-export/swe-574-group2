@@ -1,6 +1,9 @@
 package com.swe.fairurban.Helpers;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,15 +14,23 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 
 public class ServiceConnector {
 	
@@ -153,6 +164,69 @@ public class ServiceConnector {
 		   thConnection.start();
 	}
 	
+	public void ConnectUsingJsonPost()
+	{
+		
+		   Thread thConnection = new Thread(new Runnable() {
+				
+				public void run() {
+					// TODO Auto-generated method stub
+					
+			        
+			        String message;
+
+			        HttpResponse resp = null;
+			        
+			        HttpPost p = new HttpPost(url);
+			        
+			        JSONObject object = new JSONObject();
+			        try {
+			        	if (parameterPairs != null) {
+			        		for (NameValuePair nameValuePair : parameterPairs) {
+								object.put(nameValuePair.getName(),nameValuePair.getValue());
+							}
+						}
+			        	
+
+			        } catch (Exception ex) {
+			        	BroadcastException();
+			        	return;
+			        }
+
+				   try {
+				        message = object.toString();
+	
+	
+				        p.setEntity(new StringEntity(message, "UTF8"));
+				        p.setHeader("Content-type", "application/json");
+				        	
+				      
+				        	
+			            resp = hc.execute(p);
+				        
+				        
+				        if (resp != null) {
+				            if (resp.getStatusLine().getStatusCode() == 200)
+				                BroadcastConnectionFinished(EntityUtils.toString(resp.getEntity()));
+				            else
+				            	BroadcastException();
+				        }
+				        else {
+							BroadcastException();
+						}
+
+			        } catch (Exception e) {
+			            e.printStackTrace();
+			            BroadcastException();
+			        }
+				}
+				
+			});
+		   
+		   
+		   thConnection.start();
+	}
+	
 	public String SyncConnect()
 	{	        
         String message = null;
@@ -211,10 +285,28 @@ public class ServiceConnector {
 			  
 			         HttpPost post = new HttpPost(url);
 			         
-			    
-			    
 			         
-				     FileBody bin = new FileBody(file);
+			         Options opts = new BitmapFactory.Options();
+			         opts.inSampleSize = 2;   // for 1/2 the image to be loaded
+
+			         Bitmap original = BitmapFactory.decodeFile(fileUrl, opts);
+			         
+//			         Integer[] newSize = BitmapHelper.GetThumbnailSize(original, 100, 100);
+//			       
+//			         Bitmap thumb = Bitmap.createScaledBitmap (original,newSize[0], newSize[1], false);
+//			         
+			         
+				     //FileBody bin = new FileBody(file);
+				  
+				     
+				     ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				     original.compress(CompressFormat.JPEG, 30, stream);
+				     InputStream is = new ByteArrayInputStream(stream.toByteArray());
+				     
+				     ContentBody bin =  new InputStreamBody(is, "img.jpeg");
+				
+				
+				     
 				     MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);  
 				     reqEntity.addPart(fileParameterName, bin);
 				     

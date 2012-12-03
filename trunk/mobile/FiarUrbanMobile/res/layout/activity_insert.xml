@@ -9,17 +9,21 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="63dp"
+        android:layout_marginTop="21dp"
         android:ems="10"
-        android:hint="Açıklama" />
+        android:hint="Açıklama" >
+
+        <requestFocus />
+    </EditText>
 
     <Button
         android:id="@+id/btnInsert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/txtComment"
-        android:layout_marginBottom="42dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="34dp"
+        android:layout_marginRight="21dp"
         android:text="OK" />
 
     <Button
@@ -36,9 +40,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/btnInsert"
+        android:layout_alignLeft="@+id/btnSelectPhoto"
+        android:layout_alignRight="@+id/btnInsert"
+        android:layout_below="@+id/spnSubCategories" />
+
+    <Spinner
+        android:id="@+id/spnMainCategories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/txtComment"
-        android:layout_alignRight="@+id/txtComment"
         android:layout_below="@+id/txtComment"
-        android:layout_marginTop="17dp" />
+        android:layout_marginTop="16dp" />
+
+    <Spinner
+        android:id="@+id/spnSubCategories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spnMainCategories"
+        android:layout_below="@+id/spnMainCategories"
+        android:layout_marginTop="14dp" />
+
+    <Button
+        android:id="@+id/btnTakePhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imgPhoto"
+        android:layout_toLeftOf="@+id/btnInsert"
+        android:layout_toRightOf="@+id/btnSelectPhoto"
+        android:text="Ft. Çek" />
 
 </RelativeLayout>

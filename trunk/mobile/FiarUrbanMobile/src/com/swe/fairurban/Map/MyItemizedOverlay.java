@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
+import com.swe.fairurban.JSONClasses.ListEntry;
  
 import java.util.ArrayList;
  
@@ -18,11 +19,15 @@ public class MyItemizedOverlay extends ItemizedOverlay {
     private ArrayList< OverlayItem > mOverlays = new ArrayList< OverlayItem >();
     Context mContext;
  
- 
- 
-    public MyItemizedOverlay(Drawable marker) {
-        super(boundCenterBottom(marker));
+    
+    private OverlayClickedEvent clickedEvent;
+    
+    
+    public void SetOverlayClickedEvent(OverlayClickedEvent event)
+    {
+    	clickedEvent = event;
     }
+ 
  
     public MyItemizedOverlay(Drawable marker, Context context) {
         super(boundCenterBottom(marker));
@@ -48,11 +53,21 @@ public class MyItemizedOverlay extends ItemizedOverlay {
     protected boolean onTap(int i) {
         //when you tap on the marker this will show the informations provided by you when you create in the 
         //main class the OverlayItem
+    	
         OverlayItem item = mOverlays.get(i);
-        AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-        dialog.setTitle(item.getTitle());
-        dialog.setMessage(item.getSnippet());
-        dialog.show();
+        
+        if (item instanceof MyOverlayItem) {
+			clickedEvent.OverlayClicked(((MyOverlayItem)item).entry);
+		}
+        else {
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+            dialog.setTitle(item.getTitle());
+            dialog.setMessage(item.getSnippet());
+            dialog.show();
+		}
+        
+        
         return true;
     }
 }

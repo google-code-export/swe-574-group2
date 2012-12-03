@@ -16,7 +16,8 @@
         <uses-library android:name="com.google.android.maps"/>
         <activity
             android:name=".UI.Login"
-            android:label="Fair Urban" >
+            android:label="Fair Urban"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,13 +26,22 @@
         </activity>
          <activity
             android:name=".UI.Map"
-            android:label="Fair Urban - Harita" >
+            android:label="Fair Urban - Harita" 
+            android:screenOrientation="portrait">
             <intent-filter>
             </intent-filter>
         </activity>
          <activity
             android:name=".UI.Insert"
-            android:label="Fair Urban - Yeni Ekle" >
+            android:label="Fair Urban - Yeni Ekle"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+            </intent-filter>
+        </activity>
+          <activity
+            android:name=".UI.Detail"
+            android:label="Fair Urban - Detaylar"
+            android:screenOrientation="portrait" >
             <intent-filter>
             </intent-filter>
         </activity>
