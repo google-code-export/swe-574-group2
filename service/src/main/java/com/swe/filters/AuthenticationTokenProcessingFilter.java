@@ -35,6 +35,10 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
     @Autowired
     UserService userService;
     private User user = null;
+    
+    public AuthenticationTokenProcessingFilter() {
+		// TODO Auto-generated constructor stub
+	}
 
     public AuthenticationTokenProcessingFilter(AuthenticationManager authManager ) {
         this.authManager = authManager;
