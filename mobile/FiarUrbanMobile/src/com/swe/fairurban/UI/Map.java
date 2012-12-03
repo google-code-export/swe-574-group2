@@ -33,6 +33,8 @@ import com.swe.fairurban.JSONClasses.EntryCategory;
 import com.swe.fairurban.JSONClasses.JSONDataContainer;
 import com.swe.fairurban.JSONClasses.ListEntry;
 import com.swe.fairurban.Map.MyItemizedOverlay;
+import com.swe.fairurban.Map.MyOverlayItem;
+import com.swe.fairurban.Map.OverlayClickedEvent;
 import com.swe.fairurban.Map.TappedLocationOverlay;
 
 import android.location.Location;
@@ -190,21 +192,53 @@ public class Map extends MapActivity {
 			public void onClick(View view) {
 				// TODO Auto-generated method stub
 				
-				if (locUpdated == false) {
-					Toast tGPSException = Toast.makeText(appContext, "Henüz lokasyonunuz bulunamadý.",1000);
+				if (locUpdated == false && tappedPoint == null) {
+					Toast tGPSException = Toast.makeText(appContext, "Henüz lokasyonunuz bulunamadý. Haritada bir lokasyona çift týklayarak da giriþ yapabilirsiniz.",1000);
 					tGPSException.show();
 					return;
 				}
-				
-				Bundle b = new Bundle();
-				b.putDouble("lat", currentLatitude);
-				b.putDouble("lng", currentLongitude);
-				
-				Intent insertIntent = new Intent(view.getContext(), Insert.class);
-				
-				insertIntent.putExtras(b);
-				
-                startActivityForResult(insertIntent,ACTIVITY_RESULT_CODE_INSERT);
+				else if (locUpdated == false && tappedPoint != null) {
+					AlertDialog.Builder dialog = new AlertDialog.Builder(appContext);
+		            dialog.setTitle("Yeni Ekle");
+		            dialog.setMessage("Henüz lokasyonunuz bulunamadý fakat harita üzerinde seçmiþ olduðunuz bir nokta var. Bu nokta için yeni giriþ yapmak istediðinize emin misiniz?");
+		            
+		            dialog.setCancelable(false)
+		            .setPositiveButton("Ekle", new DialogInterface.OnClickListener() {
+		                public void onClick(DialogInterface dialog, int id) {
+		                	AddNewScreen(tappedPoint.getLatitudeE6()/ 1E6, tappedPoint.getLongitudeE6() / 1E6);
+		                }
+		            })
+		            .setNegativeButton("Ýptal", new DialogInterface.OnClickListener() {
+		                public void onClick(DialogInterface dialog, int id) {
+		                     dialog.cancel();
+		                }
+		            });
+		            
+		            dialog.show();
+				}
+				else if (locUpdated == true && tappedPoint == null) {
+					AddNewScreen(currentLatitude,currentLongitude);
+				}
+				else if (locUpdated == true && tappedPoint != null) {
+					AlertDialog.Builder dialog = new AlertDialog.Builder(appContext);
+		            dialog.setTitle("Yeni Ekle");
+		            dialog.setMessage("Bulunduðunuz lokasyona mý, seçtiðiniz lokasyona mý eklemek istiyorsunuz?");
+		            
+		            dialog.setCancelable(false)
+		            .setPositiveButton("Bulunduðum", new DialogInterface.OnClickListener() {
+		                public void onClick(DialogInterface dialog, int id) {
+		                	AddNewScreen(currentLatitude,currentLongitude);
+		                }
+		            })
+		            .setNegativeButton("Seçtiðim", new DialogInterface.OnClickListener() {
+		                public void onClick(DialogInterface dialog, int id) {
+		                	AddNewScreen(tappedPoint.getLatitudeE6()/ 1E6, tappedPoint.getLongitudeE6() / 1E6);
+		                }
+		            });
+		            
+		            dialog.show();
+				}
+			
 			}
 		});
 		
@@ -282,9 +316,9 @@ public class Map extends MapActivity {
 	    List<EntryCategory> subCategories = new LinkedList<EntryCategory>();
 	    
 	    EntryCategory allCatsSub = new EntryCategory();
-		allCats.id = -1;
-		allCats.title = "Hepsi";
-		allCats.parentReasonId = -1;
+	    allCatsSub.id = -1;
+	    allCatsSub.title = "Hepsi";
+	    allCatsSub.parentReasonId = -1;
 		
 		subCategories.add(allCatsSub);
 		
@@ -376,6 +410,51 @@ public class Map extends MapActivity {
 		RefreshMap();
 		
 	}
+	
+	
+	private void AddNewScreen(double currentLatitude2, double currentLongitude2)
+	{
+		Bundle b = new Bundle();
+		b.putDouble("lat", currentLatitude2);
+		b.putDouble("lng", currentLongitude2);
+		
+		Intent insertIntent = new Intent(appContext, Insert.class);
+		
+		insertIntent.putExtras(b);
+		
+        startActivityForResult(insertIntent,ACTIVITY_RESULT_CODE_INSERT);
+	}
+	
+	private OverlayClickedEvent overlayClickedEvent = new OverlayClickedEvent() {
+		
+		@Override
+		public void OverlayClicked(final ListEntry clickedEntry) {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(appContext);
+            dialog.setTitle("Engel içeriði");
+            dialog.setMessage(clickedEntry.comment);
+            
+            dialog.setCancelable(false)
+            .setPositiveButton("Ayrýntýlar", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                	Bundle b = new Bundle();
+    				b.putParcelable("entry", clickedEntry);
+    				
+    				Intent detailIntent = new Intent(appContext, Detail.class);
+    				
+    				detailIntent.putExtras(b);
+    				
+                    startActivity(detailIntent);
+                }
+            })
+            .setNegativeButton("Kapat", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                     dialog.cancel();
+                }
+            });
+            
+            dialog.show();
+		}
+	};
 	
 	
 	protected void PopulateSubCategoriesSpinner(Integer parentCategoryId)
@@ -539,10 +618,13 @@ public class Map extends MapActivity {
 
 			for (ListEntry poiData : data) {
 				GeoPoint point = LocationHelper.CreateGeoPoint(poiData.coordX, poiData.coordY);
-				OverlayItem overlayitem = new OverlayItem(point, "", poiData.comment);
+				MyOverlayItem overlayitem = new MyOverlayItem(point, "", poiData.comment,poiData);
+				
 				
 				itemizedoverlay.addOverlay(overlayitem);
 			}
+			
+			itemizedoverlay.SetOverlayClickedEvent(overlayClickedEvent);
 			
 			mapOverlays.add(itemizedoverlay);
 		}

@@ -14,6 +14,18 @@ public class ServiceHelper {
 	
 	private final static String GET_CATEGORIES_URL = "/service/categories/";
 	
+	private final static String VOTE_URL = "/service/entries/thumbs";
+	
+	
+	public static String GetEntiryDetailsUrl(Integer entityId)
+	{
+		return MAIN_SERVICE_HOST + String.format(LIST_DATA_URL) + "/" + entityId;
+	}
+	
+	public static String GetVotingUrl()
+	{
+		return MAIN_SERVICE_HOST + VOTE_URL;
+	}
 	
 	public static String GetListDataUrl()
 	{

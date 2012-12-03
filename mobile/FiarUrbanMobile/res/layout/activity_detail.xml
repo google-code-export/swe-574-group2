@@ -1,0 +1,97 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/lblComment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="26dp"
+        android:layout_marginTop="22dp"
+        android:ems="10"
+        android:text="Açıklama" />
+
+    <TextView
+        android:id="@+id/lblCommentText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/lblComment"
+        android:layout_alignBottom="@+id/lblComment"
+        android:layout_alignParentRight="true"
+        android:ems="10"
+        android:text="-" />
+
+    <TextView
+        android:id="@+id/lblUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/lblComment"
+        android:layout_below="@+id/lblComment"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:text="Kullanıcı" />
+
+    <TextView
+        android:id="@+id/lblUsernameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/lblUsername"
+        android:layout_alignBottom="@+id/lblUsername"
+        android:layout_alignParentRight="true"
+        android:ems="10"
+        android:text="-" />
+
+    <TextView
+        android:id="@+id/lblVote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/lblUsername"
+        android:layout_below="@+id/lblUsername"
+        android:layout_marginTop="15dp"
+        android:ems="10"
+        android:text="Olumlu/Olumsuz Oy" />
+
+    <TextView
+        android:id="@+id/lblVoteText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/lblVote"
+        android:layout_alignBottom="@+id/lblVote"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/lblVote"
+        android:ems="10"
+        android:text="-/-" />
+
+    <ImageButton
+        android:id="@+id/ibThumbUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/lblVote"
+        android:layout_below="@+id/lblVote"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/thumbup" />
+
+    <ImageButton
+        android:id="@+id/ibThumbDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/ibThumbUp"
+        android:layout_marginLeft="17dp"
+        android:layout_toRightOf="@+id/ibThumbUp"
+        android:src="@drawable/thumbdown" />
+
+    <ImageView
+        android:id="@+id/imgEntry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/ibThumbUp"
+        android:layout_marginTop="18dp"
+        android:scaleType="fitCenter"/>
+
+</RelativeLayout>
