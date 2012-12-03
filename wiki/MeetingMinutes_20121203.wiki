@@ -16,9 +16,9 @@
 6. Searching by location and priority should be added.
 
 7. Reporting implementation
-7.1. List of all accessibility violations
-7.2. List of "open" and "fixed" violations
-7.3. List of violations by search results
-7.3.1. List by category
-7.3.2. List by priority
-7.3.3. List by location/proximity
+  7.1. List of all accessibility violations
+  7.2. List of "open" and "fixed" violations
+    7.3. List of violations by search results
+      7.3.1. List by category
+      7.3.2. List by priority
+      7.3.3. List by location/proximity
