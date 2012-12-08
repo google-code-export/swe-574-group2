@@ -42,18 +42,25 @@ public class LoginController {
 
 	  @RequestMapping(value="/status", method = RequestMethod.GET,produces="application/json")
 	  public ResponseEntity<LoginStatus> getStatus(HttpServletRequest request) {
-		System.out.println("getStatuss");
 		
 		SecurityContext context = (SecurityContext) request.getSession().getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
-	    Authentication auth = context.getAuthentication();
-	    LoginStatus status = new LoginStatus();
-	    if (auth != null && !auth.getName().equals("anonymousUser") && auth.isAuthenticated()) {
-	      status.setLoggedIn(true);
-	      status.setUsername(auth.getName());
-	    } else {
-	    	status.setLoggedIn(false);
-		      status.setUsername(null);
-	    }
+		 LoginStatus status = new LoginStatus();
+		if (context == null){
+			status.setLoggedIn(false);
+		    status.setUsername(null);
+		}
+		else{
+			 Authentication auth = context.getAuthentication();
+			   
+			    if (auth != null && !auth.getName().equals("anonymousUser") && auth.isAuthenticated()) {
+			      status.setLoggedIn(true);
+			      status.setUsername(auth.getName());
+			    } else {
+			    	status.setLoggedIn(false);
+				      status.setUsername(null);
+			    }
+		}
+	   
 	    
 	    HttpHeaders responseHeaders = makeCORS();
 	    return new ResponseEntity<LoginStatus>(status,responseHeaders,HttpStatus.OK);
