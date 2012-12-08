@@ -37,7 +37,7 @@
 <!-- Multipart Resolver -->
 <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <!-- one of the properties available; the maximum file size in bytes -->
-        <property name="maxUploadSize" value="100000"/>
+        <property name="maxUploadSize" value="100000000"/>
     </bean>
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
             p:prefix="/WEB-INF/jsp/" p:suffix=".jsp"></bean>

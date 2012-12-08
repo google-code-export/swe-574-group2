@@ -1,0 +1,614 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=Cp1254">
+<title>Fair Urban</title>
+</head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<style type="text/css">
+html {
+	height: 100%
+}
+
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0
+}
+
+#map_canvas {
+	height: 100%
+}
+.loginform
+{
+	background-color:white;
+}
+</style>
+<link href="http://fonts.googleapis.com/css?family=Montserrat:400,700"
+	rel="stylesheet" type="text/css" />
+<link href="css/default.css" rel="stylesheet" type="text/css"
+	media="all" />
+
+<script type="text/javascript"
+	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCg0FRVSu5XHjjkG1NV1tev04MaGOTg5Jo&sensor=false"></script>
+<script type="text/javascript"
+	src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+
+<script type="text/javascript" src="js/jquery.lightbox_me.js"></script>
+
+
+<script type="text/javascript">
+	var markersArray = [];
+
+	function clearOverlays() {
+		for ( var i = 0; i < markersArray.length; i++) {
+			markersArray[i].setMap(null);
+		}
+	}
+
+	function downloadUrl(url, callback) {
+		var request = window.ActiveXObject ? new ActiveXObject(
+				'Microsoft.XMLHTTP') : new XMLHttpRequest;
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				request.onreadystatechange = doNothing;
+				callback(request, request.status);
+			}
+		};
+
+		request.open('GET', url, true);
+		request.send(null);
+	}
+
+	function doNothing() {
+	}
+
+	function bindInfoWindow(marker, map, infoWindow, html) {
+		markersArray.push(marker);
+		google.maps.event.addListener(marker, 'click', function() {
+			infoWindow.setContent(html);
+			infoWindow.open(map, marker);
+		});
+	}
+
+	var entryDetailUrl = "entry.html?id=";
+
+	// Set the Map variable
+	var map;
+	function initialize() {
+		var myOptions = {
+			zoom : 12,
+			mapTypeId : google.maps.MapTypeId.ROADMAP,
+			scrollwheel : true
+		};
+
+		//Define Marker properties
+		var markerImg = new google.maps.MarkerImage(
+				'images/markers/marker2.png',
+				// This marker is 129 pixels wide by 42 pixels tall.
+				new google.maps.Size(22, 32),
+				// The origin for this image is 0,0.
+				new google.maps.Point(0, 0),
+				// The anchor for this image is the base of the flagpole at 18,42.
+				new google.maps.Point(18, 42));
+
+		var infoWindow = new google.maps.InfoWindow;
+		map = new google.maps.Map(document.getElementById('map_canvas'),
+				myOptions);
+
+		// Set the center of the map
+		var pos = new google.maps.LatLng(41.08, 29.025);
+		//var pos = new google.maps.LatLng(0, 0);
+		map.setCenter(pos);
+		function infoCallback(infowindow, marker) {
+			return function() {
+				infowindow.open(map, marker);
+			};
+		}
+
+		var getAllEntriesUrl = "./service/entries";
+
+		$.getJSON(getAllEntriesUrl,
+						function(data) {
+							$
+									.each(
+											data['data'],
+											function(index, element) {
+												var comment = element.comment;
+												var entryId = element.id;
+												var upVote = element.upVoteCount;
+												var downVote = element.downVoteCount;
+												var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
+												var point = new google.maps.LatLng(
+														parseFloat(element.coordX),
+														parseFloat(element.coordY));
+												var html = "<img width='70%' height='70%' src='"
+														+ image
+														+ "'>"
+														+ "<p></p><b>''"
+														+ comment
+														+ "''</b> <p></p>"
+														+ upVote
+														+ " olumlu oy &nbsp;&nbsp;"
+														+ "<a rel='"
+														+ entryId
+														+ "' id='lnkUpVote' href='javascript:voteUp("
+														+ entryId
+														+ ");'"
+														+ "><img width='25' height='25'" 
+						+ "src='images/upArrow.png' title='Olumlu oy ver'></a>&nbsp;&nbsp;&nbsp;"
+														+ "<a rel='"
+														+ entryId
+														+ "' id='lnkDownVote' href='javascript:voteDown("
+														+ entryId
+														+ ");'>"
+														+ "<img width='25' height='25'"
+						+ "src='images/downArrow.png' title='Olumsuz oy ver'></a>"
+														+ "&nbsp;&nbsp;"
+														+ downVote
+														+ " olumsuz oy <p></p>"
+														+ "<a style='text-decoration: underline' href='" 
+						+ entryDetailUrl + entryId + "'>Detay...</a>";
+
+												var marker = new google.maps.Marker(
+														{
+															map : map,
+															position : point,
+															icon : markerImg
+														});
+												bindInfoWindow(marker, map,
+														infoWindow, html);
+											});
+
+							$('#divCount').html(
+									"Sistemde toplam " + data['data'].length
+											+ " adet ihlâl var.");
+						});
+
+		// 		var marker = new google.maps.Marker({
+		// 			position : map.getCenter(),
+		// 			map : map,
+		// 			title : 'Click to zoom'
+		// 		});
+
+		// 		google.maps.event.addListener(marker, 'click', function() {
+		// 			map.setZoom(8);
+		// 			map.setCenter(marker.getPosition());
+		// 		});
+	};
+
+	// Initializes the Google Map
+	google.maps.event.addDomListener(window, 'load', initialize);
+
+	var voteUrl = "./service/entries/thumbs";
+	var isLoggedInUrl = "./service/login/status";
+	var logOutUrl = "./service/j_spring_security_logout";
+
+	
+	function voteUp(entryId) {
+		$.ajax({
+		    url: voteUrl,
+		    type: 'post',
+		    data: JSON.stringify({entryId:entryId,up:true}),
+		    dataType: 'json',
+		    contentType: "application/json;charset=utf-8",
+		}).done(function(){
+		    var upp = $('#lblUpVote').val();
+		    $('#lblUpVote').val(parseInt(upp) + 1);
+		});
+	};
+
+	function voteDown(entryId) {
+		$.ajax({
+			url : voteUrl,
+			type : 'post',
+			data : {
+				entryId : entryId,
+				up : false
+			}
+		}).done(function() {
+			var upp = $('#lblUpVote').val();
+			$('#lblUpVote').val(parseInt(upp) + 1);
+		});
+	};
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		
+		IsLoggedIn();
+		
+		$('#spnLogin').click(function(e) {
+		    $('#divlogin').lightbox_me({
+		        centered: true, 
+		        onLoad: function() { 
+		            $('#sign_up').find('input:first').focus()
+		            }
+		        });
+		    e.preventDefault();
+		});
+		
+		//testuser - swe574TEST!
+		$('#frmlogin').submit(function() {
+						
+						//alert($("#frmlogin").serialize())
+						$.ajax({
+							type: 'POST',
+							data: $("#frmlogin").serialize(),
+				          	url: './service/login/sigin',
+				            success: function(msg,textStatus) {
+				            	alert("Başarıyla giriş yaptınız!");
+				            	$('#spnLogout').show();
+			 					$('#spnLogin').hide();
+				            	$('#divlogin').trigger('close');
+				            },
+				            error:function(jqXHR, textStatus, errorThrown){
+					          alert("Bir hata oluştu, lütfen tekrar deneyiniz.");
+				              //alert(errorThrown);
+				            }
+				        });
+						  return false;
+					});
+		
+						//jQuery.support.cors = true;
+
+						//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
+						//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
+						var getCategoriesUrl = './service/categories';
+						var getEntriesByCategoryUrl = './service/entries?categoryId=';
+
+						var selectParent = $('#ddlCategories');
+						var selectChild = $('#ddlChildren');
+						$.getJSON(getCategoriesUrl, function(data) {
+							// 			$.each(data['data'], function(index, element) {
+							// 		        $('#feed').append(element.id + " " + element.title + " " + " " + element.parentReasonId + "</br>");
+							// 		        $.each(element.violationTypes, function(index, element2)
+							// 		        {
+							// 		        	$('#feed').append(element2.id + " " + element2.title + " " + " " + element2.description + " " + element2.imageMeta);
+							// 		        });
+							// 		    });
+							$.each(data['data'], function(index, element) {
+								$(selectParent).append(
+										$('<option></option>').val(element.id)
+												.html(element.title));
+							});
+						});
+
+						selectParent
+								.change(function() {
+									if (selectParent.find(":selected").val() == "0") {
+										selectChild.hide();
+									} else {
+										selectChild.empty();
+										selectChild.append($(
+												'<option></option>').val(0)
+												.html("Tamamı"));
+										$
+												.getJSON(
+														getCategoriesUrl
+																+ "/"
+																+ selectParent
+																		.find(
+																				":selected")
+																		.val(),
+														function(data) {
+															$
+																	.each(
+																			data['data'],
+																			function(
+																					index,
+																					element) {
+																				selectChild
+																						.append($(
+																								'<option></option>')
+																								.val(
+																										element.id)
+																								.html(
+																										element.title));
+																			});
+															selectChild.show();
+														});
+									}
+								});
+
+						selectChild.change(function() {
+
+						});
+
+						$('#btnSearch')
+								.click(
+										function() {
+											var valToSearch = 0;
+											if (selectChild.val() == "0") {
+												valToSearch = selectParent
+														.val();
+											} else {
+												valToSearch = selectChild.val();
+											}
+
+											var scriptUrl = getEntriesByCategoryUrl
+													+ valToSearch;
+											$
+													.ajax({
+														url : scriptUrl,
+														type : 'get',
+														dataType : 'json',
+														beforeSend : function() {
+															$("#spinner")
+																	.show();
+														},
+														complete : function() {
+															$("#spinner")
+																	.hide();
+														},
+														success : function(data) {
+															var dataS = data['data'];
+
+															$('#divCount')
+																	.html(
+																			"Filtreleme sonucu "
+																					+ dataS.length
+																					+ " adet ihlâl bulundu.");
+
+															var pinImg = new google.maps.MarkerImage(
+																	'images/markers/wheelchair.png',
+																	// This marker is 129 pixels wide by 42 pixels tall.
+																	new google.maps.Size(
+																			129,
+																			42),
+																	// The origin for this image is 0,0.
+																	new google.maps.Point(
+																			0,
+																			0),
+																	// The anchor for this image is the base of the flagpole at 18,42.
+																	new google.maps.Point(
+																			18,
+																			42));
+
+															var infoWindow = new google.maps.InfoWindow;
+
+															clearOverlays();
+
+															$
+																	.each(
+																			dataS,
+																			function(
+																					index,
+																					element) {
+																				var comment = element.comment;
+																				var entryId = element.id;
+																				var point = new google.maps.LatLng(
+																						parseFloat(element.coordX),
+																						parseFloat(element.coordY));
+																				var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
+																				var html = "<img width='70%' height='70%' src='"
+																						+ image
+																						+ "'>"
+																						+ "<br/><b>''"
+																						+ comment
+																						+ "''</b> <br/> <a style='text-decoration: underline' href='" 
+		    						+ entryDetailUrl + entryId + "'>Detay...</a>";
+																				var marker = new google.maps.Marker(
+																						{
+																							map : map,
+																							position : point,
+																							icon : pinImg
+																						});
+
+																				bindInfoWindow(
+																						marker,
+																						map,
+																						infoWindow,
+																						html);
+
+																			});
+														},
+														error : function(data) {
+															alert("Bir hata oluştu, lütfen tekrar deneyin.");
+														}
+													});
+
+										});
+
+						var voteUrl = "./service/entries/thumbs";
+
+						$("#lnkUpVote").click(function() {
+							alert($("#lnkUpVote").attr('rel'));
+							$.ajax({
+								url : voteUrl,
+								type : 'post',
+								data : {
+									entryId : $("#lnkUpVote").attr('rel'),
+									up : true
+								}
+							}).done(function() {
+								alert($("#lnkUpVote").attr('rel'));
+								var upp = $('#lblUpVote').val();
+								$('#lblUpVote').val(parseInt(upp) + 1);
+							});
+						});
+
+						$("#lnkDownVote").click(function() {
+							if ($('#lnkDownVote').hasClass('disabled'))
+								return;
+							$('#lblVote').html('Down vote verildi');
+							$('#msgVote').hide().fadeIn("slow", "linear");
+							var upp = $('#hdnDownVote').val();
+							$('#lblDownVote').html(parseInt(upp) - 1);
+							$('#lnkDownVote').addClass('disabled');
+						});
+
+						function voteUp(entryId) {
+							alert(entryId);
+							$.ajax({
+								url : voteUrl,
+								type : 'post',
+								data : {
+									entryId : $("#lnkUpVote").attr('rel'),
+									up : true
+								}
+							}).done(function() {
+								alert($("#lnkUpVote").attr('rel'));
+								var upp = $('#lblUpVote').val();
+								$('#lblUpVote').val(parseInt(upp) + 1);
+							});
+						};
+
+					});
+	
+	function IsLoggedIn() {
+		$.ajax({
+			url : isLoggedInUrl,
+			type : 'get',
+			success: function(msg){
+				if(msg.loggedIn == true)
+					{
+ 					$('#spnLogout').show();
+ 					$('#spnLogin').hide();
+					//$('#spnLogin').show();
+					//$('#spnLogout').hide();
+					}
+				else
+					{
+						$('#spnLogin').show();
+						$('#spnLogout').hide();
+					}
+			},
+			error: function(){}
+		})
+	};
+	
+	function logOut() {
+		$.ajax({
+			url : logOutUrl,
+			type : 'get',
+			success: function(msg){
+				if(msg.status == true)
+					{
+					alert("Başarıyla çıkış yaptınız!");
+					console.log(msg);
+					$('#spnLogin').show();
+					$('#spnLogout').hide();
+					}
+				else
+					{
+						console.log(msg);
+						$('#spnLogout').show();
+						$('#spnLogin').hide();
+					}
+			},
+			error: function(){}
+		})
+	};
+	
+	
+		
+	
+	
+</script>
+
+<body>
+
+<div class="loginform" style="display: none;" id="divlogin">
+        <form action="./service/login/sigin" accept-charset="UTF-8" method="post" id="frmlogin">
+	<div><div class="login-error"></div><div class="form-item" id="edit-name-wrapper">
+	 <label for="edit-name">Username: <span class="form-required" title="This field is required.">*</span></label>
+	 <input type="text" maxlength="60" name="username" id="username" size="15" value="" class="form-text required">
+	</div>
+	<div class="form-item" id="edit-pass-wrapper">
+	 <label for="edit-pass">Password: <span class="form-required" title="This field is required.">*</span></label>
+	 <input type="password" name="password" id="password" maxlength="60" size="15" class="form-text required">
+	</div>
+	<input type="submit" name="op" id="edit-submit-1" value="Log in" class="form-submit">
+	<div class="item-list"><ul><li class="first"></li>
+	<li><a href="/user/register" title="Create a new user account." class="gi-user-register">Register</a></li>
+	<li class="last"><a href="/user/password" title="Request new password via e-mail.">Forgot password ?</a></li>
+	</ul></div><input type="hidden" name="form_build_id" id="form-c1062bd63291587f665fe24a402917e9" value="form-c1062bd63291587f665fe24a402917e9">
+	<input type="hidden" name="form_id" id="edit-user-login-block" value="user_login_block">
+	</div></form>
+</div>
+	<div id="wrapper" class="container">
+		<div id="header">
+			<div id="logo">
+				<img src="images/logo.png" width="20%;" style="float: left">
+				<h1>
+					<a href="#">FAIR URBAN</a>
+				</h1>
+				<!-- 			<p>Alt Başlık</p> -->
+			</div>
+			<div id="menu">
+				<ul>
+					<li class="current_page_item"><a href="#">Ana Sayfa</a></li>
+					<li><a href="#">Hakkımızda</a></li>
+					<li><a href="#">Yeni Ekle</a></li>
+					<li><a id="spnLogin" style="display: none" href="javascript:;">Giriş</a>
+						<a id="spnLogout" style="display: none" href="javascript:;" onclick="logOut();" >Çıkış</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div id="page" style="padding: 10px 0 0;">
+			<div id="content">
+				<div id="cbox1">
+					<div>
+						<h4>Kategori filtreleme:</h4>
+						<select id="ddlCategories">
+							<option value="0">Tamamı</option>
+						</select> <select id="ddlChildren" style="display: none">
+							<!--<option value="0">Tamamı</option> -->
+						</select> <input type="button" id="btnSearch" name="formSearch" value="Ara" />
+						<span id="spinner" class="spinner" style="display: none;"><img
+							id="img-spinner" src="images/spinner.gif" alt="Yükleniyor" /> </span>
+						<p style="height: 7px"></p>
+						<div id="divCount" style="font-weight: bold;"></div>
+					</div>
+				</div>
+				<div id="two-column">
+					<div id="map_canvas"
+		style="width: 900px; height: 700px;"></div>
+					
+				</div>
+			</div>
+			<div id="sidebar">
+				<div id="box1">
+					<h2>Praesent mattis</h2>
+					<ul class="style1">
+						<li class="first"><a href="#">Vestibulum luctus venenatis
+								dui</a></li>
+						<li><a href="#">Aenean elementum facilisis ligula</a></li>
+						<li><a href="#">Ut tincidunt elit vitae augue</a></li>
+						<li><a href="#">Aenean elementum facilisis ligula</a></li>
+						<li><a href="#">Ut tincidunt elit vitae augue</a></li>
+						<li><a href="#">Sed quis odio sagittis leo vehicula</a></li>
+					</ul>
+					<p>
+						<a href="#" class="link-style">Read More</a>
+					</p>
+				</div>
+				<div id="box2">
+					<h2>Maecenas lectus</h2>
+					<p>
+						<a href="#" class="link-style">Read More</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<p style="height: 20px"></p>
+	
+	<p style="height: 20px;"></p>
+	<div>
+		<a href="new.html"
+			style="font-weight: bold; text-decoration: underline;">Bulunduğum
+			lokasyona yeni giriş</a> &nbsp;&nbsp;||&nbsp;&nbsp; <a
+			href="new_manual.html"
+			style="font-weight: bold; text-decoration: underline;">Seçeceğim
+			lokasyona yeni giriş</a>
+	</div>
+	<p style="height: 20px"></p>
+</body>
+
+
+</html>
