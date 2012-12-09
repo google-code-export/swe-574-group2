@@ -1,0 +1,266 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<title>Fair Urban</title>
+</head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<style type="text/css">
+html {
+	height: 100%
+}
+
+body {
+	height: 100%;
+	margin: 0;
+	padding: 0
+}
+
+#map_canvas {
+	height: 100%
+}
+
+.loginform
+{
+	background-color:white;
+}
+
+.clsTable
+{
+	border: 0;
+	border-collapse:separate; 
+	border-spacing:2em;
+	border-width: 1px; 
+	border-color:#000000; 
+	border-style: solid;
+}
+
+.reqVal
+{
+	color: red;
+	display: none;
+}
+</style>
+<link href="http://fonts.googleapis.com/css?family=Montserrat:400,700"
+	rel="stylesheet" type="text/css" />
+<link href="css/default.css" rel="stylesheet" type="text/css"
+	media="all" />
+
+<script type="text/javascript"
+	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCg0FRVSu5XHjjkG1NV1tev04MaGOTg5Jo&sensor=false"></script>
+<script type="text/javascript"
+	src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+
+<script type="text/javascript" src="js/jquery.lightbox_me.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		
+		IsLoggedIn();
+		
+		$('#spnLogin').click(function(e) {
+		    $('#divlogin').lightbox_me({
+		        centered: true, 
+		        onLoad: function() { 
+		            $('#sign_up').find('input:first').focus()
+		            }
+		        });
+		    e.preventDefault();
+		});
+		
+		//testuser - swe574TEST!
+		$('#frmlogin').submit(function() {
+			
+			if($('#username').val() == "" || $('#password').val() == "")
+			{
+				if($('#username').val() == ""){$('#reqUser').show();}else{$('#reqUser').hide();}
+				if($('#password').val() == ""){$('#reqPass').show();}else{$('#reqPass').hide();}
+				return false;
+			}
+			else
+			{
+				//alert($("#frmlogin").serialize())
+				$.ajax({
+					type: 'POST',
+					data: $("#frmlogin").serialize(),
+		          	url: './service/login/sigin',
+		            success: function(msg,textStatus) {
+		            	//alert("Başarıyla giriş yaptınız!");
+		            	//$('#spnLogout').show();
+	 					//$('#spnLogin').hide();
+		            	$('#divlogin').trigger('close');
+		            	IsLoggedIn();
+		            },
+		            error:function(jqXHR, textStatus, errorThrown){
+			          alert("Yanlış kullanıcı adı/şifre, lütfen tekrar deneyiniz.");
+		              //alert(errorThrown);
+		            }
+		        });
+				  return false;
+			}	
+		});
+});
+	
+	var isLoggedInUrl = "./service/login/status";
+	var logOutUrl = "./service/j_spring_security_logout";
+	
+	function IsLoggedIn() {
+		$.ajax({
+			url : isLoggedInUrl,
+			type : 'get',
+			success: function(msg){
+				if(msg.loggedIn == true)
+					{
+					$('#welcomeText').show().html('Hoşgeldin ' + msg.username + '!');
+ 					$('#spnLogout').show();
+ 					$('#spnLogin').hide();
+ 					$('#liNewEntry').show();
+					//$('#spnLogin').show();
+					//$('#spnLogout').hide();
+					}
+				else
+					{
+						$('#spnLogin').show();
+						$('#spnLogout').hide();
+						$('#liNewEntry').hide();
+					}
+			},
+			error: function(){}
+		})
+	};
+	
+	function logOut() {
+		$.ajax({
+			url : logOutUrl,
+			type : 'get',
+			success: function(msg){
+				if(msg.status == true)
+					{
+					alert("Başarıyla çıkış yaptınız!");
+					console.log(msg);
+					IsLoggedIn();
+					}
+				else
+					{
+						console.log(msg);
+						$('#spnLogout').show();
+						$('#spnLogin').hide();
+					}
+			},
+			error: function(){}
+		})
+	};
+</script>
+
+<body>
+
+<div class="loginform" style="display: none; border:#111" id="divlogin">
+<form action="./service/login/sigin" accept-charset="UTF-8" method="post" id="frmlogin">
+    <table class="clsTable">
+       <tr>
+         <td colspan="2"><span style="font-size: large;">Siteye giriş yapın</span></td>
+       </tr>
+       <tr>
+         <td><label for="username">Kullanıcı adı:<span class="reqVal" id="reqUser">&nbsp;*</span></label></td>
+         <td> <input type="text" maxlength="60" name="username" id="username" size="15" value="" class="required" style="float: right"></td>
+       </tr>
+       <tr>
+         <td><label for="password">Şifre:<span class="reqVal" id="reqPass">&nbsp;*</span></label></td>
+         <td> <input type="password" name="password" id="password" maxlength="60" size="15" class="required" style="float: right"></td>
+       </tr>
+       <tr>
+         <td><input type="submit" name="submit" id="submit" value="Giriş"></td>
+         <td></td>
+       </tr>
+       <tr>
+         <td><a href="register.html" title="Üye olun!" style="font-size: 14px;">Kaydol</a></td>
+         <td></td>
+       </tr>
+    </table>
+	<input type="hidden" name="form_build_id" id="form-c1062bd63291587f665fe24a402917e9" value="form-c1062bd63291587f665fe24a402917e9">
+	<input type="hidden" name="form_id" id="edit-user-login-block" value="user_login_block">
+</form>
+</div>
+	<div id="wrapper" class="container">
+		<div id="header">
+			<div id="logo">
+				<a href="default.html"><img src="images/logo.png" width="25%;" style="float: left"></a>
+				<h1 style="margin-top: 10px">  
+					<a href="default.html">&nbsp;FAIR URBAN</a>
+				</h1>
+				<!-- 			<p>Alt Başlık</p> -->
+			</div>
+			<div id="menu">
+				<ul>
+					<li><a href="default.html">Ana Sayfa</a></li>
+					<li  class="current_page_item"><a href="about.html">Hakkımızda</a></li>
+					<li id="liNewEntry"><a href="new.html">Yeni Ekle</a></li>
+					<li><a id="spnLogin" style="display: none" href="javascript:;">GIRIS</a>
+						<a id="spnLogout" style="display: none" href="javascript:;" onclick="logOut();" >ÇIKIS</a>
+					</li>
+				</ul>
+			</div>
+			<span style="display: none; float: right; margin-right: 20px; margin-top: 10px; font-weight: bold;" id="welcomeText"></span>
+		</div>
+		<div id="page" style="padding: 10px 0 0;">
+			<div id="content">
+				<div id="cbox1">
+					<div style="font-size: 14px;">
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam molestie,
+						 metus dignissim ornare consequat, orci lorem elementum nunc, 
+						 ac luctus justo justo vitae augue. Donec facilisis aliquam elit nec egestas. 
+						 Morbi sed commodo sapien. Nunc eu tempus elit. Fusce tortor urna, 
+						 dictum at tincidunt non, venenatis vel massa. Aenean laoreet elementum risus, 
+						 quis fermentum orci ultrices a. Praesent tincidunt congue diam, vel pretium nisi adipiscing in. 
+						 Suspendisse vel nibh non massa congue auctor. Sed vel est non elit elementum sagittis. 
+						 Quisque ut nulla mauris. Nullam fringilla neque sed diam fringilla pulvinar posuere nibh gravida. 
+						 Aliquam erat volutpat. Quisque quis vehicula felis. Cras turpis magna, 
+						 vestibulum sed convallis convallis, ullamcorper ac magna.</p>
+
+						<p>Nunc varius tortor vitae augue gravida rutrum. Nam ac turpis eget ante feugiat semper eu elementum justo. 
+						Duis sit amet quam eget elit pellentesque tempus pretium vel erat. Sed justo erat, dignissim at ultricies vitae, 
+						consectetur quis nisl. Aliquam turpis erat, mollis auctor porta ac, viverra in nibh. Cras odio purus, congue vel egestas quis,
+						placerat faucibus felis. Pellentesque ac sem eu risus viverra varius. Vestibulum tristique lorem vitae metus vehicula 
+						sit amet tristique arcu luctus. Cras vel neque turpis, quis scelerisque urna. Aenean varius vestibulum tempus. 
+						Etiam imperdiet volutpat tellus, sed sodales nisi vestibulum ac. Donec eu lorem ut metus porttitor sodales nec vitae lectus. 
+						Nulla facilisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur quis sapien et leo pretium faucibus.</p>
+
+						<p>Aenean vitae suscipit erat. Integer non enim eget ipsum sollicitudin euismod. 
+						Sed vehicula commodo nisi a ornare. Vivamus fringilla, arcu vitae placerat mattis, 
+						dui quam venenatis mauris, sed ultricies sapien erat vel sem. Nullam nec lectus ut odio pellentesque 
+						convallis. Donec vel nulla sit amet quam fermentum ornare et dapibus mauris. Sed id leo vitae elit 
+						rutrum vestibulum quis in metus. Proin placerat imperdiet massa, vitae sollicitudin diam venenatis 
+						placerat.</p>
+					</div>
+				</div>
+					<a href="javascript: window.history.go(-1)" style="font-weight:bold; text-decoration: underline; color: #2AA8D2; font-size: 14px;"><--Geri</a>
+					<p style="height: 5px;"></p>
+			</div>
+<!-- 			<div id="sidebar"> -->
+<!-- 				<div id="box1"> -->
+<!-- 					<h2>Praesent mattis</h2> -->
+<!-- 					<ul class="style1"> -->
+<!-- 						<li class="first"><a href="#">Vestibulum luctus venenatis -->
+<!-- 								dui</a></li> -->
+<!-- 						<li><a href="#">Aenean elementum facilisis ligula</a></li> -->
+<!-- 						<li><a href="#">Ut tincidunt elit vitae augue</a></li> -->
+<!-- 						<li><a href="#">Aenean elementum facilisis ligula</a></li> -->
+<!-- 						<li><a href="#">Ut tincidunt elit vitae augue</a></li> -->
+<!-- 						<li><a href="#">Sed quis odio sagittis leo vehicula</a></li> -->
+<!-- 					</ul> -->
+<!-- 					<p> -->
+<!-- 						<a href="#" class="link-style">Read More</a> -->
+<!-- 					</p> -->
+<!-- 				</div> -->
+<!-- 				<div id="box2"> -->
+<!-- 					<h2>Maecenas lectus</h2> -->
+<!-- 					<p> -->
+<!-- 						<a href="#" class="link-style">Read More</a> -->
+<!-- 					</p> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+					
+		</div>
+	</div>
+</body>
+</html>
