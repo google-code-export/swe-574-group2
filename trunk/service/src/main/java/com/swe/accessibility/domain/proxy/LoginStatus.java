@@ -37,4 +37,13 @@ public class LoginStatus {
 	    public String getUsername() {
 	      return username;
 	    }
+
+		@Override
+		public String toString() {
+			
+			return "{loggedIn:" + loggedIn + ", username:"
+					+ username + ", errorReason:" + errorReason + "}";
+		}
+	    
+	    
 	  }
