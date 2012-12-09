@@ -14,10 +14,8 @@ import java.security.Principal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -27,10 +25,12 @@ import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +44,7 @@ import com.swe.accessibility.domain.EntryReason;
 import com.swe.accessibility.domain.InsertEntryResult;
 import com.swe.accessibility.domain.SubReason;
 import com.swe.accessibility.domain.User;
+import com.swe.accessibility.domain.proxy.Config;
 import com.swe.accessibility.domain.proxy.EntryList;
 import com.swe.accessibility.domain.proxy.EntryProxy;
 import com.swe.accessibility.domain.proxy.ThumbsObject;
@@ -72,6 +73,9 @@ public class EntryController {
 	
 	@Resource(name="commentService")
 	private CommentService commentService;
+	
+	@Autowired
+	private Config config;
 	
 	
 	@RequestMapping(value = "/add", method = RequestMethod.POST, headers={"content-type=multipart/form-data"},produces={"application/json"})
@@ -307,20 +311,32 @@ public class EntryController {
 	
 	@RequestMapping(value="/thumbs",method={RequestMethod.POST,RequestMethod.OPTIONS},produces="application/json",headers={"Content-Type=application/json"})
 	
-	public ResponseEntity<UpdateResult> updateVoteCount(@RequestBody ThumbsObject thumbs){
+	public ResponseEntity<UpdateResult> updateVoteCount(Principal principal,@RequestBody ThumbsObject thumbs){
 		
 		UpdateResult result = new UpdateResult();
 		HttpHeaders responseHeaders = makeCORS();
+		User user = userService.getUserByName(principal.getName());
 		int id = thumbs.getEntryId();
+		
+		Entry entry = entryService.getRawEntry(id);
 		boolean up = thumbs.isUp();
-		try{
-			entryService.updateEntryVote(id,up);
-			result.setResultId(0);
-			result.setResultStatus("SUCCESS");
-		}catch(Exception e){
-			result.setResultId(1);
+		
+		if(entryService.checkForVote(entry, user)){
+			result.setResultId(2);
 			result.setResultStatus("FAILURE");
 		}
+		else{
+			try{
+				entryService.updateEntryVote(entry,up,user);
+				
+				result.setResultId(0);
+				result.setResultStatus("SUCCESS");
+			}catch(Exception e){
+				result.setResultId(1);
+				result.setResultStatus("FAILURE");
+			}
+		}
+		
 		
 		
 		return new ResponseEntity<UpdateResult>(result,responseHeaders,HttpStatus.OK );
@@ -414,5 +430,12 @@ public class EntryController {
     	g.dispose();
     	return scaledBI;
     }
+	
+	@ExceptionHandler(value=Exception.class)
+	public String handleException(Exception e){
+		
+		e.printStackTrace();
+		return "error";
+	}
 	
 }
