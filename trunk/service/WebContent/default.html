@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=Cp1254">
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <title>Fair Urban</title>
 </head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
@@ -19,9 +19,26 @@ body {
 #map_canvas {
 	height: 100%
 }
+
 .loginform
 {
 	background-color:white;
+}
+
+.clsTable
+{
+	border: 0;
+	border-collapse:separate; 
+	border-spacing:2em;
+	border-width: 1px; 
+	border-color:#000000; 
+	border-style: solid;
+}
+
+.reqVal
+{
+	color: red;
+	display: none;
 }
 </style>
 <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700"
@@ -36,7 +53,6 @@ body {
 
 <script type="text/javascript" src="js/jquery.lightbox_me.js"></script>
 
-
 <script type="text/javascript">
 	var markersArray = [];
 
@@ -44,21 +60,6 @@ body {
 		for ( var i = 0; i < markersArray.length; i++) {
 			markersArray[i].setMap(null);
 		}
-	}
-
-	function downloadUrl(url, callback) {
-		var request = window.ActiveXObject ? new ActiveXObject(
-				'Microsoft.XMLHTTP') : new XMLHttpRequest;
-
-		request.onreadystatechange = function() {
-			if (request.readyState == 4) {
-				request.onreadystatechange = doNothing;
-				callback(request, request.status);
-			}
-		};
-
-		request.open('GET', url, true);
-		request.send(null);
 	}
 
 	function doNothing() {
@@ -123,7 +124,7 @@ body {
 												var point = new google.maps.LatLng(
 														parseFloat(element.coordX),
 														parseFloat(element.coordY));
-												var html = "<img width='70%' height='70%' src='"
+												var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
 														+ image
 														+ "'>"
 														+ "<p></p><b>''"
@@ -149,7 +150,7 @@ body {
 														+ downVote
 														+ " olumsuz oy <p></p>"
 														+ "<a style='text-decoration: underline' href='" 
-						+ entryDetailUrl + entryId + "'>Detay...</a>";
+						+ entryDetailUrl + entryId + "'>Detay...</a></div>";
 
 												var marker = new google.maps.Marker(
 														{
@@ -163,7 +164,7 @@ body {
 
 							$('#divCount').html(
 									"Sistemde toplam " + data['data'].length
-											+ " adet ihlâl var.");
+											+ " adet ihlÃ¢l var.");
 						});
 
 		// 		var marker = new google.maps.Marker({
@@ -231,25 +232,35 @@ body {
 		
 		//testuser - swe574TEST!
 		$('#frmlogin').submit(function() {
-						
-						//alert($("#frmlogin").serialize())
-						$.ajax({
-							type: 'POST',
-							data: $("#frmlogin").serialize(),
-				          	url: './service/login/sigin',
-				            success: function(msg,textStatus) {
-				            	alert("Başarıyla giriş yaptınız!");
-				            	$('#spnLogout').show();
-			 					$('#spnLogin').hide();
-				            	$('#divlogin').trigger('close');
-				            },
-				            error:function(jqXHR, textStatus, errorThrown){
-					          alert("Bir hata oluştu, lütfen tekrar deneyiniz.");
-				              //alert(errorThrown);
-				            }
-				        });
-						  return false;
-					});
+			
+			if($('#username').val() == "" || $('#password').val() == "")
+			{
+				if($('#username').val() == ""){$('#reqUser').show();}else{$('#reqUser').hide();}
+				if($('#password').val() == ""){$('#reqPass').show();}else{$('#reqPass').hide();}
+				return false;
+			}
+			else
+			{
+				//alert($("#frmlogin").serialize())
+				$.ajax({
+					type: 'POST',
+					data: $("#frmlogin").serialize(),
+		          	url: './service/login/sigin',
+		            success: function(msg,textStatus) {
+		            	//alert("BaÅŸarÄ±yla giriÅŸ yaptÄ±nÄ±z!");
+		            	//$('#spnLogout').show();
+	 					//$('#spnLogin').hide();
+		            	$('#divlogin').trigger('close');
+		            	IsLoggedIn();
+		            },
+		            error:function(jqXHR, textStatus, errorThrown){
+			          alert("YanlÄ±ÅŸ kullanÄ±cÄ± adÄ±/ÅŸifre, lÃ¼tfen tekrar deneyiniz.");
+		              //alert(errorThrown);
+		            }
+		        });
+				  return false;
+			}	
+		});
 		
 						//jQuery.support.cors = true;
 
@@ -283,7 +294,7 @@ body {
 										selectChild.empty();
 										selectChild.append($(
 												'<option></option>').val(0)
-												.html("Tamamı"));
+												.html("TamamÄ±"));
 										$
 												.getJSON(
 														getCategoriesUrl
@@ -349,7 +360,7 @@ body {
 																	.html(
 																			"Filtreleme sonucu "
 																					+ dataS.length
-																					+ " adet ihlâl bulundu.");
+																					+ " adet ihlÃ¢l bulundu.");
 
 															var pinImg = new google.maps.MarkerImage(
 																	'images/markers/wheelchair.png',
@@ -382,13 +393,33 @@ body {
 																						parseFloat(element.coordX),
 																						parseFloat(element.coordY));
 																				var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
-																				var html = "<img width='70%' height='70%' src='"
-																						+ image
-																						+ "'>"
-																						+ "<br/><b>''"
-																						+ comment
-																						+ "''</b> <br/> <a style='text-decoration: underline' href='" 
-		    						+ entryDetailUrl + entryId + "'>Detay...</a>";
+																				var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
+																					+ image
+																					+ "'>"
+																					+ "<p></p><b>''"
+																					+ comment
+																					+ "''</b> <p></p>"
+																					+ upVote
+																					+ " olumlu oy &nbsp;&nbsp;"
+																					+ "<a rel='"
+																					+ entryId
+																					+ "' id='lnkUpVote' href='javascript:voteUp("
+																					+ entryId
+																					+ ");'"
+																					+ "><img width='25' height='25'" 
+													+ "src='images/upArrow.png' title='Olumlu oy ver'></a>&nbsp;&nbsp;&nbsp;"
+																					+ "<a rel='"
+																					+ entryId
+																					+ "' id='lnkDownVote' href='javascript:voteDown("
+																					+ entryId
+																					+ ");'>"
+																					+ "<img width='25' height='25'"
+													+ "src='images/downArrow.png' title='Olumsuz oy ver'></a>"
+																					+ "&nbsp;&nbsp;"
+																					+ downVote
+																					+ " olumsuz oy <p></p>"
+																					+ "<a style='text-decoration: underline' href='" 
+													+ entryDetailUrl + entryId + "'>Detay...</a></div>";
 																				var marker = new google.maps.Marker(
 																						{
 																							map : map,
@@ -405,7 +436,7 @@ body {
 																			});
 														},
 														error : function(data) {
-															alert("Bir hata oluştu, lütfen tekrar deneyin.");
+															alert("Bir hata oluÅŸtu, lÃ¼tfen tekrar deneyin.");
 														}
 													});
 
@@ -464,6 +495,7 @@ body {
 			success: function(msg){
 				if(msg.loggedIn == true)
 					{
+					$('#welcomeText').show().html('HoÅŸgeldin ' + msg.username + '!');
  					$('#spnLogout').show();
  					$('#spnLogin').hide();
 					//$('#spnLogin').show();
@@ -486,10 +518,9 @@ body {
 			success: function(msg){
 				if(msg.status == true)
 					{
-					alert("Başarıyla çıkış yaptınız!");
+					alert("BaÅŸarÄ±yla Ã§Ä±kÄ±ÅŸ yaptÄ±nÄ±z!");
 					console.log(msg);
-					$('#spnLogin').show();
-					$('#spnLogout').hide();
+					IsLoggedIn();
 					}
 				else
 					{
@@ -510,43 +541,53 @@ body {
 
 <body>
 
-<div class="loginform" style="display: none;" id="divlogin">
-        <form action="./service/login/sigin" accept-charset="UTF-8" method="post" id="frmlogin">
-	<div><div class="login-error"></div><div class="form-item" id="edit-name-wrapper">
-	 <label for="edit-name">Username: <span class="form-required" title="This field is required.">*</span></label>
-	 <input type="text" maxlength="60" name="username" id="username" size="15" value="" class="form-text required">
-	</div>
-	<div class="form-item" id="edit-pass-wrapper">
-	 <label for="edit-pass">Password: <span class="form-required" title="This field is required.">*</span></label>
-	 <input type="password" name="password" id="password" maxlength="60" size="15" class="form-text required">
-	</div>
-	<input type="submit" name="op" id="edit-submit-1" value="Log in" class="form-submit">
-	<div class="item-list"><ul><li class="first"></li>
-	<li><a href="/user/register" title="Create a new user account." class="gi-user-register">Register</a></li>
-	<li class="last"><a href="/user/password" title="Request new password via e-mail.">Forgot password ?</a></li>
-	</ul></div><input type="hidden" name="form_build_id" id="form-c1062bd63291587f665fe24a402917e9" value="form-c1062bd63291587f665fe24a402917e9">
+<div class="loginform" style="display: none; border:#111" id="divlogin">
+<form action="./service/login/sigin" accept-charset="UTF-8" method="post" id="frmlogin">
+    <table class="clsTable">
+       <tr>
+         <td colspan="2"><span style="font-size: large;">Siteye giriÅŸ yapÄ±n</span></td>
+       </tr>
+       <tr>
+         <td><label for="username">KullanÄ±cÄ± adÄ±:<span class="reqVal" id="reqUser">&nbsp;*</span></label></td>
+         <td> <input type="text" maxlength="60" name="username" id="username" size="15" value="" class="required" style="float: right"></td>
+       </tr>
+       <tr>
+         <td><label for="password">Åifre:<span class="reqVal" id="reqPass">&nbsp;*</span></label></td>
+         <td> <input type="password" name="password" id="password" maxlength="60" size="15" class="required" style="float: right"></td>
+       </tr>
+       <tr>
+         <td><input type="submit" name="submit" id="submit" value="GiriÅŸ"></td>
+         <td></td>
+       </tr>
+       <tr>
+         <td><a href="register.html" title="Ãœye olun!" style="font-size: 14px;">Kaydol</a></td>
+         <td></td>
+       </tr>
+    </table>
+	<input type="hidden" name="form_build_id" id="form-c1062bd63291587f665fe24a402917e9" value="form-c1062bd63291587f665fe24a402917e9">
 	<input type="hidden" name="form_id" id="edit-user-login-block" value="user_login_block">
-	</div></form>
+</form>
 </div>
 	<div id="wrapper" class="container">
 		<div id="header">
 			<div id="logo">
-				<img src="images/logo.png" width="20%;" style="float: left">
-				<h1>
-					<a href="#">FAIR URBAN</a>
+				<img src="images/logo.png" width="25%;" style="float: left">
+				<h1 style="margin-top: 10px">  
+					<a href="default.html">&nbsp;FAIR URBAN</a>
 				</h1>
-				<!-- 			<p>Alt Başlık</p> -->
+				<!-- 			<p>Alt BaÅŸlÄ±k</p> -->
 			</div>
 			<div id="menu">
 				<ul>
-					<li class="current_page_item"><a href="#">Ana Sayfa</a></li>
-					<li><a href="#">Hakkımızda</a></li>
-					<li><a href="#">Yeni Ekle</a></li>
-					<li><a id="spnLogin" style="display: none" href="javascript:;">Giriş</a>
-						<a id="spnLogout" style="display: none" href="javascript:;" onclick="logOut();" >Çıkış</a>
+					<li class="current_page_item"><a href="default.html">Ana Sayfa</a></li>
+					<li><a href="about.html">HakkÄ±mÄ±zda</a></li>
+					<li><a href="new.html">Yeni Ekle</a></li>
+					<li><a id="spnLogin" style="display: none" href="javascript:;">GIRIS</a>
+						<a id="spnLogout" style="display: none" href="javascript:;" onclick="logOut();" >Ã‡IKIS</a>
 					</li>
 				</ul>
 			</div>
+			<span style="display: none; float: right; margin-right: 20px; font-weight: bold;" id="welcomeText"></span>
 		</div>
 		<div id="page" style="padding: 10px 0 0;">
 			<div id="content">
@@ -554,12 +595,12 @@ body {
 					<div>
 						<h4>Kategori filtreleme:</h4>
 						<select id="ddlCategories">
-							<option value="0">Tamamı</option>
+							<option value="0">TamamÄ±</option>
 						</select> <select id="ddlChildren" style="display: none">
-							<!--<option value="0">Tamamı</option> -->
+							<!--<option value="0">TamamÄ±</option> -->
 						</select> <input type="button" id="btnSearch" name="formSearch" value="Ara" />
 						<span id="spinner" class="spinner" style="display: none;"><img
-							id="img-spinner" src="images/spinner.gif" alt="Yükleniyor" /> </span>
+							id="img-spinner" src="images/spinner.gif" alt="YÃ¼kleniyor" /> </span>
 						<p style="height: 7px"></p>
 						<div id="divCount" style="font-weight: bold;"></div>
 					</div>
@@ -601,11 +642,11 @@ body {
 	<p style="height: 20px;"></p>
 	<div>
 		<a href="new.html"
-			style="font-weight: bold; text-decoration: underline;">Bulunduğum
-			lokasyona yeni giriş</a> &nbsp;&nbsp;||&nbsp;&nbsp; <a
+			style="font-weight: bold; text-decoration: underline;">BulunduÄŸum
+			lokasyona yeni giriÅŸ</a> &nbsp;&nbsp;||&nbsp;&nbsp; <a
 			href="new_manual.html"
-			style="font-weight: bold; text-decoration: underline;">Seçeceğim
-			lokasyona yeni giriş</a>
+			style="font-weight: bold; text-decoration: underline;">SeÃ§eceÄŸim
+			lokasyona yeni giriÅŸ</a>
 	</div>
 	<p style="height: 20px"></p>
 </body>
