@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.swe.accessibility.domain.Comment;
 import com.swe.accessibility.domain.Entry;
 import com.swe.accessibility.domain.EntryReason;
@@ -20,13 +22,12 @@ public class EntryProxy implements Serializable {
 	private static final long serialVersionUID = 3786243773940227607L;
 	
 	
-	private static String imageHost = "http://testpalette.com/";
+	
 	
 	private int id;
 	
 	private String imageMeta;
-	
-	
+
 	
 	private BigDecimal coordX;
 	
@@ -72,7 +73,7 @@ public class EntryProxy implements Serializable {
 	}
 
 	public void setImageMeta(String imageMeta) {
-		this.imageMeta = imageHost+imageMeta;
+		this.imageMeta = imageMeta;
 	}
 
 	public int getId() {

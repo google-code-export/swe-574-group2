@@ -97,7 +97,7 @@ public class EntryDaoImpl implements EntryDao {
 		query.setParameter("id", id);
 
 		Iterator<Object[]> iter = query.list().iterator();
-		System.out.println(query.list().size());
+		
 		List<Entry> entries = new ArrayList<Entry>();
 		while (iter.hasNext()) {
 			Object[] arr = iter.next();
