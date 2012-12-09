@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -71,7 +72,7 @@ public class LoginController {
 //
 //		HttpStatus httpStatus = null;
 //		LoginStatus status = new LoginStatus();
-//		System.out.println("login");
+
 //		if (user == null){
 //			status.setLoggedIn(false);
 //			status.setUsername(null);
@@ -116,7 +117,7 @@ public class LoginController {
 	  @RequestMapping(method=RequestMethod.GET,value="/success",produces="application/json")
 	  public ResponseEntity<LoginStatus> loginSuccess(Principal user, HttpServletRequest request, HttpServletResponse response) {
 		  
-		  System.out.println("Login success");
+	
 		  HttpStatus httpStatus = HttpStatus.OK;
 		  LoginStatus status = new LoginStatus();
 		  status.setLoggedIn(true);
@@ -129,7 +130,7 @@ public class LoginController {
 	  @RequestMapping(method=RequestMethod.GET,value="/logoutsuccess",produces="application/json")
 	  public @ResponseBody String logoutSuccess(HttpServletRequest request, HttpServletResponse response) {
 		  
-		  System.out.println("Logout success");
+		
 		  return "Sucessfull logout from service";
 		  
 	  }
@@ -145,6 +146,10 @@ public class LoginController {
 			return responseHeaders;
 		}
 		
-
+		@ExceptionHandler(value=Exception.class)
+		public String handleException(){
+				
+			return "error";
+		}
 	  	
 }

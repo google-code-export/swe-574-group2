@@ -238,7 +238,7 @@ public class EntryController {
 		 while (readers.hasNext()) {
 		        ImageReader read = readers.next();
 		        format = read.getFormatName();
-		        System.out.println("format name = " + format);
+		        
 		         
 		 }
 		BufferedImage image = ImageIO.read(iis);
