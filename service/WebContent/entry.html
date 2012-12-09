@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=Cp1254">
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <title>Fair Urban</title>
 </head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
@@ -20,42 +20,47 @@ body {
 	height: 100%
 }
 
-a.disabled { color:gray; }
+.loginform
+{
+	background-color:white;
+}
+
+.clsTable
+{
+	border: 0;
+	border-collapse:separate; 
+	border-spacing:2em;
+	border-width: 1px; 
+	border-color:#000000; 
+	border-style: solid;
+}
+
+.reqVal
+{
+	color: red;
+	display: none;
+}
 </style>
-<link rel="stylesheet" href="css/baseTheme/style.css" type="text/css"
+<link href="http://fonts.googleapis.com/css?family=Montserrat:400,700"
+	rel="stylesheet" type="text/css" />
+<link href="css/default.css" rel="stylesheet" type="text/css"
 	media="all" />
-<link rel="stylesheet" href="css/basic.css" type="text/css" media="all" />
 
 <script type="text/javascript"
 	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCg0FRVSu5XHjjkG1NV1tev04MaGOTg5Jo&sensor=false"></script>
 <script type="text/javascript"
 	src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 
-<script type="text/javascript" src="js/ajaxupload-min.js"></script>
-
-<!-- <script type="text/javascript" src="js/jquery.jsonp.js"></script> -->
+<script type="text/javascript" src="js/jquery.lightbox_me.js"></script>
 
 <script type="text/javascript">
-
-	function getParameterByName(name)
-	{
-	  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-	  var regexS = "[\\?&]" + name + "=([^&#]*)";
-	  var regex = new RegExp(regexS);
-	  var results = regex.exec(window.location.search);
-	  if(results == null)
-	    return "";
-	  else
-	    return decodeURIComponent(results[1].replace(/\+/g, " "));
-	}
-
 	var markersArray = [];
-	
+
 	function clearOverlays() {
-		  for (var i = 0; i < markersArray.length; i++ ) {
-		    markersArray[i].setMap(null);
-		  }
+		for ( var i = 0; i < markersArray.length; i++) {
+			markersArray[i].setMap(null);
 		}
+	}
 
 	function doNothing() {
 	}
@@ -68,183 +73,579 @@ a.disabled { color:gray; }
 		});
 	}
 
-	function codeLatLng(latLng) {
-		    var input = latLng;
-		    var latlngStr = input.split(",",2);
-		    var lat = parseFloat(latlngStr[0]);
-		    var lng = parseFloat(latlngStr[1]);
-		    var latlng = new google.maps.LatLng(lat, lng);
-		    geocoder.geocode({'latLng': latlng}, function(results, status) {
-		      if (status == google.maps.GeocoderStatus.OK) {
-		        if (results[0]) {
-		          $('#lblAddress').html(results[0].formatted_address);
-		        }
-		      } else {
-		        alert("Adres bulma hatas�: " + status);
-		      }
-		    });
-	}
+	var entryDetailUrl = "entry.html?id=";
 
 	// Set the Map variable
 	var map;
-	geocoder = new google.maps.Geocoder();
 	function initialize() {
 		var myOptions = {
-			zoom : 18,
+			zoom : 12,
 			mapTypeId : google.maps.MapTypeId.ROADMAP,
-			scrollwheel: false
+			scrollwheel : true
 		};
 
-		var infoWindow = new google.maps.InfoWindow;
-
+		//Define Marker properties
 		var markerImg = new google.maps.MarkerImage(
 				'images/markers/marker2.png',
 				// This marker is 129 pixels wide by 42 pixels tall.
-				new google.maps.Size(129, 42),
+				new google.maps.Size(22, 32),
 				// The origin for this image is 0,0.
 				new google.maps.Point(0, 0),
 				// The anchor for this image is the base of the flagpole at 18,42.
 				new google.maps.Point(18, 42));
 
-		var getAllEntriesUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries";
-		var entryId = getParameterByName('id');
-		var coordX = 0;
-		var coordY = 0;
-		
-		$.getJSON(getAllEntriesUrl, function(data) {
-			$.each(data['data'], function(index, element) {
-		        if(element.id == entryId)
-		        {
-		        	var comment = element.comment;
-					var upVote = element.upVoteCount;
-					var downVote = element.downVoteCount;
-					var user = element.userName;
-					var category = "parent - will be added to web service";
-					var childCat = "child - will be added to web service";
-					var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg";
-					coordX = element.coordX;
-					coordY = element.coordY;
-					var point = new google.maps.LatLng(parseFloat(coordX), parseFloat(coordY));
-					var html = "<b>Koordinatlar: </b> " + element.coordX + " , " + element.coordY;
-					var marker = new google.maps.Marker({
-						map : map,
-						position : point,
-						icon : markerImg
-					});
-					
-					bindInfoWindow(marker, map, infoWindow, html);
-
-					codeLatLng(coordX + ","+ coordY);
-					//alert(coordX + ","+ coordY);
-
-					$('#lblComment').html(comment);
-					$('#lblCategory').html(category + " --- " + childCat);
-					$('#lblUpVote').html(upVote);
-					$('#lblDownVote').html(downVote);
-					$('#lblUser').html(user);
-					$('#hdnUpVote').val(upVote);
-					$('#hdnDownVote').val(downVote);
-					$('#imgEntry').attr('src', image);
-
-					// Set the center of the map
-					var pos = new google.maps.LatLng(coordX, coordY);
-					map.setCenter(pos);
-			    }
-		    });
-		 });
-
+		var infoWindow = new google.maps.InfoWindow;
 		map = new google.maps.Map(document.getElementById('map_canvas'),
 				myOptions);
 
+		// Set the center of the map
+		var pos = new google.maps.LatLng(41.08, 29.025);
+		//var pos = new google.maps.LatLng(0, 0);
+		map.setCenter(pos);
 		function infoCallback(infowindow, marker) {
 			return function() {
 				infowindow.open(map, marker);
 			};
 		}
+
+		var getAllEntriesUrl = "./service/entries";
+
+		$.getJSON(getAllEntriesUrl,
+						function(data) {
+							$
+									.each(
+											data['data'],
+											function(index, element) {
+												var comment = element.comment;
+												var entryId = element.id;
+												var upVote = element.upVoteCount;
+												var downVote = element.downVoteCount;
+												var image = element.imageMeta;
+												var point = new google.maps.LatLng(
+														parseFloat(element.coordX),
+														parseFloat(element.coordY));
+												var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
+														+ image
+														+ "'>"
+														+ "<p></p><b>''"
+														+ comment
+														+ "''</b> <p></p>"
+														+ upVote
+														+ " acil &nbsp;&nbsp;"
+														+ "<a rel='"
+														+ entryId
+														+ "' id='lnkUpVote' href='javascript:voteUp("
+														+ entryId
+														+ ");'"
+														+ "><img width='25' height='25'" 
+						+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
+														+ "<a rel='"
+														+ entryId
+														+ "' id='lnkDownVote' href='javascript:voteDown("
+														+ entryId
+														+ ");'>"
+														+ "<img width='25' height='25'"
+						+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
+														+ "&nbsp;&nbsp;"
+														+ downVote
+														+ " bekleyebilir <p></p>"
+														+ "<a style='text-decoration: underline' href='" 
+						+ entryDetailUrl + entryId + "'>Detay...</a></div>";
+
+												var marker = new google.maps.Marker(
+														{
+															map : map,
+															position : point,
+															icon : markerImg
+														});
+												bindInfoWindow(marker, map,
+														infoWindow, html);
+											});
+
+							$('#divCount').html(
+									"Sistemde toplam " + data['data'].length
+											+ " adet ihlâl var.");
+						});
+
+		// 		var marker = new google.maps.Marker({
+		// 			position : map.getCenter(),
+		// 			map : map,
+		// 			title : 'Click to zoom'
+		// 		});
+
+		// 		google.maps.event.addListener(marker, 'click', function() {
+		// 			map.setZoom(8);
+		// 			map.setCenter(marker.getPosition());
+		// 		});
 	};
 
 	// Initializes the Google Map
 	google.maps.event.addDomListener(window, 'load', initialize);
 
-	var voteUrl = "http://swe.cmpe.boun.edu.tr:8180/rest/service/entries/thumbs";
-	
-	
-	$(document).ready(function() {
+	var voteUrl = "./service/entries/thumbs";
+	var isLoggedInUrl = "./service/login/status";
+	var logOutUrl = "./service/j_spring_security_logout";
 
-		var entryId = getParameterByName('id');
+	
+	function voteUp(entryId) {
+		$.ajax({
+		    url: voteUrl,
+		    type: 'post',
+		    data: JSON.stringify({entryId:entryId,up:true}),
+		    dataType: 'json',
+		    contentType: "application/json;charset=utf-8",
+		}).done(function(){
+		    var upp = $('#lblUpVote').val();
+		    $('#lblUpVote').val(parseInt(upp) + 1);
+		});
+	};
+
+	function voteDown(entryId) {
+		$.ajax({
+			url : voteUrl,
+			type : 'post',
+			data : {
+				entryId : entryId,
+				up : false
+			}
+		}).done(function() {
+			var upp = $('#lblUpVote').val();
+			$('#lblUpVote').val(parseInt(upp) + 1);
+		});
+	};
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
 		
-		$("#lnkUpVote").click(function() {
-			$.ajax({
-			    url: voteUrl,
-			    type: 'post',
-			    //headers: {'AuthToken':'testuser:a74ff09c24dbf421a3e1d6be58c48f44867a85d4'},
-			    data: JSON.stringify({entryId:entryId, up:true}),
-			    dataType: 'json',
-			    contentType: "application/json;charset=utf-8",
-			    crossDomain: true,
-			    success: function(response) {
-			         alert("success");
-			     },
-			     error: function(xhr, errorThrown) {
-			         alert('Error!  Status = ' + xhr.status + " Message = " + errorThrown);
-			     }
-			}).done(function(){
-			    alert("up vote verildi!");
-			    var upp = $('#lblUpVote').val();
-			    $('#lblUpVote').val(parseInt(upp) + 1);
-			});
+		IsLoggedIn();
+		
+		$('#spnLogin').click(function(e) {
+		    $('#divlogin').lightbox_me({
+		        centered: true, 
+		        onLoad: function() { 
+		            $('#sign_up').find('input:first').focus()
+		            }
+		        });
+		    e.preventDefault();
 		});
 		
-		$("#lnkDownVote").click(function() {
-			if ($('#lnkDownVote').hasClass('disabled')) return;
-			$('#lblVote').html('Down vote verildi');
-			$('#msgVote').hide().fadeIn("slow", "linear");
-			var upp = $('#hdnDownVote').val();
-		    $('#lblDownVote').html(parseInt(upp) - 1);
-		    $('#lnkDownVote').addClass('disabled');    
+		//testuser - swe574TEST!
+		$('#frmlogin').submit(function() {
+			
+			if($('#username').val() == "" || $('#password').val() == "")
+			{
+				if($('#username').val() == ""){$('#reqUser').show();}else{$('#reqUser').hide();}
+				if($('#password').val() == ""){$('#reqPass').show();}else{$('#reqPass').hide();}
+				return false;
+			}
+			else
+			{
+				//alert($("#frmlogin").serialize())
+				$.ajax({
+					type: 'POST',
+					data: $("#frmlogin").serialize(),
+		          	url: './service/login/sigin',
+		            success: function(msg,textStatus) {
+		            	//alert("Başarıyla giriş yaptınız!");
+		            	//$('#spnLogout').show();
+	 					//$('#spnLogin').hide();
+		            	$('#divlogin').trigger('close');
+		            	IsLoggedIn();
+		            },
+		            error:function(jqXHR, textStatus, errorThrown){
+			          alert("Yanlış kullanıcı adı/şifre, lütfen tekrar deneyiniz.");
+		              //alert(errorThrown);
+		            }
+		        });
+				  return false;
+			}	
 		});
-	});
+		
+						//jQuery.support.cors = true;
+
+						//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
+						//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
+						var getCategoriesUrl = './service/categories';
+						var getEntriesByCategoryUrl = './service/entries?categoryId=';
+
+						var selectParent = $('#ddlCategories');
+						var selectChild = $('#ddlChildren');
+						$.getJSON(getCategoriesUrl, function(data) {
+							// 			$.each(data['data'], function(index, element) {
+							// 		        $('#feed').append(element.id + " " + element.title + " " + " " + element.parentReasonId + "</br>");
+							// 		        $.each(element.violationTypes, function(index, element2)
+							// 		        {
+							// 		        	$('#feed').append(element2.id + " " + element2.title + " " + " " + element2.description + " " + element2.imageMeta);
+							// 		        });
+							// 		    });
+							$.each(data['data'], function(index, element) {
+								$(selectParent).append(
+										$('<option></option>').val(element.id)
+												.html(element.title));
+							});
+						});
+
+						selectParent
+								.change(function() {
+									if (selectParent.find(":selected").val() == "0") {
+										selectChild.hide();
+										selectChild.val("0");
+									} else {
+										selectChild.empty();
+										selectChild.append($(
+												'<option></option>').val(0)
+												.html("Tamamı"));
+										$
+												.getJSON(
+														getCategoriesUrl
+																+ "/"
+																+ selectParent
+																		.find(
+																				":selected")
+																		.val(),
+														function(data) {
+															$
+																	.each(
+																			data['data'],
+																			function(
+																					index,
+																					element) {
+																				selectChild
+																						.append($(
+																								'<option></option>')
+																								.val(
+																										element.id)
+																								.html(
+																										element.title));
+																			});
+															selectChild.show();
+														});
+									}
+								});
+
+						selectChild.change(function() {
+
+						});
+
+						$('#btnSearch')
+								.click(
+										function() {
+											var valToSearch = 0;
+											if (selectChild.val() == "0") {
+												valToSearch = selectParent
+														.val();
+											} else {
+												valToSearch = selectChild.val();
+											}
+											
+											var searchUrl = "";
+											var getAllEntriesUrl = "./service/entries";
+											
+											if(valToSearch != "0")
+											{
+												searchUrl = getEntriesByCategoryUrl + valToSearch;
+											}
+											else
+											{
+												searchUrl = getAllEntriesUrl;
+											}
+
+											var scriptUrl = searchUrl;
+											$
+													.ajax({
+														url : scriptUrl,
+														type : 'get',
+														dataType : 'json',
+														beforeSend : function() {
+															$("#spinner")
+																	.show();
+														},
+														complete : function() {
+															$("#spinner")
+																	.hide();
+														},
+														success : function(data) {
+															var dataS = data['data'];
+
+															$('#divCount')
+																	.html(
+																			"Filtreleme sonucu "
+																					+ dataS.length
+																					+ " adet ihlâl bulundu.");
+
+															var pinImg = new google.maps.MarkerImage(
+																	'images/markers/wheelchair.png',
+																	// This marker is 129 pixels wide by 42 pixels tall.
+																	new google.maps.Size(
+																			129,
+																			42),
+																	// The origin for this image is 0,0.
+																	new google.maps.Point(
+																			0,
+																			0),
+																	// The anchor for this image is the base of the flagpole at 18,42.
+																	new google.maps.Point(
+																			18,
+																			42));
+
+															var infoWindow = new google.maps.InfoWindow;
+
+															clearOverlays();
+
+															$
+																	.each(
+																			dataS,
+																			function(
+																					index,
+																					element) {
+																				var comment = element.comment;
+																				var entryId = element.id;
+																				var upVote = element.upVoteCount;
+																				var downVote = element.downVoteCount;
+																				var point = new google.maps.LatLng(
+																						parseFloat(element.coordX),
+																						parseFloat(element.coordY));
+																				var image = element.imageMeta;
+																				var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
+																					+ image
+																					+ "'>"
+																					+ "<p></p><b>''"
+																					+ comment
+																					+ "''</b> <p></p>"
+																					+ upVote
+																					+ " acil &nbsp;&nbsp;"
+																					+ "<a rel='"
+																					+ entryId
+																					+ "' id='lnkUpVote' href='javascript:voteUp("
+																					+ entryId
+																					+ ");'"
+																					+ "><img width='25' height='25'" 
+													+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
+																					+ "<a rel='"
+																					+ entryId
+																					+ "' id='lnkDownVote' href='javascript:voteDown("
+																					+ entryId
+																					+ ");'>"
+																					+ "<img width='25' height='25'"
+													+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
+																					+ "&nbsp;&nbsp;"
+																					+ downVote
+																					+ " bekleyebilir <p></p>"
+																					+ "<a style='text-decoration: underline' href='" 
+													+ entryDetailUrl + entryId + "'>Detay...</a></div>";
+																				var marker = new google.maps.Marker(
+																						{
+																							map : map,
+																							position : point,
+																							icon : pinImg
+																						});
+
+																				bindInfoWindow(
+																						marker,
+																						map,
+																						infoWindow,
+																						html);
+
+																			});
+														},
+														error : function(data) {
+															alert("Bir hata oluştu, lütfen tekrar deneyin.");
+														}
+													});
+
+										});
+
+						var voteUrl = "./service/entries/thumbs";
+
+						$("#lnkUpVote").click(function() {
+							alert($("#lnkUpVote").attr('rel'));
+							$.ajax({
+								url : voteUrl,
+								type : 'post',
+								data : {
+									entryId : $("#lnkUpVote").attr('rel'),
+									up : true
+								}
+							}).done(function() {
+								alert($("#lnkUpVote").attr('rel'));
+								var upp = $('#lblUpVote').val();
+								$('#lblUpVote').val(parseInt(upp) + 1);
+							});
+						});
+
+						$("#lnkDownVote").click(function() {
+							if ($('#lnkDownVote').hasClass('disabled'))
+								return;
+							$('#lblVote').html('Down vote verildi');
+							$('#msgVote').hide().fadeIn("slow", "linear");
+							var upp = $('#hdnDownVote').val();
+							$('#lblDownVote').html(parseInt(upp) - 1);
+							$('#lnkDownVote').addClass('disabled');
+						});
+
+						function voteUp(entryId) {
+							alert(entryId);
+							$.ajax({
+								url : voteUrl,
+								type : 'post',
+								data : {
+									entryId : $("#lnkUpVote").attr('rel'),
+									up : true
+								}
+							}).done(function() {
+								alert($("#lnkUpVote").attr('rel'));
+								var upp = $('#lblUpVote').val();
+								$('#lblUpVote').val(parseInt(upp) + 1);
+							});
+						};
+
+					});
+	
+	function IsLoggedIn() {
+		$.ajax({
+			url : isLoggedInUrl,
+			type : 'get',
+			success: function(msg){
+				if(msg.loggedIn == true)
+					{
+					$('#welcomeText').show().html('Hoşgeldin ' + msg.username + '!');
+ 					$('#spnLogout').show();
+ 					$('#spnLogin').hide();
+ 					$('#liNewEntry').show();
+					//$('#spnLogin').show();
+					//$('#spnLogout').hide();
+					}
+				else
+					{
+						$('#spnLogin').show();
+						$('#spnLogout').hide();
+						$('#liNewEntry').hide();
+					}
+			},
+			error: function(){}
+		})
+	};
+	
+	function logOut() {
+		$.ajax({
+			url : logOutUrl,
+			type : 'get',
+			success: function(msg){
+				if(msg.status == true)
+					{
+					alert("Başarıyla çıkış yaptınız!");
+					console.log(msg);
+					IsLoggedIn();
+					}
+				else
+					{
+						console.log(msg);
+						$('#spnLogout').show();
+						$('#spnLogin').hide();
+					}
+			},
+			error: function(){}
+		})
+	};
 </script>
 
 <body>
-	<p style="height: 20px;"></p>
-	<h2>Detay</h2>
-	<hr width="1100px;">
-	<p style="height: 20px;"></p>
-	<div style="text-align: left; margin-left: 30px; float: left;">
-		<input type="hidden" id="hdnUpVote" value="0" name="hdnUpVote" />
-		<input type="hidden" id="hdnDownVote" value="0" name="hdnUpVote" />
-		<img border="1" src="" id="imgEntry">
-		<p style="height: 10px;"></p>
-		<span style="font-weight: bold;">Adres:</span>
-		<span id="lblAddress"></span>
-		<p style="height: 10px;"></p>
-		<span style="font-weight: bold;">A��klama:</span>
-		<span id="lblComment"></span>
-		<p style="height: 10px;"></p>
-		<span style="font-weight: bold;">Kategori:</span>
-		<span id="lblCategory"></span>
-		<p style="height: 10px;"></p>
-		<span style="font-weight: bold;">Olumlu Oy:</span>
-		<span id="lblUpVote"></span>
-		<p style="height: 10px;"></p>
-		<span style="font-weight: bold;">Olumsuz Oy:</span>
-		<span id="lblDownVote"></span>
-		<p style="height: 10px;"></p>
-		<span style="font-weight: bold;">Giri�i yapan:</span>
-		<span id="lblUser"></span>
-		<p style="height: 10px;"></p>
-		<a id="lnkUpVote" href="javascript:"><img width="50" height="50" 
-			src="images/upArrow.png" title="Olumlu oy ver"></a>&nbsp;&nbsp;&nbsp;
-		<a id="lnkDownVote" href="javascript:"><img width="50" height="50" 
-			src="images/downArrow.png" title="Olumsuz oy ver"></a>&nbsp;&nbsp;&nbsp;
-		<p id="msgVote"><span id="lblVote"></span></p>
-		<p style="height: 20px;"></p>
-		<a href="javascript: window.history.go(-1)" style="font-weight:bold; text-decoration: underline;"><--Geri</a>
-	</div>
 
-	<div id="map_canvas" style="width: 650px; height: 500px; margin-right: 30px; float: right;"></div>
-	<p style="height: 60px;"></p>
+<div class="loginform" style="display: none; border:#111" id="divlogin">
+<form action="./service/login/sigin" accept-charset="UTF-8" method="post" id="frmlogin">
+    <table class="clsTable">
+       <tr>
+         <td colspan="2"><span style="font-size: large;">Siteye giriş yapın</span></td>
+       </tr>
+       <tr>
+         <td><label for="username">Kullanıcı adı:<span class="reqVal" id="reqUser">&nbsp;*</span></label></td>
+         <td> <input type="text" maxlength="60" name="username" id="username" size="15" value="" class="required" style="float: right"></td>
+       </tr>
+       <tr>
+         <td><label for="password">Şifre:<span class="reqVal" id="reqPass">&nbsp;*</span></label></td>
+         <td> <input type="password" name="password" id="password" maxlength="60" size="15" class="required" style="float: right"></td>
+       </tr>
+       <tr>
+         <td><input type="submit" name="submit" id="submit" value="Giriş" style="font-weight: bold;"></td>
+         <td></td>
+       </tr>
+       <tr>
+         <td><a href="register.html" title="Üye olun!" style="font-size: 14px;">Kaydol</a></td>
+         <td></td>
+       </tr>
+    </table>
+	<input type="hidden" name="form_build_id" id="form-c1062bd63291587f665fe24a402917e9" value="form-c1062bd63291587f665fe24a402917e9">
+	<input type="hidden" name="form_id" id="edit-user-login-block" value="user_login_block">
+</form>
+</div>
+	<div id="wrapper" class="container">
+		<div id="header">
+			<div id="logo">
+				<a href="default.html"><img src="images/logo.png" width="25%;" style="float: left"></a>
+				<h1 style="margin-top: 10px">  
+					<a href="default.html">&nbsp;FAIR URBAN</a>
+				</h1>
+				<!-- 			<p>Alt Başlık</p> -->
+			</div>
+			<div id="menu">
+				<ul>
+					<li class="current_page_item"><a href="default.html">Ana Sayfa</a></li>
+					<li><a href="about.html">Hakkımızda</a></li>
+					<li id="liNewEntry"><a href="new.html">Yeni Ekle</a></li>
+					<li><a id="spnLogin" style="display: none" href="javascript:;">GIRIS</a>
+						<a id="spnLogout" style="display: none" href="javascript:;" onclick="logOut();" >ÇIKIS</a>
+					</li>
+				</ul>
+			</div>
+			<span style="display: none; float: right; margin-right: 20px; margin-top: 10px; font-weight: bold;" id="welcomeText"></span>
+		</div>
+		<div id="page" style="padding: 10px 0 0;">
+			<div id="content" style="width: 900px;">
+				<div id="cbox1">
+					<div>
+						<h4>Kategori filtreleme:</h4>
+						<select id="ddlCategories">
+							<option value="0">Tamamı</option>
+						</select> <select id="ddlChildren" style="display: none">
+							<!--<option value="0">Tamamı</option> -->
+						</select> <input type="button" id="btnSearch" name="formSearch" value="Ara" style="font-weight: bold;" />
+						<span id="spinner" class="spinner" style="display: none;"><img
+							id="img-spinner" src="images/spinner.gif" alt="Yükleniyor" /> </span>
+						<p style="height: 7px"></p>
+						<div id="divCount" style="font-weight: bold;"></div>
+					</div>
+				</div>
+				<div id="two-column" style="border-top: 0px; padding-top: 0px;">
+					<div id="map_canvas" style="width: 900px; height: 500px;"></div>
+				</div>
+			</div>
+<!-- 			<div id="sidebar"> -->
+<!-- 				<div id="box1"> -->
+<!-- 					<h2>Praesent mattis</h2> -->
+<!-- 					<ul class="style1"> -->
+<!-- 						<li class="first"><a href="#">Vestibulum luctus venenatis -->
+<!-- 								dui</a></li> -->
+<!-- 						<li><a href="#">Aenean elementum facilisis ligula</a></li> -->
+<!-- 						<li><a href="#">Ut tincidunt elit vitae augue</a></li> -->
+<!-- 						<li><a href="#">Aenean elementum facilisis ligula</a></li> -->
+<!-- 						<li><a href="#">Ut tincidunt elit vitae augue</a></li> -->
+<!-- 						<li><a href="#">Sed quis odio sagittis leo vehicula</a></li> -->
+<!-- 					</ul> -->
+<!-- 					<p> -->
+<!-- 						<a href="#" class="link-style">Read More</a> -->
+<!-- 					</p> -->
+<!-- 				</div> -->
+<!-- 				<div id="box2"> -->
+<!-- 					<h2>Maecenas lectus</h2> -->
+<!-- 					<p> -->
+<!-- 						<a href="#" class="link-style">Read More</a> -->
+<!-- 					</p> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+		</div>
+	</div>
+	<p style="height: 20px"></p>
 </body>
 
 

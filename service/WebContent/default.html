@@ -120,7 +120,7 @@ body {
 												var entryId = element.id;
 												var upVote = element.upVoteCount;
 												var downVote = element.downVoteCount;
-												var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
+												var image = element.imageMeta;
 												var point = new google.maps.LatLng(
 														parseFloat(element.coordX),
 														parseFloat(element.coordY));
@@ -131,24 +131,24 @@ body {
 														+ comment
 														+ "''</b> <p></p>"
 														+ upVote
-														+ " olumlu oy &nbsp;&nbsp;"
+														+ " acil &nbsp;&nbsp;"
 														+ "<a rel='"
 														+ entryId
 														+ "' id='lnkUpVote' href='javascript:voteUp("
 														+ entryId
 														+ ");'"
 														+ "><img width='25' height='25'" 
-						+ "src='images/upArrow.png' title='Olumlu oy ver'></a>&nbsp;&nbsp;&nbsp;"
+						+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
 														+ "<a rel='"
 														+ entryId
 														+ "' id='lnkDownVote' href='javascript:voteDown("
 														+ entryId
 														+ ");'>"
 														+ "<img width='25' height='25'"
-						+ "src='images/downArrow.png' title='Olumsuz oy ver'></a>"
+						+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
 														+ "&nbsp;&nbsp;"
 														+ downVote
-														+ " olumsuz oy <p></p>"
+														+ " bekleyebilir <p></p>"
 														+ "<a style='text-decoration: underline' href='" 
 						+ entryDetailUrl + entryId + "'>Detay...</a></div>";
 
@@ -290,6 +290,7 @@ body {
 								.change(function() {
 									if (selectParent.find(":selected").val() == "0") {
 										selectChild.hide();
+										selectChild.val("0");
 									} else {
 										selectChild.empty();
 										selectChild.append($(
@@ -337,9 +338,20 @@ body {
 											} else {
 												valToSearch = selectChild.val();
 											}
+											
+											var searchUrl = "";
+											var getAllEntriesUrl = "./service/entries";
+											
+											if(valToSearch != "0")
+											{
+												searchUrl = getEntriesByCategoryUrl + valToSearch;
+											}
+											else
+											{
+												searchUrl = getAllEntriesUrl;
+											}
 
-											var scriptUrl = getEntriesByCategoryUrl
-													+ valToSearch;
+											var scriptUrl = searchUrl;
 											$
 													.ajax({
 														url : scriptUrl,
@@ -389,10 +401,12 @@ body {
 																					element) {
 																				var comment = element.comment;
 																				var entryId = element.id;
+																				var upVote = element.upVoteCount;
+																				var downVote = element.downVoteCount;
 																				var point = new google.maps.LatLng(
 																						parseFloat(element.coordX),
 																						parseFloat(element.coordY));
-																				var image = "http://physicsworld.com/blog/Guetamala%20hole.jpg"; //element.imageMeta;
+																				var image = element.imageMeta;
 																				var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
 																					+ image
 																					+ "'>"
@@ -400,24 +414,24 @@ body {
 																					+ comment
 																					+ "''</b> <p></p>"
 																					+ upVote
-																					+ " olumlu oy &nbsp;&nbsp;"
+																					+ " acil &nbsp;&nbsp;"
 																					+ "<a rel='"
 																					+ entryId
 																					+ "' id='lnkUpVote' href='javascript:voteUp("
 																					+ entryId
 																					+ ");'"
 																					+ "><img width='25' height='25'" 
-													+ "src='images/upArrow.png' title='Olumlu oy ver'></a>&nbsp;&nbsp;&nbsp;"
+													+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
 																					+ "<a rel='"
 																					+ entryId
 																					+ "' id='lnkDownVote' href='javascript:voteDown("
 																					+ entryId
 																					+ ");'>"
 																					+ "<img width='25' height='25'"
-													+ "src='images/downArrow.png' title='Olumsuz oy ver'></a>"
+													+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
 																					+ "&nbsp;&nbsp;"
 																					+ downVote
-																					+ " olumsuz oy <p></p>"
+																					+ " bekleyebilir <p></p>"
 																					+ "<a style='text-decoration: underline' href='" 
 													+ entryDetailUrl + entryId + "'>Detay...</a></div>";
 																				var marker = new google.maps.Marker(
@@ -498,6 +512,7 @@ body {
 					$('#welcomeText').show().html('Hoşgeldin ' + msg.username + '!');
  					$('#spnLogout').show();
  					$('#spnLogin').hide();
+ 					$('#liNewEntry').show();
 					//$('#spnLogin').show();
 					//$('#spnLogout').hide();
 					}
@@ -505,6 +520,7 @@ body {
 					{
 						$('#spnLogin').show();
 						$('#spnLogout').hide();
+						$('#liNewEntry').hide();
 					}
 			},
 			error: function(){}
@@ -532,11 +548,6 @@ body {
 			error: function(){}
 		})
 	};
-	
-	
-		
-	
-	
 </script>
 
 <body>
@@ -556,7 +567,7 @@ body {
          <td> <input type="password" name="password" id="password" maxlength="60" size="15" class="required" style="float: right"></td>
        </tr>
        <tr>
-         <td><input type="submit" name="submit" id="submit" value="Giriş"></td>
+         <td><input type="submit" name="submit" id="submit" value="Giriş" style="font-weight: bold;"></td>
          <td></td>
        </tr>
        <tr>
@@ -571,7 +582,7 @@ body {
 	<div id="wrapper" class="container">
 		<div id="header">
 			<div id="logo">
-				<img src="images/logo.png" width="25%;" style="float: left">
+				<a href="default.html"><img src="images/logo.png" width="25%;" style="float: left"></a>
 				<h1 style="margin-top: 10px">  
 					<a href="default.html">&nbsp;FAIR URBAN</a>
 				</h1>
@@ -581,16 +592,16 @@ body {
 				<ul>
 					<li class="current_page_item"><a href="default.html">Ana Sayfa</a></li>
 					<li><a href="about.html">Hakkımızda</a></li>
-					<li><a href="new.html">Yeni Ekle</a></li>
+					<li id="liNewEntry"><a href="new.html">Yeni Ekle</a></li>
 					<li><a id="spnLogin" style="display: none" href="javascript:;">GIRIS</a>
 						<a id="spnLogout" style="display: none" href="javascript:;" onclick="logOut();" >ÇIKIS</a>
 					</li>
 				</ul>
 			</div>
-			<span style="display: none; float: right; margin-right: 20px; font-weight: bold;" id="welcomeText"></span>
+			<span style="display: none; float: right; margin-right: 20px; margin-top: 10px; font-weight: bold;" id="welcomeText"></span>
 		</div>
 		<div id="page" style="padding: 10px 0 0;">
-			<div id="content">
+			<div id="content" style="width: 900px;">
 				<div id="cbox1">
 					<div>
 						<h4>Kategori filtreleme:</h4>
@@ -598,55 +609,41 @@ body {
 							<option value="0">Tamamı</option>
 						</select> <select id="ddlChildren" style="display: none">
 							<!--<option value="0">Tamamı</option> -->
-						</select> <input type="button" id="btnSearch" name="formSearch" value="Ara" />
+						</select> <input type="button" id="btnSearch" name="formSearch" value="Ara" style="font-weight: bold;" />
 						<span id="spinner" class="spinner" style="display: none;"><img
 							id="img-spinner" src="images/spinner.gif" alt="Yükleniyor" /> </span>
 						<p style="height: 7px"></p>
 						<div id="divCount" style="font-weight: bold;"></div>
 					</div>
 				</div>
-				<div id="two-column">
-					<div id="map_canvas"
-		style="width: 900px; height: 700px;"></div>
-					
+				<div id="two-column" style="border-top: 0px; padding-top: 0px;">
+					<div id="map_canvas" style="width: 900px; height: 500px;"></div>
 				</div>
 			</div>
-			<div id="sidebar">
-				<div id="box1">
-					<h2>Praesent mattis</h2>
-					<ul class="style1">
-						<li class="first"><a href="#">Vestibulum luctus venenatis
-								dui</a></li>
-						<li><a href="#">Aenean elementum facilisis ligula</a></li>
-						<li><a href="#">Ut tincidunt elit vitae augue</a></li>
-						<li><a href="#">Aenean elementum facilisis ligula</a></li>
-						<li><a href="#">Ut tincidunt elit vitae augue</a></li>
-						<li><a href="#">Sed quis odio sagittis leo vehicula</a></li>
-					</ul>
-					<p>
-						<a href="#" class="link-style">Read More</a>
-					</p>
-				</div>
-				<div id="box2">
-					<h2>Maecenas lectus</h2>
-					<p>
-						<a href="#" class="link-style">Read More</a>
-					</p>
-				</div>
-			</div>
+<!-- 			<div id="sidebar"> -->
+<!-- 				<div id="box1"> -->
+<!-- 					<h2>Praesent mattis</h2> -->
+<!-- 					<ul class="style1"> -->
+<!-- 						<li class="first"><a href="#">Vestibulum luctus venenatis -->
+<!-- 								dui</a></li> -->
+<!-- 						<li><a href="#">Aenean elementum facilisis ligula</a></li> -->
+<!-- 						<li><a href="#">Ut tincidunt elit vitae augue</a></li> -->
+<!-- 						<li><a href="#">Aenean elementum facilisis ligula</a></li> -->
+<!-- 						<li><a href="#">Ut tincidunt elit vitae augue</a></li> -->
+<!-- 						<li><a href="#">Sed quis odio sagittis leo vehicula</a></li> -->
+<!-- 					</ul> -->
+<!-- 					<p> -->
+<!-- 						<a href="#" class="link-style">Read More</a> -->
+<!-- 					</p> -->
+<!-- 				</div> -->
+<!-- 				<div id="box2"> -->
+<!-- 					<h2>Maecenas lectus</h2> -->
+<!-- 					<p> -->
+<!-- 						<a href="#" class="link-style">Read More</a> -->
+<!-- 					</p> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
 		</div>
-	</div>
-
-	<p style="height: 20px"></p>
-	
-	<p style="height: 20px;"></p>
-	<div>
-		<a href="new.html"
-			style="font-weight: bold; text-decoration: underline;">Bulunduğum
-			lokasyona yeni giriş</a> &nbsp;&nbsp;||&nbsp;&nbsp; <a
-			href="new_manual.html"
-			style="font-weight: bold; text-decoration: underline;">Seçeceğim
-			lokasyona yeni giriş</a>
 	</div>
 	<p style="height: 20px"></p>
 </body>
