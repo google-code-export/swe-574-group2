@@ -24,7 +24,7 @@ public interface EntryDao {
 
 	List<Entry> getEntriesByType(String id);
 
-	List<Entry> getEntriesByCategory(String id);
+	List<Entry> getEntriesByCategory(SubReason reason);
 	
 	
 

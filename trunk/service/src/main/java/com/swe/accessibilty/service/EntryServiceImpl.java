@@ -9,7 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.swe.accessibility.dataaccess.EntryDao;
+import com.swe.accessibility.dataaccess.ReasonDao;
+import com.swe.accessibility.dataaccess.UserEntryVoteDao;
 import com.swe.accessibility.domain.Entry;
+import com.swe.accessibility.domain.SubReason;
+import com.swe.accessibility.domain.User;
+import com.swe.accessibility.domain.UserEntryVote;
+import com.swe.accessibility.domain.UserEntryVoteId;
+import com.swe.accessibility.domain.proxy.Config;
 import com.swe.accessibility.domain.proxy.EntryProxy;
 
 @Service(value="entryService")
@@ -18,6 +25,15 @@ public class EntryServiceImpl implements EntryService {
 
 	@Autowired
 	private EntryDao entryDao;
+	
+	@Autowired
+	private ReasonDao reasonDao;
+	
+	@Autowired
+	private Config config;
+	
+	@Autowired
+	private UserEntryVoteDao userEntryVoteDao;
 	
 	/* (non-Javadoc)
 	 * @see com.swe.accessibilty.service.EntryServiceInter#addEntry(com.swe.accessibility.domain.Entry)
@@ -55,7 +71,10 @@ public class EntryServiceImpl implements EntryService {
 		
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
 		for (Entry entry : getEntries()){
-			entries.add(new EntryProxy(entry));
+			EntryProxy proxy = new EntryProxy(entry);
+		
+			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
+			entries.add(proxy);
 		}
 		
 		return entries;
@@ -65,7 +84,10 @@ public class EntryServiceImpl implements EntryService {
 		
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
 		for (Entry entry : getEntry(coordX, coordY)){
-			entries.add(new EntryProxy(entry));
+			EntryProxy proxy = new EntryProxy(entry);
+			
+			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
+			entries.add(proxy);
 		}
 		
 		return entries;
@@ -77,27 +99,34 @@ public class EntryServiceImpl implements EntryService {
 		
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
 		for (Entry entry : entryDao.getEntriesByType(typeId)){
-			entries.add(new EntryProxy(entry));
+			EntryProxy proxy = new EntryProxy(entry);
+			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
+			entries.add(proxy);
 		}
 		
 		return entries;
 	}
 
 	@Override
+	@Transactional
 	public List<EntryProxy> getEntriesByCategory(String categoryId) {
 		
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
-		for (Entry entry : entryDao.getEntriesByCategory(categoryId)){
-			entries.add(new EntryProxy(entry));
+		
+		SubReason reason = reasonDao.getEntriesBySub(Integer.parseInt(categoryId));
+		for (Entry entry : entryDao.getEntriesByCategory(reason)){
+			EntryProxy proxy = new EntryProxy(entry);
+			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
+			entries.add(proxy);
 		}
 		
 		return entries;
 	}
 
 	@Override
-	public void updateEntryVote(int id, boolean up) {
+	public void updateEntryVote(Entry entry, boolean up,User user) {
 		
-		Entry entry = entryDao.getById(id);
+		
 		
 		if(up)
 			entry.setUpVoteCount(entry.getUpVoteCount()+1);
@@ -105,6 +134,12 @@ public class EntryServiceImpl implements EntryService {
 			entry.setDownVoteCount(entry.getDownVoteCount()+1);
 		
 		entryDao.update(entry);
+		UserEntryVote userVote = new UserEntryVote();
+		UserEntryVoteId pk = new UserEntryVoteId();
+		pk.setEntry(entry);
+		pk.setUser(user);
+		userVote.setPk(pk);
+		userEntryVoteDao.add(userVote);
 		
 	}
 
@@ -127,6 +162,25 @@ public class EntryServiceImpl implements EntryService {
 		
 		return entryDao.getById(id);
 	}
+	
+	@Override
+	@Transactional
+	public boolean checkForVote(Entry entry, User user){
+		
+		boolean status = false;
+		UserEntryVoteId id = new UserEntryVoteId();
+		id.setEntry(entry);
+		id.setUser(user);
+		
+		UserEntryVote obj = userEntryVoteDao.get(id);
+		
+		if (obj != null)
+			status = true;
+		
+		return status;
+		
+	}
+	
 	
 	
 	

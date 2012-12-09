@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.swe.accessibility.domain.Entry;
+import com.swe.accessibility.domain.User;
 import com.swe.accessibility.domain.proxy.EntryProxy;
 
 public interface EntryService {
@@ -28,9 +29,14 @@ public interface EntryService {
 
 	public abstract List<EntryProxy> getEntriesByCategory(String categoryId);
 
-	public abstract void updateEntryVote(int id, boolean up);
+	@Transactional
+	public abstract void updateEntryVote(Entry entry, boolean up, User user);
 
+	@Transactional
 	public abstract EntryProxy getEntryById(int id);
 
 	Entry getRawEntry(int id);
+
+	@Transactional
+	boolean checkForVote(Entry entry, User user);
 }
