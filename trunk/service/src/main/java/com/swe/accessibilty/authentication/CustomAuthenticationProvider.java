@@ -33,10 +33,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider{
 		List<GrantedAuthority> AUTHORITIES = new ArrayList<GrantedAuthority>();
 		String hashed = DigestUtils.sha1Hex(auth.getCredentials().toString());
 		User user = userService.getUserByName(auth.getName());
-		System.out.println(auth.getName());
-		System.out.println(auth.getCredentials().toString());
-		System.out.println(user.getUsername());
-		System.out.println(user.getPassword());
+		
 		
 		if (user.getUsername() == null){
 			throw new AuthenticationCredentialsNotFoundException("user not found");
