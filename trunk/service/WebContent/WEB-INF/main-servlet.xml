@@ -1,54 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns:p="http://www.springframework.org/schema/p"
- xmlns:context="http://www.springframework.org/schema/context"
- xmlns:mvc="http://www.springframework.org/schema/mvc"
- xmlns:util="http://www.springframework.org/schema/util" 
- xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
       http://www.springframework.org/schema/mvc
    	 http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
    	 http://www.springframework.org/schema/util 
    	 http://www.springframework.org/schema/util/spring-util-3.0.xsd">
- 
 
- <!-- Declare a view resolver -->
-   
- <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-      p:prefix="/WEB-INF/jsp/" p:suffix=".jsp" />
 
-<!-- Json Message Converter -->
-<bean id="jsonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" >
-        <property name="supportedMediaTypes" value="application/json" />    
-    </bean>
-    
-    
-    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-    <property name="messageConverters"> 
-         	<util:list id="beanList">  
-                <ref bean="jsonHttpMessageConverter" />  
-            </util:list> 
-        </property>
-    </bean>
-    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
 
-<!-- Multipart Resolver -->
-<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <!-- one of the properties available; the maximum file size in bytes -->
-        <property name="maxUploadSize" value="100000000"/>
-    </bean>
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-            p:prefix="/WEB-INF/jsp/" p:suffix=".jsp"></bean>
-     
-    <bean id="messageSource"
-            class="org.springframework.context.support.ResourceBundleMessageSource"
-            p:basename="Messages"></bean>
-            
-  <context:component-scan base-package="com.swe.accessibility.controller"/>
- 
- 	<context:annotation-config />  
- 	<mvc:annotation-driven />         
+
+
+	<!-- Json Message Converter -->
+	<bean id="jsonHttpMessageConverter"
+		class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+		<property name="supportedMediaTypes" value="application/json" />
+	</bean>
+
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<util:list id="beanList">
+				<ref bean="jsonHttpMessageConverter" />
+			</util:list>
+		</property>
+	</bean>
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"></bean>
+
+	<!-- Multipart Resolver -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- one of the properties available; the maximum file size in bytes -->
+		<property name="maxUploadSize" value="100000000" />
+	</bean>
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:suffix=".html" />
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource"
+		p:basename="Messages"></bean>
+
+
+
+	<context:component-scan base-package="com.swe.accessibility.controller" />
+
+	<context:annotation-config />
+	<mvc:annotation-driven />
 
 </beans>
