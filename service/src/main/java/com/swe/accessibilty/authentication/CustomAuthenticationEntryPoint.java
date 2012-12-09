@@ -25,7 +25,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 	@Override
 	public void commence(HttpServletRequest req, HttpServletResponse resp,
 			AuthenticationException e) throws IOException, ServletException {
-		System.out.println("In the entry point");
+		
 	
 	
 		resp.setStatus(HttpStatus.UNAUTHORIZED.value());

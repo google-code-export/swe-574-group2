@@ -55,7 +55,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 		if (token != null){
 			
 			if (validateToken(token)){
-				System.out.println("Valid Token!!!");
+			
 				Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 				authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 				UsernamePasswordAuthenticationToken authentication = 
@@ -71,7 +71,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 		}
 		
 //        // continue thru the filter chain
-    	System.out.println("In the auth filter");
+    	
     	
         chain.doFilter(request, response);
     }

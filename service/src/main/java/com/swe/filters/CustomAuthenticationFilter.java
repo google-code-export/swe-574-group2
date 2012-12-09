@@ -30,7 +30,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 			HttpServletResponse response) throws AuthenticationException,
 			IOException, ServletException {
 		
-			System.out.println("In the auth filter");
+			
 		    String username = obtainUsername(request);
 	        String password = obtainPassword(request);
 
