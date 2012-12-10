@@ -109,6 +109,8 @@ body {
 		}
 
 		var getAllEntriesUrl = "./service/entries";
+		
+		var loggedIn = $('#loggedMu').val();
 
 		$.getJSON(getAllEntriesUrl,
 						function(data) {
@@ -121,6 +123,37 @@ body {
 												var upVote = element.upVoteCount;
 												var downVote = element.downVoteCount;
 												var image = element.imageMeta;
+												var voting = "";
+												
+												if(loggedIn == 'true')
+												{
+													voting = 
+													'<span id="lblUpVote' + entryId + '">' + upVote + '</span>'
+													+ " acil &nbsp;&nbsp;"
+													+ "<a rel='"
+													+ entryId
+													+ "' id='lnkUpVote" + entryId + "' href='javascript:voteUp("
+													+ entryId
+													+ ");'"
+													+ "><img width='25' height='25'" 
+					+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
+													+ "<a rel='"
+													+ entryId
+													+ "' id='lnkDownVote" + entryId + "' href='javascript:voteDown("
+													+ entryId
+													+ ");'>"
+													+ "<img width='25' height='25'"
+					+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
+													+ "&nbsp;&nbsp;"
+													+ '<span id="lblDownVote' + entryId + '">' + downVote + '</span>'
+													+ " bekleyebilir";
+												}
+												
+												else
+												{
+													voting = "Puanlayabilmek için giriş yapınız!";
+												}
+												
 												var point = new google.maps.LatLng(
 														parseFloat(element.coordX),
 														parseFloat(element.coordY));
@@ -130,25 +163,8 @@ body {
 														+ "<p></p><b>''"
 														+ comment
 														+ "''</b> <p></p>"
-														+ upVote
-														+ " acil &nbsp;&nbsp;"
-														+ "<a rel='"
-														+ entryId
-														+ "' id='lnkUpVote' href='javascript:voteUp("
-														+ entryId
-														+ ");'"
-														+ "><img width='25' height='25'" 
-						+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
-														+ "<a rel='"
-														+ entryId
-														+ "' id='lnkDownVote' href='javascript:voteDown("
-														+ entryId
-														+ ");'>"
-														+ "<img width='25' height='25'"
-						+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
-														+ "&nbsp;&nbsp;"
-														+ downVote
-														+ " bekleyebilir <p></p>"
+														+ voting
+														+ "<p></p>"
 														+ "<a style='text-decoration: underline' href='" 
 						+ entryDetailUrl + entryId + "'>Detay...</a></div>";
 
@@ -184,34 +200,61 @@ body {
 
 	var voteUrl = "./service/entries/thumbs";
 	var isLoggedInUrl = "./service/login/status";
-	var logOutUrl = "./service/j_spring_security_logout";
+	var logOutUrl = "./j_spring_security_logout";
 
 	
 	function voteUp(entryId) {
+		if($('#lnkUpVote' + entryId).hasClass("disabled")){return};
 		$.ajax({
 		    url: voteUrl,
 		    type: 'post',
 		    data: JSON.stringify({entryId:entryId,up:true}),
 		    dataType: 'json',
 		    contentType: "application/json;charset=utf-8",
-		}).done(function(){
-		    var upp = $('#lblUpVote').val();
-		    $('#lblUpVote').val(parseInt(upp) + 1);
-		});
+		    success: function(data) {
+		        if(data.resultStatus == "SUCCESS")
+		        {
+		        	var upp = $('#lblUpVote' + entryId).text();
+				    $('#lblUpVote' + entryId).text(parseInt(upp) + 1);
+				    $('#lnkUpVote' + entryId).removeAttr("href");
+				    $('#lnkUpVote' + entryId).addClass("disabled");
+		        }
+		        else
+		        {
+		        	alert('Bir hata oluştu, lütfen tekrar deneyin.');
+		        }
+		      },
+		    error: function(data) {
+		    	alert('Bir hata oluştu, lütfen tekrar deneyin.');
+		      }
+		})
 	};
 
 	function voteDown(entryId) {
+		if($('#lnkDownVote' + entryId).hasClass("disabled")){return};
 		$.ajax({
-			url : voteUrl,
-			type : 'post',
-			data : {
-				entryId : entryId,
-				up : false
-			}
-		}).done(function() {
-			var upp = $('#lblUpVote').val();
-			$('#lblUpVote').val(parseInt(upp) + 1);
-		});
+			url: voteUrl,
+		    type: 'post',
+		    data: JSON.stringify({entryId:entryId,up:true}),
+		    dataType: 'json',
+		    contentType: "application/json;charset=utf-8",
+		    success: function(data) {
+		        if(data.resultStatus == "SUCCESS")
+		        {
+		        	var dnn = $('#lblDownVote' + entryId).text();
+					$('#lblDownVote' + entryId).text(parseInt(dnn) + 1);
+					$('#lnkDownVote' + entryId).removeAttr("href");
+					$('#lnkDownVote' + entryId).addClass("disabled");
+		        }
+		        else
+		        {
+		        	alert('Bir hata oluştu, lütfen tekrar deneyin.');
+		        }
+		      },
+		    error: function(data) {
+		    	alert('Bir hata oluştu, lütfen tekrar deneyin.');
+		      }
+		})
 	};
 </script>
 
@@ -456,51 +499,11 @@ body {
 
 										});
 
-						var voteUrl = "./service/entries/thumbs";
-
-						$("#lnkUpVote").click(function() {
-							alert($("#lnkUpVote").attr('rel'));
-							$.ajax({
-								url : voteUrl,
-								type : 'post',
-								data : {
-									entryId : $("#lnkUpVote").attr('rel'),
-									up : true
-								}
-							}).done(function() {
-								alert($("#lnkUpVote").attr('rel'));
-								var upp = $('#lblUpVote').val();
-								$('#lblUpVote').val(parseInt(upp) + 1);
-							});
-						});
-
-						$("#lnkDownVote").click(function() {
-							if ($('#lnkDownVote').hasClass('disabled'))
-								return;
-							$('#lblVote').html('Down vote verildi');
-							$('#msgVote').hide().fadeIn("slow", "linear");
-							var upp = $('#hdnDownVote').val();
-							$('#lblDownVote').html(parseInt(upp) - 1);
-							$('#lnkDownVote').addClass('disabled');
-						});
-
-						function voteUp(entryId) {
-							alert(entryId);
-							$.ajax({
-								url : voteUrl,
-								type : 'post',
-								data : {
-									entryId : $("#lnkUpVote").attr('rel'),
-									up : true
-								}
-							}).done(function() {
-								alert($("#lnkUpVote").attr('rel'));
-								var upp = $('#lblUpVote').val();
-								$('#lblUpVote').val(parseInt(upp) + 1);
-							});
-						};
-
 					});
+	
+	function IsLoggedReturn(nedir) {
+		return nedir;
+	};
 	
 	function IsLoggedIn() {
 		$.ajax({
@@ -509,23 +512,26 @@ body {
 			success: function(msg){
 				if(msg.loggedIn == true)
 					{
-					$('#welcomeText').show().html('Hoşgeldin ' + msg.username + '!');
- 					$('#spnLogout').show();
- 					$('#spnLogin').hide();
- 					$('#liNewEntry').show();
-					//$('#spnLogin').show();
-					//$('#spnLogout').hide();
+						$('#welcomeText').show().html('Hoşgeldin ' + msg.username + '!');
+	 					$('#spnLogout').show();
+	 					$('#spnLogin').hide();
+	 					$('#liNewEntry').show();
+						//$('#spnLogin').show();
+						//$('#spnLogout').hide();
+						$('#loggedMu').val('true');
 					}
 				else
 					{
 						$('#spnLogin').show();
 						$('#spnLogout').hide();
 						$('#liNewEntry').hide();
+						$('#loggedMu').val('false');
 					}
 			},
 			error: function(){}
 		})
 	};
+
 	
 	function logOut() {
 		$.ajax({
@@ -551,7 +557,7 @@ body {
 </script>
 
 <body>
-
+<input type="hidden" name="loggedMu" id="loggedMu" value="false">
 <div class="loginform" style="display: none; border:#111" id="divlogin">
 <form action="./service/login/sigin" accept-charset="UTF-8" method="post" id="frmlogin">
     <table class="clsTable">
