@@ -49,7 +49,6 @@ public class ReasonServiceImpl implements ReasonService {
 	 * @see com.swe.accessibilty.service.ReasonServiceI#getSubReason(int)
 	 */
 	@Override
-	@Transactional
 	public SubReason getSubReason(int id){
 		
 		return reasonDao.getById(id);
@@ -61,10 +60,6 @@ public class ReasonServiceImpl implements ReasonService {
 		
 		SubReason reason = reasonDao.getEntriesBySub(id);
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
-		
-//		for (Entry entry : reason.getEntries()){
-//			entries.add(new EntryProxy(entry));
-//		}
 		
 		return entries;
 	}

@@ -39,4 +39,7 @@ public interface EntryService {
 
 	@Transactional
 	boolean checkForVote(Entry entry, User user);
+
+	@Transactional
+	public abstract List<EntryProxy> loadEntries(String priority);
 }

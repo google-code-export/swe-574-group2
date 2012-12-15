@@ -180,6 +180,23 @@ public class EntryServiceImpl implements EntryService {
 		return status;
 		
 	}
+
+	@Override
+	@Transactional
+	public List<EntryProxy> loadEntries(String priority) {
+		
+		List<EntryProxy> entries = new ArrayList<EntryProxy>();
+		for (Entry entry : entryDao.getEntriesByPriority(priority)){
+			EntryProxy proxy = new EntryProxy(entry);
+		
+			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
+			entries.add(proxy);
+		}
+		
+		return entries;
+	}
+
+	
 	
 	
 	
