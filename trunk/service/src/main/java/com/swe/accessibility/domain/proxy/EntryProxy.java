@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.swe.accessibility.domain.Comment;
 import com.swe.accessibility.domain.Entry;
 import com.swe.accessibility.domain.EntryReason;
+import com.swe.accessibility.domain.Priority;
 import com.swe.accessibility.domain.SubReason;
 
 
@@ -44,10 +45,14 @@ public class EntryProxy implements Serializable {
 	
 	private String userName;
 	
+	private boolean fixed;
+	
 	
 	private List<CommentProxy> comments;
 	
 	private List<SubReason> reasons;
+	
+	private String priority;
 	
 	
 	public EntryProxy() {
@@ -65,6 +70,22 @@ public class EntryProxy implements Serializable {
 		this.upVoteCount = entry.getUpVoteCount();
         if (entry.getUser() != null)
         	this.setUserName(entry.getUser().getUsername());
+        this.fixed = entry.isFixed();
+        
+        int code = entry.getPriority();
+
+		switch (code) {
+		case 1:
+			this.priority = Priority.LOW.getLabel();
+			break;
+		case 2:
+			this.priority = Priority.HIGH.getLabel();
+		case 3:
+			this.priority = Priority.CRITICAL.getLabel();
+			break;
+		default:
+			this.priority = null;
+		}
        
 	}
 
@@ -144,6 +165,21 @@ public class EntryProxy implements Serializable {
 		this.comments = comments;
 	}
 
+	public boolean isFixed() {
+		return fixed;
+	}
+	
+	public void setFixed(boolean fixed) {
+		this.fixed = fixed;
+	}
+	
+	public String getPriority() {
+		return priority;
+	}
+	
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
 	
 	
 

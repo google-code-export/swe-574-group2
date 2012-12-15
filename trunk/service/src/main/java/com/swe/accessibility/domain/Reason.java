@@ -33,27 +33,6 @@ public class Reason implements Serializable{
 	@Column(name="ParentReasonId")
 	private int parentReasonId;
 	
-	//@ManyToMany(mappedBy="reasons",fetch=FetchType.LAZY)
-//	private Set<ViolationType> violationTypes;
-	
-//	public Set<Entry> getEntries() {
-//		return entries;
-//	}
-//
-//	public void setEntries(Set<Entry> entries) {
-//		this.entries = entries;
-//	}
-
-	//@ManyToMany(mappedBy="reasons")
-	//private Set<Entry> entries;
-	
-//	public Set<ViolationType> getViolationTypes() {
-//		return violationTypes;
-//	}
-//
-//	public void setViolationTypes(Set<ViolationType> violationTypes) {
-//		this.violationTypes = violationTypes;
-//	}
 
 	public int getId() {
 		return id;

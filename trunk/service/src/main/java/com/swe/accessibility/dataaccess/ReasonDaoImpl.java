@@ -39,7 +39,7 @@ public class ReasonDaoImpl implements ReasonDao {
 	@Override
 	public SubReason getById(int id) {
 		
-		return (SubReason) sessionFactory.getCurrentSession().load(SubReason.class, id);
+		return (SubReason) sessionFactory.getCurrentSession().get(SubReason.class, id);
 	}
 
 	@Override

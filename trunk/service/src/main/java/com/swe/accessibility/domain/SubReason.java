@@ -50,6 +50,11 @@ public class SubReason implements Serializable{
 //		this.violationTypes = violationTypes;
 //	}
 	
+	
+	private String extra;
+	
+	
+	private int priority;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "er.reason", cascade = 
 	    {CascadeType.PERSIST, CascadeType.MERGE})
@@ -59,7 +64,7 @@ public class SubReason implements Serializable{
 
 	
 
-	public void setEntries(Set<EntryReason> entryReasons) {
+	public void setEntryReasons(Set<EntryReason> entryReasons) {
 		this.entryReasons = entryReasons;
 	}
 	
@@ -92,6 +97,22 @@ public class SubReason implements Serializable{
 		this.parentReasonId = parentReasonId;
 	}
 
+	@Column(name="extra")
+	public String getExtra() {
+		return extra;
+	}
 	
+	public void setExtra(String extra) {
+		this.extra = extra;
+	}
+	
+	@Column(name="priority")
+	public int getPriority() {
+		return priority;
+	}
+	
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
 	
 }

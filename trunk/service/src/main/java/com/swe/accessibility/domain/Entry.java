@@ -56,6 +56,11 @@ public class Entry implements Serializable {
 	private User user;
 	
 	
+	private boolean fixed;
+	
+	private int priority;
+	
+	
 	private Set<EntryReason> entryReasons = new HashSet<EntryReason>();
 	
 	@ManyToMany(cascade={CascadeType.ALL})
@@ -65,7 +70,10 @@ public class Entry implements Serializable {
 	@OneToMany(mappedBy="entry",fetch=FetchType.LAZY)
 	private List<Comment> comments;
 
-	
+	public Entry() {
+		this.fixed = false;
+		this.priority = 1;
+	}
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public int getId() {
@@ -161,6 +169,24 @@ public class Entry implements Serializable {
 	
 	public void setEntryReasons(Set<EntryReason> entryReasons) {
 		this.entryReasons = entryReasons;
+	}
+	
+	@Column(name="fixed")
+	public boolean isFixed() {
+		return fixed;
+	}
+	
+	public void setFixed(boolean fixed) {
+		this.fixed = fixed;
+	}
+	
+	@Column(name="priority")
+	public int getPriority() {
+		return priority;
+	}
+	
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 
 }

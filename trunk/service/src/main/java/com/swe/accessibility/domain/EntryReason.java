@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.AssociationOverride;
 import javax.persistence.AssociationOverrides;
+import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -25,6 +26,9 @@ public class EntryReason implements Serializable {
 	private static final long serialVersionUID = 3503942712551273826L;
 	
 	private EntryReasonId er = new EntryReasonId();
+	
+	
+	private String extra;
 
 	@EmbeddedId
 	public EntryReasonId getEr() {
@@ -57,6 +61,15 @@ public class EntryReason implements Serializable {
 	public void setReason(SubReason reason){
 		
 		getEr().setReason(reason);
+	}
+
+	@Column(name="extra")
+	public String getExtra() {
+		return extra;
+	}
+	
+	public void setExtra(String extra) {
+		this.extra = extra;
 	}
 	
 	

@@ -25,6 +25,8 @@ public interface EntryDao {
 	List<Entry> getEntriesByType(String id);
 
 	List<Entry> getEntriesByCategory(SubReason reason);
+
+	List<Entry> getEntriesByPriority(String priority);
 	
 	
 

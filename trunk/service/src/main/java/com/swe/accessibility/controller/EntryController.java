@@ -25,6 +25,9 @@ import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.codehaus.jackson.map.util.JSONPObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -88,7 +91,7 @@ public class EntryController {
 		format.setParseBigDecimal(true);
 		BigDecimal coordX;
 		BigDecimal coordY;
-		
+		String value = null;
 		
 		String username = null;
 		if (principal == null)
@@ -99,7 +102,7 @@ public class EntryController {
 		try {
 			coordX = (BigDecimal) format.parse(request.getParameter("coordX"));
 			coordY = (BigDecimal) format.parse(request.getParameter("coordY"));
-			
+			value = request.getParameter("value");
 			User currentUser = userService.getUserByName(username);
 		
 			String comment = request.getParameter("comment");
@@ -108,9 +111,17 @@ public class EntryController {
 		
 			
 			SubReason reason = reasonService.getSubReason(categoryId);
+			int priority = reason.getPriority();
+			String extra = reason.getExtra();
 			
+			JSONObject obj = new JSONObject(extra);
+			obj.put("value", value);
 			
+			//Priority setting according to boundary
 			
+			if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 3){
+				priority++;
+			}
 			
 			String uri = saveFile(request);
 			entry.setComment(comment);
@@ -118,11 +129,12 @@ public class EntryController {
 			entry.setCoordY(coordY);
 			entry.setImageMeta(uri);
 			entry.setUser(currentUser);
-			
+			entry.setPriority(priority);
 			
 			EntryReason entryReason = new EntryReason();
 			entryReason.setReason(reason);
 			entryReason.setEntry(entry);
+			entryReason.setExtra(obj.toString());
 			
 			entry.getEntryReasons().add(entryReason);
 			
@@ -142,8 +154,10 @@ public class EntryController {
 			e.printStackTrace();
 			entryResult.setResultStatus("Error saving file");
 			entryResult.setResultId(3);
+		} catch (JSONException e) {
+			entryResult.setResultStatus("Error adding entry");
+			entryResult.setResultId(4);
 		}
-		
 		
 		HttpHeaders responseHeaders = makeCORS();
 		ResponseEntity<InsertEntryResult> entity = new ResponseEntity<InsertEntryResult>(entryResult,responseHeaders,HttpStatus.OK );
@@ -256,7 +270,7 @@ public class EntryController {
 	}
 
 	@RequestMapping(method={RequestMethod.GET},produces={"application/json"})
-	public  ResponseEntity<EntryList> getEntries(@RequestParam(required=false) String x, @RequestParam(required=false) String y,@RequestParam(required=false) String categoryId,@RequestParam(required=false) String typeId){
+	public  ResponseEntity<EntryList> getEntries(@RequestParam(required=false) String x, @RequestParam(required=false) String y,@RequestParam(required=false) String categoryId,@RequestParam(required=false) String typeId,@RequestParam(required=false) String priority){
 		
 		
 		HttpHeaders responseHeaders = makeCORS();
@@ -279,6 +293,8 @@ public class EntryController {
 				result = getEntryByCategory(categoryId);
 			else if(typeId != null)
 				result = getByType(typeId);
+			else if (priority != null)
+				result = getByPriority(priority);
 			else
 				result = getEntries();
 		}catch(ParseException e){
@@ -291,6 +307,9 @@ public class EntryController {
 		return entity;
 	}
 	
+	
+
+
 	@RequestMapping(value="/{id}",method={RequestMethod.GET},produces={"application/json"})
 	public  ResponseEntity<EntryList> getEntry(@PathVariable int id){
 		
@@ -381,13 +400,17 @@ public class EntryController {
 		
 		return result;
 	}
-
-	private  EntryList getEntryByCategory(@RequestParam String categoryId) throws ParseException{
-		
-		int id;
+	
+	private EntryList getByPriority(String priority) {
 		
 		EntryList result = new EntryList();
-		id = Integer.parseInt(categoryId);
+		result.setData(entryService.loadEntries(priority));
+		return result;
+	}
+
+	private  EntryList getEntryByCategory(String categoryId) throws ParseException{
+		
+		EntryList result = new EntryList();
 		result.setData(entryService.getEntriesByCategory(categoryId));
 		
 	
