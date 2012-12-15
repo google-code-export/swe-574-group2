@@ -22,12 +22,18 @@ public class UserService {
 		return userDao.get(name, password);
 	}
 
-
+	@Transactional
 	public User getUserByName(String username) {
 		
 		return userDao.get(username);
 			
 
+	}
+	
+	@Transactional
+	public void addUser(User user){
+		
+		userDao.insert(user);
 	}
 
 }

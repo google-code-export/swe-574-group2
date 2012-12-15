@@ -2,6 +2,7 @@ package com.swe.accessibility.controller;
 
 import java.security.Principal;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -10,24 +11,23 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.swe.accessibility.domain.LoginStatus;
-import com.swe.accessibility.domain.UserObject;
+import com.swe.accessibility.domain.User;
+import com.swe.accessibility.domain.UserType;
+import com.swe.accessibility.domain.proxy.SignupStatus;
+import com.swe.accessibilty.service.TypeService;
+import com.swe.accessibilty.service.UserService;
 
 @Controller
 @RequestMapping("/login")
@@ -40,6 +40,11 @@ public class LoginController {
 	
 	@Autowired
 	RememberMeServices rememberMeService;
+	
+	@Resource(name="userService")
+	UserService userService;
+	
+	
 
 	  @RequestMapping(value="/status", method = RequestMethod.GET,produces="application/json")
 	  public ResponseEntity<LoginStatus> getStatus(HttpServletRequest request) {
@@ -67,52 +72,7 @@ public class LoginController {
 	    return new ResponseEntity<LoginStatus>(status,responseHeaders,HttpStatus.OK);
 	  }
 
-//	  @RequestMapping(value="/sigin",method = {RequestMethod.POST,RequestMethod.OPTIONS,RequestMethod.GET},produces="application/json",headers={"Content-Type=application/json"})
-//	  public ResponseEntity<LoginStatus> login(@RequestBody UserObject user, HttpServletRequest request, HttpServletResponse response) {
-//
-//		HttpStatus httpStatus = null;
-//		LoginStatus status = new LoginStatus();
 
-//		if (user == null){
-//			status.setLoggedIn(false);
-//			status.setUsername(null);
-//			status.setErrorReason("User not found");
-//			httpStatus = HttpStatus.UNAUTHORIZED;
-//			HttpHeaders responseHeaders = makeCORS();
-//			
-//		    return new ResponseEntity<LoginStatus>(status,responseHeaders,httpStatus);
-//		}
-//	    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
-//	    
-//	    token.setDetails(user);
-//
-//	    
-//		
-//	    try {
-//	      Authentication auth = authenticationManager.authenticate(token);
-//	      SecurityContextHolder.getContext().setAuthentication(auth);
-//	      request.getSession().setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
-//	      status.setLoggedIn(auth.isAuthenticated());
-//	      status.setUsername(auth.getName());
-//	      //rememberMeService.loginSuccess(request, response, auth);
-//	      httpStatus = HttpStatus.OK;
-//	    } catch (BadCredentialsException e) {
-//	      status.setLoggedIn(false);
-//		  status.setUsername(null);
-//		  status.setErrorReason("Bad credentials");
-//		  httpStatus = HttpStatus.UNAUTHORIZED;
-//	    }catch (AuthenticationCredentialsNotFoundException e) {
-//		  status.setLoggedIn(false);
-//		  status.setUsername(user.getUsername());
-//		  status.setErrorReason("User not found");
-//		  httpStatus = HttpStatus.UNAUTHORIZED;
-//		}
-//	    //String cookieValue = "AuthToken=" + user.getUsername() + ":" + DigestUtils.sha1Hex(user.getPassword());
-//	    HttpHeaders responseHeaders = makeCORS();
-//	    
-//	    //responseHeaders.set("AuthToken", cookieValue);
-//	    return new ResponseEntity<LoginStatus>(status,responseHeaders,httpStatus);
-//	  }
 	  
 	  @RequestMapping(method=RequestMethod.GET,value="/success",produces="application/json")
 	  public ResponseEntity<LoginStatus> loginSuccess(Principal user, HttpServletRequest request, HttpServletResponse response) {
@@ -133,6 +93,47 @@ public class LoginController {
 		
 		  return "Sucessfull logout from service";
 		  
+	  }
+	  
+	  @RequestMapping(method=RequestMethod.POST,value="/signup")
+	  public ResponseEntity<SignupStatus> signup(HttpServletRequest req, HttpServletResponse resp){
+		  
+		  HttpHeaders responseHeaders = makeCORS();
+		  
+		  
+		  HttpStatus httpStatus = null;
+		  SignupStatus status = new SignupStatus();
+		  User user = new User();
+		  
+		  String username = req.getParameter("username");
+		  String password = req.getParameter("password");
+		  if (username == null || password == null){
+			  status.setStatus("Failed");
+			  status.setError("User name or password is null.");
+			  httpStatus = HttpStatus.BAD_REQUEST;
+		  }
+		  else if (userService.getUserByName(username) != null){
+			  status.setStatus("Failed");
+			  status.setError("User already exists");
+			  httpStatus = HttpStatus.BAD_REQUEST;
+		  }
+		  else{
+			  user.setUsername(username);
+			  user.setPassword(password);
+			  
+			  UserType type = new UserType();
+			  type.setId(2);
+			  type.setTitle("user");
+			  user.setUserType(type);
+			  
+			  userService.addUser(user);
+			  
+			  status.setStatus("Success");
+			  httpStatus = HttpStatus.CREATED;
+		  }
+		  
+		 
+		  return new ResponseEntity<SignupStatus>(status,responseHeaders,httpStatus);
 	  }
 	  
 	  private static HttpHeaders makeCORS(){
