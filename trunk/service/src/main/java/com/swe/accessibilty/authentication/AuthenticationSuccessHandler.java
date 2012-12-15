@@ -20,9 +20,7 @@ public class AuthenticationSuccessHandler extends
 		SimpleUrlAuthenticationSuccessHandler {
 
 	private RequestCache requestCache = new HttpSessionRequestCache();
-
-<<<<<<< .mine
-=======
+	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request,
 			HttpServletResponse response, Authentication authentication)
@@ -31,31 +29,19 @@ public class AuthenticationSuccessHandler extends
 
 		clearAuthenticationAttributes(request);
 
-
-	    
-	        
-	        //Object for return login status
-	        LoginStatus status = new LoginStatus();
-	        status.setLoggedIn(true);
-	        status.setUsername(authentication.getName());
-	        
-	        PrintWriter out = response.getWriter();
-	        response.addHeader("Access-Control-Allow-Origin", "http://localhost");
-	        response.addHeader("Access-Control-Allow-Credentials", "true");
-	        System.out.println(status.toString());
-	        out.write(String.valueOf(status.toString()));
-	    }
-
+		// Object for return login status
 		LoginStatus status = new LoginStatus();
 		status.setLoggedIn(true);
 		status.setUsername(authentication.getName());
 
-
 		PrintWriter out = response.getWriter();
 		response.addHeader("Access-Control-Allow-Origin", "http://localhost");
 		response.addHeader("Access-Control-Allow-Credentials", "true");
-		// response.setContentType("text/json");
-	
+		System.out.println(status.toString());
+		out.write(String.valueOf(status.toString()));
+
+		
+
 		out.write(String.valueOf(status.toString()));
 	}
 
