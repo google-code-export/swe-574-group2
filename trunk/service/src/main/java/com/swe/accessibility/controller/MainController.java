@@ -1,5 +1,8 @@
 package com.swe.accessibility.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
@@ -11,9 +14,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.swe.accessibility.domain.Priority;
 import com.swe.accessibility.domain.ReasonList;
+import com.swe.accessibility.domain.proxy.PriorityList;
 import com.swe.accessibility.domain.proxy.SubReasonList;
 import com.swe.accessibility.domain.proxy.TypeList;
 import com.swe.accessibilty.service.ReasonService;
@@ -91,6 +95,23 @@ public class MainController {
 		ResponseEntity<TypeList> entity = new ResponseEntity<TypeList>(result,responseHeaders,HttpStatus.OK );
 		
 		return entity;
+		
+	}
+	
+	
+	@RequestMapping(value="/priorities", method=RequestMethod.GET,produces={"application/json"})
+	public ResponseEntity<PriorityList> getPriorities(){
+		
+		PriorityList result = new PriorityList();
+		List<String> priorities = new ArrayList<String>();
+		priorities.add(Priority.LOW.getLabel());
+		priorities.add(Priority.HIGH.getLabel());
+		priorities.add(Priority.CRITICAL.getLabel());
+		
+		result.setData(priorities);
+		
+		return new ResponseEntity<PriorityList>(result,HttpStatus.OK);
+		
 		
 	}
 	
