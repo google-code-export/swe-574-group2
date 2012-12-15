@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.swe.accessibility.domain.Entry;
+import com.swe.accessibility.domain.Priority;
 import com.swe.accessibility.domain.SubReason;
 import com.swe.accessibility.domain.User;
 
@@ -160,11 +161,19 @@ public class EntryDaoImpl implements EntryDao {
 	@Override
 	public List<Entry> getEntriesByPriority(String priority) {
 		
+		int code = 0;
+		
+		if (priority.equals(Priority.LOW.getLabel()))
+			code = Priority.LOW.getDegree();
+		else if (priority.equals(Priority.HIGH.getLabel()))
+			code = Priority.HIGH.getDegree();
+		else
+			code = Priority.CRITICAL.getDegree();
 		String queryStr = "SELECT e.id,e.comment,e.coordX,e.coordY,e.upVoteCount,e.downVoteCount,e.imageMeta,e.priority,u.username from Reason r  join EntryReason er on er.ReasonId = r.id join Entry e on er.EntryID = e.id  "
 				+ "join User u on e.submittedBy = u.id where e.priority = :priority";
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(
 				queryStr);
-		query.setParameter("p", priority);
+		query.setParameter("p", code);
 		
 		Iterator<Object[]> iter = query.list().iterator();
 
