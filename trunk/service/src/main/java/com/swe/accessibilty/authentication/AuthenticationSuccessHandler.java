@@ -28,10 +28,10 @@ public class AuthenticationSuccessHandler extends
 			HttpServletResponse response, Authentication authentication)
 			throws ServletException, IOException {
 
->>>>>>> .r127
+
 		clearAuthenticationAttributes(request);
 
-<<<<<<< .mine
+
 	    
 	        
 	        //Object for return login status
@@ -45,11 +45,11 @@ public class AuthenticationSuccessHandler extends
 	        System.out.println(status.toString());
 	        out.write(String.valueOf(status.toString()));
 	    }
-=======
+
 		LoginStatus status = new LoginStatus();
 		status.setLoggedIn(true);
 		status.setUsername(authentication.getName());
->>>>>>> .r127
+
 
 		PrintWriter out = response.getWriter();
 		response.addHeader("Access-Control-Allow-Origin", "http://localhost");

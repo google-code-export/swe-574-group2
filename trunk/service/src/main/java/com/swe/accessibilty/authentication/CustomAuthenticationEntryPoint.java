@@ -25,14 +25,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 	@Override
 	public void commence(HttpServletRequest req, HttpServletResponse resp,
 			AuthenticationException e) throws IOException, ServletException {
-<<<<<<< .mine
+
 			
 		//Unauthenticated request comes here som response value has to be 401
-=======
-		
-	
-	
->>>>>>> .r127
 		resp.setStatus(HttpStatus.UNAUTHORIZED.value());
 		
 	}
