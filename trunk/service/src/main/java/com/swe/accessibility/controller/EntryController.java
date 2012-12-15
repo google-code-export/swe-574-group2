@@ -113,15 +113,21 @@ public class EntryController {
 			SubReason reason = reasonService.getSubReason(categoryId);
 			int priority = reason.getPriority();
 			String extra = reason.getExtra();
+			JSONObject obj = null;
+				
 			
-			JSONObject obj = new JSONObject(extra);
-			obj.put("value", value);
-			
-			//Priority setting according to boundary
-			
-			if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 3){
-				priority++;
+			if (value != null && extra != null){
+				obj = new JSONObject(extra);
+				obj.put("value", value);
+				//Priority setting according to boundary
+				
+				if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 3){
+					priority++;
+				}
 			}
+			
+			
+			
 			
 			String uri = saveFile(request);
 			entry.setComment(comment);
@@ -134,7 +140,8 @@ public class EntryController {
 			EntryReason entryReason = new EntryReason();
 			entryReason.setReason(reason);
 			entryReason.setEntry(entry);
-			entryReason.setExtra(obj.toString());
+			if (obj != null)
+				entryReason.setExtra(obj.toString());
 			
 			entry.getEntryReasons().add(entryReason);
 			
