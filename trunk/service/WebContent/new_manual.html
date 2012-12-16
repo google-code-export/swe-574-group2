@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=Cp1254">
-<title>Fair Urban</title>
+<title>Fair Urban - Elle Lokasyon Seçme - Yeni Kayıt Girişi</title>
 </head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <style type="text/css">
@@ -19,29 +19,150 @@ body {
 #map_canvas {
 	height: 100%
 }
-</style>
-<link rel="stylesheet" href="css/baseTheme/style.css" type="text/css"
-	media="all" />
-<link rel="stylesheet" href="css/basic.css" type="text/css" media="all" />
 
+.loginform
+{
+	background-color:white;
+}
+
+.clsTable
+{
+	border: 0;
+	border-collapse:separate; 
+	border-spacing:2em;
+	border-width: 1px; 
+	border-color:#000000; 
+	border-style: solid;
+}
+
+.reqVal
+{
+	color: red;
+	display: none;
+}
+</style>
+<link href="http://fonts.googleapis.com/css?family=Montserrat:400,700"
+	rel="stylesheet" type="text/css" />
+<link href="css/default.css" rel="stylesheet" type="text/css"
+	media="all" />
+	
+<script type="text/javascript"
+	src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCg0FRVSu5XHjjkG1NV1tev04MaGOTg5Jo&sensor=false"></script>
 <script type="text/javascript"
 	src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 
-<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
-
-<script type="text/javascript" src="js/ajaxupload-min.js"></script>
-
+<script type="text/javascript" src="js/jquery.lightbox_me.js"></script>
 <script type="text/javascript">
-	$(document).ready(function() {
+
+var isLoggedInUrl = "./service/login/status";
+var logOutUrl = "./j_spring_security_logout";
+
+function IsLoggedIn() {
+	$.ajax({
+		url : isLoggedInUrl,
+		type : 'get',
+		success: function(msg){
+			if(msg.loggedIn == true)
+				{
+				$('#welcomeText').show().html('Hoşgeldin ' + msg.username + '!');
+					$('#spnLogout').show();
+					$('#spnLogin').hide();
+				//$('#spnLogin').show();
+				//$('#spnLogout').hide();
+				}
+			else
+				{
+					$('#spnLogin').show();
+					$('#spnLogout').hide();
+				}
+		},
+		error: function(){}
+	})
+};
+
+function logOut() {
+	$.ajax({
+		url : logOutUrl,
+		type : 'get',
+		success: function(msg){
+			if(msg.status == true)
+				{
+				alert("Başarıyla çıkış yaptınız!");
+				console.log(msg);
+				IsLoggedIn();
+				}
+			else
+				{
+					console.log(msg);
+					$('#spnLogout').show();
+					$('#spnLogin').hide();
+				}
+		},
+		error: function(){}
+	})
+};
+
+$(document).ready(function() {
+		
+	IsLoggedIn();
+		
+		$('#spnLogin').click(function(e) {
+		    $('#divlogin').lightbox_me({
+		        centered: true, 
+		        onLoad: function() { 
+		            $('#sign_up').find('input:first').focus()
+		            }
+		        });
+		    e.preventDefault();
+		});
+		
+		//testuser - swe574TEST!
+		$('#frmlogin').submit(function() {
+			
+			if($('#username').val() == "" || $('#password').val() == "")
+			{
+				if($('#username').val() == ""){$('#reqUser').show();}else{$('#reqUser').hide();}
+				if($('#password').val() == ""){$('#reqPass').show();}else{$('#reqPass').hide();}
+				return false;
+			}
+			else
+			{
+				//alert($("#frmlogin").serialize())
+				$.ajax({
+					type: 'POST',
+					data: $("#frmlogin").serialize(),
+		          	url: './service/login/sigin',
+		            success: function(msg,textStatus) {
+		            	//alert("Başarıyla giriş yaptınız!");
+		            	//$('#spnLogout').show();
+	 					//$('#spnLogin').hide();
+		            	$('#divlogin').trigger('close');
+		            	IsLoggedIn();
+		            },
+		            error:function(jqXHR, textStatus, errorThrown){
+			          alert("Yanlış kullanıcı adı/şifre, lütfen tekrar deneyiniz.");
+		              //alert(errorThrown);
+		            }
+		        });
+				  return false;
+			}	
+		});
 
 		//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
 		//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
-		var getCategoriesUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/categories';
-		var getEntriesByCategoryUrl = 'http://swe.cmpe.boun.edu.tr:8180/rest/service/entries?categoryId=';
+		var getCategoriesUrl = './service/categories';
+		var getEntriesByCategoryUrl = './service/entries?categoryId=';
 
 		var selectParent = $('#ddlCategories');
 		var selectChild = $('#ddlChildren');
 		$.getJSON(getCategoriesUrl, function(data) {
+// 			$.each(data['data'], function(index, element) {
+// 		        $('#feed').append(element.id + " " + element.title + " " + " " + element.parentReasonId + "</br>");
+// 		        $.each(element.violationTypes, function(index, element2)
+// 		        {
+// 		        	$('#feed').append(element2.id + " " + element2.title + " " + " " + element2.description + " " + element2.imageMeta);
+// 		        });
+// 		    });
 			$.each(data['data'], function(index, element) {
 		        $(selectParent).append(
 		        	$('<option></option>').val(element.id).html(element.title)
@@ -50,6 +171,9 @@ body {
 		 });
 		
 		selectParent.change(function() {
+
+			$('#category').val(selectParent.find(":selected").val());
+			
 			if(selectParent.find(":selected").val() == "0")
 			{
 				selectChild.hide();
@@ -80,6 +204,15 @@ body {
 		
 		selectChild.change(function() {
 
+			if(selectChild.find(":selected").val() != 0)
+			{
+				$('#category').val(selectChild.find(":selected").val());
+			}
+			else
+			{
+				$('#category').val(selectParent.find(":selected").val());
+			}
+
 		});
 	});
 </script>
@@ -108,8 +241,8 @@ function codeLatLng(latLng) {
           var latlngStr = latLong.split(",",2);
 		  var lat = parseFloat(latlngStr[0]);
 		  var lng = parseFloat(latlngStr[1]);
-		  $('#hdnLat').val(lat);
-		  $('#hdnLng').val(lng);
+		  $('#coordY').val(lng);
+		  $('#coordX').val(lat);
         }
       } else {
         alert("Adres bulma hatası: " + status);
@@ -125,7 +258,7 @@ var myOptions = {
 	//mapTypeControl: true,
 	//mapTypeControlOptions: {style: google.maps.MapTypeControlStyle.DROPDOWN_MENU},
 	//navigationControl: true,
-	mapTypeId: google.maps.MapTypeId.ROADMAP
+	mapTypeId: google.maps.MapTypeId.HYBRID
 };
 map = new google.maps.Map(document.getElementById("map_canvas"),
                            myOptions);
@@ -167,52 +300,107 @@ google.maps.event.trigger(marker, 'click');
 google.maps.event.addDomListener(window, 'load', initialize);
 
 </script>
-
 </head>
-<body>
-	<form
-		action="http://testpalette.com:8080/RestAccessibilty/service/entries/add"
-		method="post" enctype="multipart/form-data">
-		<input type="hidden" id="hdnLat" value="0" name="hdnLat" /> 
-		<input type="hidden" id="hdnLng" value="0" name="hdnLng" />
-		<p style="height: 20px;"></p>
-		<h2>Yeni Kayıt Girişi</h2>
-		<p style="height: 20px;"></p>
-		<h3>Lütfen haritadan lokasyon seçiniz.</h3>
-		<hr width="1100px;">
-		<p style="height: 20px;"></p>
-		<div style="text-align: left; margin-left: 30px; float: left;">
-			<span style="font-weight: bold;">Kategori:</span> &nbsp; <select
-				id="ddlCategories" name="ddlCategories">
-				<option value="0">Lütfen seçiniz...</option>
-			</select> <select id="ddlChildren" name="ddlChildren"
-				style="display: none">
-				<!--<option value="0">Tamamı</option> -->
-			</select>
-			<p style="height: 10px;"></p>
-			<span style="font-weight: bold;">Açıklama:</span>
-			<textarea class="txtDescription" name="txtDescription"
-				id="txtDescription" cols="40" rows="4" style="margin-bottom: -70px;"></textarea>
-			<p style="height: 85px;"></p>
-			<span style="font-weight: bold;">Fotoğraf:</span>
-			<p></p>
-			<!-- <div class="uploader"></div> -->
-			<input type="file" name="file" id="file" />
-			<p style="height: 10px;"></p>
-			<input type="submit" id="btnSave" name="submit" value="Kaydet"
-				style="font-weight: bold;" /> <span id="spinner" class="spinner"
-				style="display: none;"><img id="img-spinner"
-				src="images/spinner.gif" alt="Kaydediliyor..." /> </span>
-			<p style="height: 20px;"></p>
-			<div id="locationinfo"></div>
-			<p style="height: 20px;"></p>
-			<a href="javascript: window.history.go(-1)"
-				style="font-weight: bold; text-decoration: underline;"><--Geri</a>
-		</div>
 
-		<div id="map_canvas"
-			style="width: 650px; height: 500px; margin-right: 30px; float: right;"></div>
-		<p style="height: 60px;"></p>
-	</form>
+<body>
+
+<div class="loginform" style="display: none; border:#111" id="divlogin">
+<form action="./service/login/sigin" accept-charset="UTF-8" method="post" id="frmlogin">
+    <table class="clsTable">
+       <tr>
+         <td colspan="2"><span style="font-size: large;">Siteye giriş yapın</span></td>
+       </tr>
+       <tr>
+         <td><label for="username">Kullanıcı adı:<span class="reqVal" id="reqUser">&nbsp;*</span></label></td>
+         <td> <input type="text" maxlength="60" name="username" id="username" size="15" value="" class="required" style="float: right"></td>
+       </tr>
+       <tr>
+         <td><label for="password">Şifre:<span class="reqVal" id="reqPass">&nbsp;*</span></label></td>
+         <td> <input type="password" name="password" id="password" maxlength="60" size="15" class="required" style="float: right"></td>
+       </tr>
+       <tr>
+         <td><input type="submit" name="submit" id="submit" value="Giriş"></td>
+         <td></td>
+       </tr>
+       <tr>
+         <td><a href="register.html" title="Üye olun!" style="font-size: 14px;">Kaydol</a></td>
+         <td></td>
+       </tr>
+    </table>
+	<input type="hidden" name="form_build_id" id="form-c1062bd63291587f665fe24a402917e9" value="form-c1062bd63291587f665fe24a402917e9">
+	<input type="hidden" name="form_id" id="edit-user-login-block" value="user_login_block">
+</form>
+</div>
+	<div id="wrapper" class="container">
+		<div id="header">
+			<div id="logo">
+				<a href="default.html"><img src="images/logo.png" width="25%;" style="float: left"></a>
+				<h1 style="margin-top: 10px">  
+					<a href="default.html">&nbsp;FAIR URBAN</a>
+				</h1>
+				<!-- 			<p>Alt Başlık</p> -->
+			</div>
+			<div id="menu">
+				<ul>
+					<li><a href="default.html">Ana Sayfa</a></li>
+					<li><a href="about.html">Hakkımızda</a></li>
+					<li class="current_page_item"><a href="new.html">Yeni Ekle</a></li>
+					<li><a id="spnLogin" style="display: none" href="javascript:;">GIRIS</a>
+						<a id="spnLogout" style="display: none" href="javascript:;" onclick="logOut();" >ÇIKIS</a>
+					</li>
+				</ul>
+				<span style="display: none; float: right; margin-right: 20px; margin-top: 10px; font-weight: bold;" id="welcomeText"></span>
+			</div>
+			
+		</div>
+		<div id="page" style="padding: 10px 0 0;">
+			<div id="content" style="width: 400px;">
+				<form action="./service/entries/add" method="post" enctype="multipart/form-data">
+				<input type="hidden" id="coordX" value="0" name="coordX" />
+				<input type="hidden" id="coordY" value="0" name="coordY" />
+				<input type="hidden" id="category" value="0" name="category" />
+				<p style="height: 5px;"></p>
+				<div id="submenu">
+				<ul>
+					<li><a href="new.html">Otomatik Lokasyon Bulma</a></li>
+					<li class="current_page_item"><a>Elle Lokasyon Seçme</a></li>
+				</ul>
+				</div>
+				<div style="text-align: left; float: left;">
+					<span style="font-weight: bold;">Kategori:</span> 
+					<select id="ddlCategories" name="ddlCategories">
+						<option value="0">Lütfen seçiniz...</option>
+					</select>
+					<select id="ddlChildren" name="ddlChildren" style="display: none">
+					</select>
+					<p style="height: 10px;"></p>
+					<span style="font-weight: bold;">Açıklama:</span>
+					<textarea class="comment" name="comment"
+						id="comment" cols="30" rows="4" style="margin-bottom: -45px;"></textarea>
+					<p style="height: 85px;"></p>
+					<span style="font-weight: bold;">Fotoğraf:</span>
+					<!-- <div class="uploader"></div> -->
+					<input type="file" name="file" id="file" /> 
+					<p style="height: 10px;"></p>
+					<input type="submit" id="btnSave" name="submit" value="Kaydet"
+						style="font-weight: bold;" />
+					<span id="spinner" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="Kaydediliyor..."/></span>
+					<p style="height: 20px;"></p>
+					<div id="locationinfo"></div>
+					<p style="height: 5px;"></p>
+					<a href="javascript: window.history.go(-1)" style="font-weight:bold; text-decoration: underline; color: #2AA8D2; font-size: 14px;"><--Geri</a>
+					<p style="height: 5px;"></p>
+				</div>
+			
+				
+				<p style="height: 60px;"></p>
+			</form>
+			</div>
+			<div id="map_canvas" style="width: 480px; height: 480px; margin-right: 0px; margin-top:10px; float: right; margin-bottom: 25px;"></div>
+			<p style="height: 60px;"></p>
+		</div>
+	</div>
 </body>
+
+
 </html>
