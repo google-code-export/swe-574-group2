@@ -218,14 +218,15 @@ body {
 				    $('#lblUpVote' + entryId).text(parseInt(upp) + 1);
 				    $('#lnkUpVote' + entryId).removeAttr("href");
 				    $('#lnkUpVote' + entryId).addClass("disabled");
+				    alert('Bu kayıt için "acil" oyu verdiniz.');
 		        }
 		        else
 		        {
-		        	alert('Bir hata oluştu, lütfen tekrar deneyin.');
+		        	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
 		        }
 		      },
 		    error: function(data) {
-		    	alert('Bir hata oluştu, lütfen tekrar deneyin.');
+		    	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
 		      }
 		})
 	};
@@ -235,7 +236,7 @@ body {
 		$.ajax({
 			url: voteUrl,
 		    type: 'post',
-		    data: JSON.stringify({entryId:entryId,up:true}),
+		    data: JSON.stringify({entryId:entryId,up:false}),
 		    dataType: 'json',
 		    contentType: "application/json;charset=utf-8",
 		    success: function(data) {
@@ -245,14 +246,19 @@ body {
 					$('#lblDownVote' + entryId).text(parseInt(dnn) + 1);
 					$('#lnkDownVote' + entryId).removeAttr("href");
 					$('#lnkDownVote' + entryId).addClass("disabled");
+					alert('Bu kayıt için "bekleyebilir" oyu verdiniz.');
+		        }
+		        else if(data.resultStatus == "FAILURE" && data.resultId == 2)
+		        {
+		        	alert('Bu kayıt için daha önce oy vermişsiniz, başka oy veremezsiniz.');
 		        }
 		        else
 		        {
-		        	alert('Bir hata oluştu, lütfen tekrar deneyin.');
+		        	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
 		        }
 		      },
 		    error: function(data) {
-		    	alert('Bir hata oluştu, lütfen tekrar deneyin.');
+		    	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
 		      }
 		})
 	};

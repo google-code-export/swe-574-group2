@@ -54,168 +54,229 @@ body {
 <script type="text/javascript" src="js/jquery.lightbox_me.js"></script>
 
 <script type="text/javascript">
-	var markersArray = [];
 
-	function clearOverlays() {
-		for ( var i = 0; i < markersArray.length; i++) {
-			markersArray[i].setMap(null);
+function getParameterByName(name)
+{
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.search);
+  if(results == null)
+    return "";
+  else
+    return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+var markersArray = [];
+
+function clearOverlays() {
+	  for (var i = 0; i < markersArray.length; i++ ) {
+	    markersArray[i].setMap(null);
+	  }
+	}
+
+function doNothing() {
+}
+
+function bindInfoWindow(marker, map, infoWindow, html) {
+	markersArray.push(marker);
+	google.maps.event.addListener(marker, 'click', function() {
+		infoWindow.setContent(html);
+		infoWindow.open(map, marker);
+	});
+}
+
+function codeLatLng(latLng) {
+	    var input = latLng;
+	    var latlngStr = input.split(",",2);
+	    var lat = parseFloat(latlngStr[0]);
+	    var lng = parseFloat(latlngStr[1]);
+	    var latlng = new google.maps.LatLng(lat, lng);
+	    geocoder.geocode({'latLng': latlng}, function(results, status) {
+	      if (status == google.maps.GeocoderStatus.OK) {
+	        if (results[0]) {
+	          $('#lblAddress').html(results[0].formatted_address);
+	        }
+	      } else {
+	        alert("Adres bulma hatası: " + status);
+	      }
+	    });
+}
+
+// Set the Map variable
+var map;
+geocoder = new google.maps.Geocoder();
+function initialize() {
+	var myOptions = {
+		zoom : 18,
+		mapTypeId : google.maps.MapTypeId.HYBRID,
+		scrollwheel: false
+	};
+
+	var infoWindow = new google.maps.InfoWindow;
+
+	var markerImg = new google.maps.MarkerImage(
+			'images/markers/marker2.png',
+			// This marker is 129 pixels wide by 42 pixels tall.
+			new google.maps.Size(129, 42),
+			// The origin for this image is 0,0.
+			new google.maps.Point(0, 0),
+			// The anchor for this image is the base of the flagpole at 18,42.
+			new google.maps.Point(18, 42));
+
+	var entryId = getParameterByName('id');
+	var getEntryByIdUrl = "./service/entries/" + entryId;
+	var coordX = 0;
+	var coordY = 0;
+	
+	$.getJSON(getEntryByIdUrl, function(data) {
+		
+		var myData = data['data'][0];
+		
+		var priority = "<font color='orange'>Yüksek</font>";
+		if(myData.priority == "Low")
+		{
+			priority = "<font color='olive'>Düşük</font>";
 		}
-	}
-
-	function doNothing() {
-	}
-
-	function bindInfoWindow(marker, map, infoWindow, html) {
-		markersArray.push(marker);
-		google.maps.event.addListener(marker, 'click', function() {
-			infoWindow.setContent(html);
-			infoWindow.open(map, marker);
+		else if(myData.priority == "High")
+		{
+			priority = "<font color='orange'>Yüksek</font>";
+		}
+		else if(myData.priority == "Critical")
+		{
+			priority = "<font color='red'>Kritik</font>";
+		}
+		
+		var fixed = "<font color='red'>Henüz düzeltilmedi</font>";
+		if(myData.fixed == false)
+		{
+			fixed = "<font color='red'>Henüz düzeltilmedi</font>";
+		}
+		else if(myData.fixed == true)
+		{
+			fixed = "<font color='green'>Düzeltildi</font>";
+		}
+		
+	    var comment = myData.comment;
+		var upVote = myData.upVoteCount;
+		var downVote = myData.downVoteCount;
+		var user = myData.userName;
+		var image = myData.imageMeta;
+		var comments = myData.comments;
+		var isFixe
+		coordX = myData.coordX;
+		coordY = myData.coordY;
+		var point = new google.maps.LatLng(parseFloat(coordX), parseFloat(coordY));
+		var html = "<b>Koordinatlar: </b> " + coordX + " , " + coordY;
+		var marker = new google.maps.Marker({
+			map : map,
+			position : point,
+			icon : markerImg
 		});
-	}
+				
+		bindInfoWindow(marker, map, infoWindow, html);
 
-	var entryDetailUrl = "entry.html?id=";
+		codeLatLng(coordX + ","+ coordY);
 
-	// Set the Map variable
-	var map;
-	function initialize() {
-		var myOptions = {
-			zoom : 12,
-			mapTypeId : google.maps.MapTypeId.ROADMAP,
-			scrollwheel : true
-		};
-
-		//Define Marker properties
-		var markerImg = new google.maps.MarkerImage(
-				'images/markers/marker2.png',
-				// This marker is 129 pixels wide by 42 pixels tall.
-				new google.maps.Size(22, 32),
-				// The origin for this image is 0,0.
-				new google.maps.Point(0, 0),
-				// The anchor for this image is the base of the flagpole at 18,42.
-				new google.maps.Point(18, 42));
-
-		var infoWindow = new google.maps.InfoWindow;
-		map = new google.maps.Map(document.getElementById('map_canvas'),
-				myOptions);
+		$('#lblStatus').html(fixed);
+		$('#lblPriority').html(priority);
+		$('#lblComment').html(comment);
+		$('#lblUpVote').html(upVote);
+		$('#lblDownVote').html(downVote);
+		$('#lblUser').html(user);
+		$('#hdnUpVote').val(upVote);
+		$('#hdnDownVote').val(downVote);
+		//$('#imgEntry').attr('src', image); //todo: uncomment this for production
 
 		// Set the center of the map
-		var pos = new google.maps.LatLng(41.08, 29.025);
-		//var pos = new google.maps.LatLng(0, 0);
+		var pos = new google.maps.LatLng(coordX, coordY);
 		map.setCenter(pos);
-		function infoCallback(infowindow, marker) {
-			return function() {
-				infowindow.open(map, marker);
-			};
-		}
+	 });
 
-		var getAllEntriesUrl = "./service/entries";
+	map = new google.maps.Map(document.getElementById('map_canvas'),
+			myOptions);
 
-		$.getJSON(getAllEntriesUrl,
-						function(data) {
-							$
-									.each(
-											data['data'],
-											function(index, element) {
-												var comment = element.comment;
-												var entryId = element.id;
-												var upVote = element.upVoteCount;
-												var downVote = element.downVoteCount;
-												var image = element.imageMeta;
-												var point = new google.maps.LatLng(
-														parseFloat(element.coordX),
-														parseFloat(element.coordY));
-												var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
-														+ image
-														+ "'>"
-														+ "<p></p><b>''"
-														+ comment
-														+ "''</b> <p></p>"
-														+ upVote
-														+ " acil &nbsp;&nbsp;"
-														+ "<a rel='"
-														+ entryId
-														+ "' id='lnkUpVote' href='javascript:voteUp("
-														+ entryId
-														+ ");'"
-														+ "><img width='25' height='25'" 
-						+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
-														+ "<a rel='"
-														+ entryId
-														+ "' id='lnkDownVote' href='javascript:voteDown("
-														+ entryId
-														+ ");'>"
-														+ "<img width='25' height='25'"
-						+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
-														+ "&nbsp;&nbsp;"
-														+ downVote
-														+ " bekleyebilir <p></p>"
-														+ "<a style='text-decoration: underline' href='" 
-						+ entryDetailUrl + entryId + "'>Detay...</a></div>";
+	function infoCallback(infowindow, marker) {
+		return function() {
+			infowindow.open(map, marker);
+		};
+	}
+};
 
-												var marker = new google.maps.Marker(
-														{
-															map : map,
-															position : point,
-															icon : markerImg
-														});
-												bindInfoWindow(marker, map,
-														infoWindow, html);
-											});
+// Initializes the Google Map
+google.maps.event.addDomListener(window, 'load', initialize);
 
-							$('#divCount').html(
-									"Sistemde toplam " + data['data'].length
-											+ " adet ihlâl var.");
-						});
+var voteUrl = "./service/entries/thumbs";
 
-		// 		var marker = new google.maps.Marker({
-		// 			position : map.getCenter(),
-		// 			map : map,
-		// 			title : 'Click to zoom'
-		// 		});
+function voteUp() {
+	var entryId = getParameterByName('id');
+	if($('#lnkUpVote').hasClass("disabled")){return};
+	$.ajax({
+	    url: voteUrl,
+	    type: 'post',
+	    data: JSON.stringify({entryId:entryId,up:true}),
+	    dataType: 'json',
+	    contentType: "application/json;charset=utf-8",
+	    success: function(data) {
+	        if(data.resultStatus == "SUCCESS")
+	        {
+	        	var upp = $('#lblUpVote').text();
+			    $('#lblUpVote').text(parseInt(upp) + 1);
+			    $('#lnkUpVote').removeAttr("href");
+			    $('#lnkUpVote').addClass("disabled");
+			    alert('Bu kayıt için "acil" oyu verdiniz.');
+	        }
+	        else if(data.resultStatus == "FAILURE" && data.resultId == 2)
+	        {
+	        	alert('Bu kayıt için daha önce oy vermişsiniz, başka oy veremezsiniz.');
+	        }
+	        else
+	        {
+	        	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
+	        }
+	      },
+	    error: function(data) {
+	    	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
+	      }
+	})
+};
 
-		// 		google.maps.event.addListener(marker, 'click', function() {
-		// 			map.setZoom(8);
-		// 			map.setCenter(marker.getPosition());
-		// 		});
-	};
-
-	// Initializes the Google Map
-	google.maps.event.addDomListener(window, 'load', initialize);
-
-	var voteUrl = "./service/entries/thumbs";
-	var isLoggedInUrl = "./service/login/status";
-	var logOutUrl = "./j_spring_security_logout";
-
-	
-	function voteUp(entryId) {
-		$.ajax({
-		    url: voteUrl,
-		    type: 'post',
-		    data: JSON.stringify({entryId:entryId,up:true}),
-		    dataType: 'json',
-		    contentType: "application/json;charset=utf-8",
-		}).done(function(){
-		    var upp = $('#lblUpVote').val();
-		    $('#lblUpVote').val(parseInt(upp) + 1);
-		});
-	};
-
-	function voteDown(entryId) {
-		$.ajax({
-			url : voteUrl,
-			type : 'post',
-			data : {
-				entryId : entryId,
-				up : false
-			}
-		}).done(function() {
-			var upp = $('#lblUpVote').val();
-			$('#lblUpVote').val(parseInt(upp) + 1);
-		});
-	};
+function voteDown() {
+	var entryId = getParameterByName('id');
+	if($('#lnkDownVote').hasClass("disabled")){return};
+	$.ajax({
+		url: voteUrl,
+	    type: 'post',
+	    data: JSON.stringify({entryId:entryId,up:false}),
+	    dataType: 'json',
+	    contentType: "application/json;charset=utf-8",
+	    success: function(data) {
+	        if(data.resultStatus == "SUCCESS")
+	        {
+	        	var dnn = $('#lblDownVote').text();
+				$('#lblDownVote').text(parseInt(dnn) + 1);
+				$('#lnkDownVote').removeAttr("href");
+				$('#lnkDownVote').addClass("disabled");
+				alert('Bu kayıt için "bekleyebilir" oyu verdiniz.');
+	        }
+	        else
+	        {
+	        	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
+	        }
+	      },
+	    error: function(data) {
+	    	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
+	      }
+	})
+};
 </script>
 
 <script type="text/javascript">
+
+var voteUrl = "./service/entries/thumbs";
+var isLoggedInUrl = "./service/login/status";
+var logOutUrl = "./j_spring_security_logout";
+
 	$(document).ready(function() {
 		
 		IsLoggedIn();
@@ -261,246 +322,11 @@ body {
 				  return false;
 			}	
 		});
-		
-						//jQuery.support.cors = true;
+	});
 
-						//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
-						//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
-						var getCategoriesUrl = './service/categories';
-						var getEntriesByCategoryUrl = './service/entries?categoryId=';
-
-						var selectParent = $('#ddlCategories');
-						var selectChild = $('#ddlChildren');
-						$.getJSON(getCategoriesUrl, function(data) {
-							// 			$.each(data['data'], function(index, element) {
-							// 		        $('#feed').append(element.id + " " + element.title + " " + " " + element.parentReasonId + "</br>");
-							// 		        $.each(element.violationTypes, function(index, element2)
-							// 		        {
-							// 		        	$('#feed').append(element2.id + " " + element2.title + " " + " " + element2.description + " " + element2.imageMeta);
-							// 		        });
-							// 		    });
-							$.each(data['data'], function(index, element) {
-								$(selectParent).append(
-										$('<option></option>').val(element.id)
-												.html(element.title));
-							});
-						});
-
-						selectParent
-								.change(function() {
-									if (selectParent.find(":selected").val() == "0") {
-										selectChild.hide();
-										selectChild.val("0");
-									} else {
-										selectChild.empty();
-										selectChild.append($(
-												'<option></option>').val(0)
-												.html("Tamamı"));
-										$
-												.getJSON(
-														getCategoriesUrl
-																+ "/"
-																+ selectParent
-																		.find(
-																				":selected")
-																		.val(),
-														function(data) {
-															$
-																	.each(
-																			data['data'],
-																			function(
-																					index,
-																					element) {
-																				selectChild
-																						.append($(
-																								'<option></option>')
-																								.val(
-																										element.id)
-																								.html(
-																										element.title));
-																			});
-															selectChild.show();
-														});
-									}
-								});
-
-						selectChild.change(function() {
-
-						});
-
-						$('#btnSearch')
-								.click(
-										function() {
-											var valToSearch = 0;
-											if (selectChild.val() == "0") {
-												valToSearch = selectParent
-														.val();
-											} else {
-												valToSearch = selectChild.val();
-											}
-											
-											var searchUrl = "";
-											var getAllEntriesUrl = "./service/entries";
-											
-											if(valToSearch != "0")
-											{
-												searchUrl = getEntriesByCategoryUrl + valToSearch;
-											}
-											else
-											{
-												searchUrl = getAllEntriesUrl;
-											}
-
-											var scriptUrl = searchUrl;
-											$
-													.ajax({
-														url : scriptUrl,
-														type : 'get',
-														dataType : 'json',
-														beforeSend : function() {
-															$("#spinner")
-																	.show();
-														},
-														complete : function() {
-															$("#spinner")
-																	.hide();
-														},
-														success : function(data) {
-															var dataS = data['data'];
-
-															$('#divCount')
-																	.html(
-																			"Filtreleme sonucu "
-																					+ dataS.length
-																					+ " adet ihlâl bulundu.");
-
-															var pinImg = new google.maps.MarkerImage(
-																	'images/markers/wheelchair.png',
-																	// This marker is 129 pixels wide by 42 pixels tall.
-																	new google.maps.Size(
-																			129,
-																			42),
-																	// The origin for this image is 0,0.
-																	new google.maps.Point(
-																			0,
-																			0),
-																	// The anchor for this image is the base of the flagpole at 18,42.
-																	new google.maps.Point(
-																			18,
-																			42));
-
-															var infoWindow = new google.maps.InfoWindow;
-
-															clearOverlays();
-
-															$
-																	.each(
-																			dataS,
-																			function(
-																					index,
-																					element) {
-																				var comment = element.comment;
-																				var entryId = element.id;
-																				var upVote = element.upVoteCount;
-																				var downVote = element.downVoteCount;
-																				var point = new google.maps.LatLng(
-																						parseFloat(element.coordX),
-																						parseFloat(element.coordY));
-																				var image = element.imageMeta;
-																				var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
-																					+ image
-																					+ "'>"
-																					+ "<p></p><b>''"
-																					+ comment
-																					+ "''</b> <p></p>"
-																					+ upVote
-																					+ " acil &nbsp;&nbsp;"
-																					+ "<a rel='"
-																					+ entryId
-																					+ "' id='lnkUpVote' href='javascript:voteUp("
-																					+ entryId
-																					+ ");'"
-																					+ "><img width='25' height='25'" 
-													+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
-																					+ "<a rel='"
-																					+ entryId
-																					+ "' id='lnkDownVote' href='javascript:voteDown("
-																					+ entryId
-																					+ ");'>"
-																					+ "<img width='25' height='25'"
-													+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
-																					+ "&nbsp;&nbsp;"
-																					+ downVote
-																					+ " bekleyebilir <p></p>"
-																					+ "<a style='text-decoration: underline' href='" 
-													+ entryDetailUrl + entryId + "'>Detay...</a></div>";
-																				var marker = new google.maps.Marker(
-																						{
-																							map : map,
-																							position : point,
-																							icon : pinImg
-																						});
-
-																				bindInfoWindow(
-																						marker,
-																						map,
-																						infoWindow,
-																						html);
-
-																			});
-														},
-														error : function(data) {
-															alert("Bir hata oluştu, lütfen tekrar deneyin.");
-														}
-													});
-
-										});
-
-						var voteUrl = "./service/entries/thumbs";
-
-						$("#lnkUpVote").click(function() {
-							alert($("#lnkUpVote").attr('rel'));
-							$.ajax({
-								url : voteUrl,
-								type : 'post',
-								data : {
-									entryId : $("#lnkUpVote").attr('rel'),
-									up : true
-								}
-							}).done(function() {
-								alert($("#lnkUpVote").attr('rel'));
-								var upp = $('#lblUpVote').val();
-								$('#lblUpVote').val(parseInt(upp) + 1);
-							});
-						});
-
-						$("#lnkDownVote").click(function() {
-							if ($('#lnkDownVote').hasClass('disabled'))
-								return;
-							$('#lblVote').html('Down vote verildi');
-							$('#msgVote').hide().fadeIn("slow", "linear");
-							var upp = $('#hdnDownVote').val();
-							$('#lblDownVote').html(parseInt(upp) - 1);
-							$('#lnkDownVote').addClass('disabled');
-						});
-
-						function voteUp(entryId) {
-							alert(entryId);
-							$.ajax({
-								url : voteUrl,
-								type : 'post',
-								data : {
-									entryId : $("#lnkUpVote").attr('rel'),
-									up : true
-								}
-							}).done(function() {
-								alert($("#lnkUpVote").attr('rel'));
-								var upp = $('#lblUpVote').val();
-								$('#lblUpVote').val(parseInt(upp) + 1);
-							});
-						};
-
-					});
+	function IsLoggedReturn(nedir) {
+		return nedir;
+	};
 	
 	function IsLoggedIn() {
 		$.ajax({
@@ -509,23 +335,26 @@ body {
 			success: function(msg){
 				if(msg.loggedIn == true)
 					{
-					$('#welcomeText').show().html('Hoşgeldin ' + msg.username + '!');
- 					$('#spnLogout').show();
- 					$('#spnLogin').hide();
- 					$('#liNewEntry').show();
-					//$('#spnLogin').show();
-					//$('#spnLogout').hide();
+						$('#welcomeText').show().html('Hoşgeldin ' + msg.username + '!');
+	 					$('#spnLogout').show();
+	 					$('#spnLogin').hide();
+	 					$('#liNewEntry').show();
+						//$('#spnLogin').show();
+						//$('#spnLogout').hide();
+						$('#loggedMu').val('true');
 					}
 				else
 					{
 						$('#spnLogin').show();
 						$('#spnLogout').hide();
 						$('#liNewEntry').hide();
+						$('#loggedMu').val('false');
 					}
 			},
 			error: function(){}
 		})
 	};
+
 	
 	function logOut() {
 		$.ajax({
@@ -551,7 +380,7 @@ body {
 </script>
 
 <body>
-
+	<input type="hidden" name="loggedMu" id="loggedMu" value="false">
 <div class="loginform" style="display: none; border:#111" id="divlogin">
 <form action="./service/login/sigin" accept-charset="UTF-8" method="post" id="frmlogin">
     <table class="clsTable">
@@ -590,7 +419,7 @@ body {
 			</div>
 			<div id="menu">
 				<ul>
-					<li class="current_page_item"><a href="default.html">Ana Sayfa</a></li>
+					<li><a href="default.html">Ana Sayfa</a></li>
 					<li><a href="about.html">Hakkımızda</a></li>
 					<li id="liNewEntry"><a href="new.html">Yeni Ekle</a></li>
 					<li><a id="spnLogin" style="display: none" href="javascript:;">GIRIS</a>
@@ -600,53 +429,51 @@ body {
 			</div>
 			<span style="display: none; float: right; margin-right: 20px; margin-top: 10px; font-weight: bold;" id="welcomeText"></span>
 		</div>
-		<div id="page" style="padding: 10px 0 0;">
+		<div id="page" style="padding: 20px 0 0;">
 			<div id="content" style="width: 900px;">
-				<div id="cbox1">
-					<div>
-						<h4>Kategori filtreleme:</h4>
-						<select id="ddlCategories">
-							<option value="0">Tamamı</option>
-						</select> <select id="ddlChildren" style="display: none">
-							<!--<option value="0">Tamamı</option> -->
-						</select> <input type="button" id="btnSearch" name="formSearch" value="Ara" style="font-weight: bold;" />
-						<span id="spinner" class="spinner" style="display: none;"><img
-							id="img-spinner" src="images/spinner.gif" alt="Yükleniyor" /> </span>
-						<p style="height: 7px"></p>
-						<div id="divCount" style="font-weight: bold;"></div>
+			<div style="float: left; width: 400px; margin-bottom: 20px;">
+						<input type="hidden" id="hdnUpVote" value="0" name="hdnUpVote" />
+						<input type="hidden" id="hdnDownVote" value="0" name="hdnUpVote" />
+						<a target="_blank" href="http://testpalette.com/7337563b-37df-4b9d-bafa-bcb1ac124fdd.JPEG">
+							<img border="1" width="50%" height="50%" 
+								src="http://testpalette.com/7337563b-37df-4b9d-bafa-bcb1ac124fdd.JPEG" id="imgEntry">
+							</a>
+						<p style="height: 10px;"></p>
+						<span style="font-weight: bold;">Öncelik:</span>
+						<span id="lblPriority"></span>
+						<p style="height: 10px;"></p>
+						<span style="font-weight: bold;">Durum:</span>
+						<span id="lblStatus"></span>
+						<p style="height: 10px;"></p>
+						<span style="font-weight: bold;">Girişi yapan:</span>
+						<span id="lblUser"></span>
+						<p style="height: 10px;"></p>
+						<span style="font-weight: bold;">Adres:</span>
+						<span id="lblAddress"></span>
+						<p style="height: 10px;"></p>
+						<span style="font-weight: bold;">Açıklama:</span>
+						<span id="lblComment"></span>						
+						<p style="height: 10px;"></p>
+						<span style="font-weight: bold;">"Acil" Oy:</span>
+						<span id="lblUpVote"></span>
+						<p style="height: 10px;"></p>
+						<span style="font-weight: bold;">"Bekleyebilir" Oy:</span>
+						<span id="lblDownVote"></span>
+						<p style="height: 10px;"></p>
+						<a id="lnkUpVote" href="javascript:voteUp();"><img width="50" height="50" 
+							src="images/upArrow.png" title="'Acil' oy ver"></a>&nbsp;&nbsp;&nbsp;
+						<a id="lnkDownVote" href="javascript:voteDown();"><img width="50" height="50" 
+							src="images/downArrow.png" title="'Bekleyebilir' oy ver"></a>&nbsp;&nbsp;&nbsp;
+						<p id="msgVote"><span id="lblVote"></span></p>
+						<p style="height: 20px;"></p>	
+						<a href="javascript: window.history.go(-1)" style="font-weight:bold; 
+							text-decoration: underline; color: #2AA8D2; font-size: 14px;"><--Geri</a>					
 					</div>
-				</div>
-				<div id="two-column" style="border-top: 0px; padding-top: 0px;">
-					<div id="map_canvas" style="width: 900px; height: 500px;"></div>
-				</div>
-			</div>
-<!-- 			<div id="sidebar"> -->
-<!-- 				<div id="box1"> -->
-<!-- 					<h2>Praesent mattis</h2> -->
-<!-- 					<ul class="style1"> -->
-<!-- 						<li class="first"><a href="#">Vestibulum luctus venenatis -->
-<!-- 								dui</a></li> -->
-<!-- 						<li><a href="#">Aenean elementum facilisis ligula</a></li> -->
-<!-- 						<li><a href="#">Ut tincidunt elit vitae augue</a></li> -->
-<!-- 						<li><a href="#">Aenean elementum facilisis ligula</a></li> -->
-<!-- 						<li><a href="#">Ut tincidunt elit vitae augue</a></li> -->
-<!-- 						<li><a href="#">Sed quis odio sagittis leo vehicula</a></li> -->
-<!-- 					</ul> -->
-<!-- 					<p> -->
-<!-- 						<a href="#" class="link-style">Read More</a> -->
-<!-- 					</p> -->
-<!-- 				</div> -->
-<!-- 				<div id="box2"> -->
-<!-- 					<h2>Maecenas lectus</h2> -->
-<!-- 					<p> -->
-<!-- 						<a href="#" class="link-style">Read More</a> -->
-<!-- 					</p> -->
-<!-- 				</div> -->
-<!-- 			</div> -->
+					<div id="map_canvas" style="width: 480px; height: 480px; 
+					margin-right: 0px; float: right; margin-bottom: 25px;"></div>
+			</div>	
 		</div>
 	</div>
 	<p style="height: 20px"></p>
 </body>
-
-
 </html>
