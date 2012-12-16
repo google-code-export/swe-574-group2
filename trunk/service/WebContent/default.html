@@ -122,7 +122,7 @@ body {
 												var entryId = element.id;
 												var upVote = element.upVoteCount;
 												var downVote = element.downVoteCount;
-												var image = element.imageMeta;
+												var image = element.imageMeta; //"images/generic.png";
 												var voting = "";
 												
 												if(loggedIn == 'true')
@@ -455,7 +455,7 @@ body {
 																				var point = new google.maps.LatLng(
 																						parseFloat(element.coordX),
 																						parseFloat(element.coordY));
-																				var image = element.imageMeta;
+																				var image = element.imageMeta; //"images/generic.png";
 																				var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
 																					+ image
 																					+ "'>"

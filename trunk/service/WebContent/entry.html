@@ -186,7 +186,8 @@ function initialize() {
 		$('#lblUser').html(user);
 		$('#hdnUpVote').val(upVote);
 		$('#hdnDownVote').val(downVote);
-		//$('#imgEntry').attr('src', image); //todo: uncomment this for production
+		$('#lnkImage').attr('href', image); //todo: uncomment this for production
+		$('#imgEntry').attr('src', image); //todo: uncomment this for production
 
 		// Set the center of the map
 		var pos = new google.maps.LatLng(coordX, coordY);
@@ -434,9 +435,9 @@ var logOutUrl = "./j_spring_security_logout";
 			<div style="float: left; width: 400px; margin-bottom: 20px;">
 						<input type="hidden" id="hdnUpVote" value="0" name="hdnUpVote" />
 						<input type="hidden" id="hdnDownVote" value="0" name="hdnUpVote" />
-						<a target="_blank" href="http://testpalette.com/7337563b-37df-4b9d-bafa-bcb1ac124fdd.JPEG">
+						<a target="_blank" id="lnkImage" href="images/generic.png">
 							<img border="1" width="50%" height="50%" 
-								src="http://testpalette.com/7337563b-37df-4b9d-bafa-bcb1ac124fdd.JPEG" id="imgEntry">
+								src="images/generic.png" id="imgEntry">
 							</a>
 						<p style="height: 10px;"></p>
 						<span style="font-weight: bold;">Öncelik:</span>
