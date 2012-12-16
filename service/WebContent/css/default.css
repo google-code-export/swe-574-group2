@@ -70,7 +70,7 @@ hr {
 /** WRAPPER */
 
 #wrapper {
-	width: 1100px;
+	width: 900px;
 	padding: 0px 50px;
 	background: #FFFFFF;
 }
@@ -134,7 +134,7 @@ hr {
 
 #menu {
 	float: right;
-	width: 700px;
+	width: 500px;
 	margin: 0 auto;
 	padding: 0;
 }
@@ -172,6 +172,52 @@ hr {
 }
 
 #menu .current_page_item a {
+	background: #2AA8D2;
+	border-radius: 5px;
+}
+
+/** SUB-MENU */
+
+#submenu {
+	float: left;
+	margin: -5px auto 20px;
+	padding: 0 0 10px;
+	border-bottom: 1px solid #DEDEDE;
+	
+}
+
+#submenu ul {
+	float: right;
+	margin: 0;
+	padding: 0px 0px 0px 0px;
+	list-style: none;
+	line-height: normal;
+}
+
+#submenu li {
+	float: left;
+	padding: 0px 0px 0px 0px;
+}
+
+#submenu a {
+	display: block;
+	margin-right: 1px;
+	padding: 10px 20px 10px 20px;
+	text-decoration: none;
+	text-align: center;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 13px;
+	font-weight: 300;
+	color: #585858;
+	border: none;
+}
+
+#submenu .current_page_item a {
+	text-decoration: none;
+	color: #FFFFFF;
+}
+
+#submenu .current_page_item a {
 	background: #2AA8D2;
 	border-radius: 5px;
 }
@@ -356,7 +402,7 @@ ul.style3 .first {
 
 .sprited {
     background: url(download_sprite.png) no-repeat;
-    line-height: 1000px;
+    line-height: 900px;
     overflow: hidden;
     display: block;
 }
