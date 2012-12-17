@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -161,6 +162,79 @@ public class EntryController {
 			e.printStackTrace();
 			entryResult.setResultStatus("Error saving file");
 			entryResult.setResultId(3);
+		} catch (JSONException e) {
+			entryResult.setResultStatus("Error adding entry");
+			entryResult.setResultId(4);
+		}
+		
+		HttpHeaders responseHeaders = makeCORS();
+		ResponseEntity<InsertEntryResult> entity = new ResponseEntity<InsertEntryResult>(entryResult,responseHeaders,HttpStatus.OK );
+		
+		
+		
+		
+		return entity;
+
+	}
+	
+	
+	@RequestMapping(value = "/edit", method = RequestMethod.POST,produces={"application/json"})
+	public  ResponseEntity<InsertEntryResult>  editEntry(HttpServletRequest request,
+			HttpSession session, Principal principal) {
+		
+		InsertEntryResult entryResult = new InsertEntryResult();
+		int id = Integer.parseInt(request.getParameter("entryId"));
+		
+		
+		String value = null;
+		
+		String username = null;
+		if (principal == null)
+		
+			username = "anonymousUser";
+		else
+			username = principal.getName();
+		try {
+			
+			value = request.getParameter("value");
+			User currentUser = userService.getUserByName(username);
+		
+			
+			Entry entry = entryService.getRawEntry(id);
+			
+		
+			EntryReason entryReason = entry.getEntryReasons().iterator().next();
+			String extra = entryReason.getExtra();
+			int priority = entry.getPriority();
+		
+			JSONObject obj = null;
+				
+			
+			if (value != null && extra != null){
+				obj = new JSONObject(extra);
+				obj.put("value", value);
+				//Priority setting according to boundary
+				
+				if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 3){
+					priority++;
+				}
+			}
+			
+			
+			entry.setPriority(priority);
+			
+			if (obj != null)
+				entryReason.setExtra(obj.toString());
+			
+			
+			
+			entryService.editEntry(entry);
+			
+			entryResult.setEntryId(id);
+			entryResult.setResultId(1);
+			entryResult.setResultStatus("Success");
+			
+			
 		} catch (JSONException e) {
 			entryResult.setResultStatus("Error adding entry");
 			entryResult.setResultId(4);

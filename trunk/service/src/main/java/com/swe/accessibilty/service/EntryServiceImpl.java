@@ -196,6 +196,14 @@ public class EntryServiceImpl implements EntryService {
 		return entries;
 	}
 
+	@Override
+	@Transactional
+	public void editEntry(Entry entry) {
+	
+		entryDao.update(entry);
+		
+	}
+
 	
 	
 	
