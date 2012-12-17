@@ -1,4 +1,4 @@
-#labels Featured,ProcessReport
+#labels Featured,ProgressReport
 As of today, we've finished the requirements document and the initial database design, and started with the development. Our first prototype will basically include the following:
 
  * A mobile application and a web site will be present.
