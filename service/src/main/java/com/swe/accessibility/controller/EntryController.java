@@ -264,15 +264,16 @@ public class EntryController {
 		 }
 		BufferedImage image = ImageIO.read(iis);
 		
-		int scaledWidth = image.getHeight() / 2;
-		int scaledHeight = image.getWidth() / 2;
-		
-		BufferedImage resizedImage = createResizedCopy(image, scaledWidth, scaledHeight, true);
+		//Disable image resizing
+//		int scaledWidth = image.getHeight() / 2;
+//		int scaledHeight = image.getWidth() / 2;
+//		
+//		BufferedImage resizedImage = createResizedCopy(image, scaledWidth, scaledHeight, true);
 		String fileURL = UUID.randomUUID().toString() + "." + format;
 		
 		File output = new File(uploadRepo + File.separator + fileURL);
 		FileOutputStream os = new FileOutputStream(output);
-		ImageIO.write(resizedImage, format, os);
+		ImageIO.write(image, format, os);
 		return fileURL;
 	}
 
