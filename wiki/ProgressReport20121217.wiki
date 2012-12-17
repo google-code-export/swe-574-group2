@@ -13,6 +13,6 @@ As decided last Monday, we didn't attend the weekly class meeting today to gain 
 
  - We have released the latest version of our web service API, which includes the functionalities described above. Mobile app and web site implementations, which will consume these new functions of the API, are in progress.
 
-Next Monday (24.12), we are going to demonstrate the last prototype of the web site and mobile app. It will include the functionalities described above. We still stick with our project plan, which can be seen at our Google Code site (http://code.google.com/p/swe-574-group2).
+Next Monday (24.12), we are going to demonstrate the last prototype of the web site and mobile app. It will include the functionalities described above. So, we still stick with our project plan.
 
 For the last lesson after next week, we decided to finish up all the bugs and implement a simple reporting functionality on the web site, which will list all the violations in the system and will allow users to group them by their certain properties.
