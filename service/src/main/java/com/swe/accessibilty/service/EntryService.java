@@ -42,4 +42,7 @@ public interface EntryService {
 
 	@Transactional
 	public abstract List<EntryProxy> loadEntries(String priority);
+
+	@Transactional
+	public abstract void editEntry(Entry entry);
 }
