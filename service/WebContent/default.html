@@ -112,12 +112,8 @@ body {
 		
 		var loggedIn = $('#loggedMu').val();
 
-		$.getJSON(getAllEntriesUrl,
-						function(data) {
-							$
-									.each(
-											data['data'],
-											function(index, element) {
+		$.getJSON(getAllEntriesUrl,function(data) {
+							$.each(data['data'],function(index, element) {
 												var comment = element.comment;
 												var entryId = element.id;
 												var upVote = element.upVoteCount;
@@ -174,13 +170,10 @@ body {
 															position : point,
 															icon : markerImg
 														});
-												bindInfoWindow(marker, map,
-														infoWindow, html);
+												bindInfoWindow(marker, map,infoWindow, html);
 											});
 
-							$('#divCount').html(
-									"Sistemde toplam " + data['data'].length
-											+ " adet ihlâl var.");
+							$('#divCount').html("Sistemde toplam " + data['data'].length + " adet ihlâl var.");
 						});
 
 		// 		var marker = new google.maps.Marker({
@@ -220,14 +213,18 @@ body {
 				    $('#lnkUpVote' + entryId).addClass("disabled");
 				    alert('Bu kayıt için "acil" oyu verdiniz.');
 		        }
+		        else if(data.resultStatus == "FAILURE" && data.resultId == 2)
+		        {
+		        	alert('Bu kayıt için daha önce oy vermişsiniz, başka oy veremezsiniz.');
+		        }
 		        else
 		        {
 		        	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
 		        }
-		      },
+		    },
 		    error: function(data) {
 		    	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
-		      }
+		    }
 		})
 	};
 
@@ -256,10 +253,10 @@ body {
 		        {
 		        	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
 		        }
-		      },
+		    },
 		    error: function(data) {
 		    	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
-		      }
+		    }
 		})
 	};
 </script>
@@ -335,51 +332,30 @@ body {
 							});
 						});
 
-						selectParent
-								.change(function() {
+						selectParent.change(function() {
 									if (selectParent.find(":selected").val() == "0") {
 										selectChild.hide();
 										selectChild.val("0");
 									} else {
 										selectChild.empty();
-										selectChild.append($(
-												'<option></option>').val(0)
-												.html("Tamamı"));
-										$
-												.getJSON(
-														getCategoriesUrl
+										selectChild.append($('<option></option>').val(0).html("Tamamı"));
+										$.getJSON(getCategoriesUrl
 																+ "/"
-																+ selectParent
-																		.find(
-																				":selected")
-																		.val(),
+																+ selectParent.find(":selected").val(),
 														function(data) {
-															$
-																	.each(
-																			data['data'],
-																			function(
-																					index,
-																					element) {
-																				selectChild
-																						.append($(
-																								'<option></option>')
-																								.val(
-																										element.id)
-																								.html(
-																										element.title));
-																			});
+															$.each(data['data'],function(index,element) {
+																				selectChild.append($('<option></option>')
+																								.val(element.id)
+																								.html(element.title));
+															});
 															selectChild.show();
 														});
 									}
 								});
 
-						selectChild.change(function() {
+						selectChild.change(function() {});
 
-						});
-
-						$('#btnSearch')
-								.click(
-										function() {
+						$('#btnSearch').click(function() {
 											var valToSearch = 0;
 											if (selectChild.val() == "0") {
 												valToSearch = selectParent
@@ -401,8 +377,10 @@ body {
 											}
 
 											var scriptUrl = searchUrl;
-											$
-													.ajax({
+											
+											var loggedIn = $('#loggedMu').val();
+											
+											$.ajax({
 														url : scriptUrl,
 														type : 'get',
 														dataType : 'json',
@@ -417,37 +395,23 @@ body {
 														success : function(data) {
 															var dataS = data['data'];
 
-															$('#divCount')
-																	.html(
-																			"Filtreleme sonucu "
+															$('#divCount').html("Filtreleme sonucu "
 																					+ dataS.length
 																					+ " adet ihlâl bulundu.");
 
-															var pinImg = new google.maps.MarkerImage(
-																	'images/markers/wheelchair.png',
+															var pinImg = new google.maps.MarkerImage('images/markers/wheelchair.png',
 																	// This marker is 129 pixels wide by 42 pixels tall.
-																	new google.maps.Size(
-																			129,
-																			42),
+																	new google.maps.Size(129,42),
 																	// The origin for this image is 0,0.
-																	new google.maps.Point(
-																			0,
-																			0),
+																	new google.maps.Point(0,0),
 																	// The anchor for this image is the base of the flagpole at 18,42.
-																	new google.maps.Point(
-																			18,
-																			42));
+																	new google.maps.Point(18,42));
 
 															var infoWindow = new google.maps.InfoWindow;
 
 															clearOverlays();
 
-															$
-																	.each(
-																			dataS,
-																			function(
-																					index,
-																					element) {
+															$.each(dataS, function(index,element) {
 																				var comment = element.comment;
 																				var entryId = element.id;
 																				var upVote = element.upVoteCount;
@@ -456,31 +420,43 @@ body {
 																						parseFloat(element.coordX),
 																						parseFloat(element.coordY));
 																				var image = element.imageMeta; //"images/generic.png";
+																				var voting = "";
+																				
+																				if(loggedIn == "true")
+																				{
+																					voting = 
+																						'<span id="lblUpVote' + entryId + '">' + upVote + '</span>'
+																						+ " acil &nbsp;&nbsp;"
+																						+ "<a rel='"
+																						+ entryId
+																						+ "' id='lnkUpVote" + entryId + "' href='javascript:voteUp("
+																						+ entryId
+																						+ ");'"
+																						+ "><img width='25' height='25'" 
+														+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
+																						+ "<a rel='"
+																						+ entryId
+																						+ "' id='lnkDownVote" + entryId + "' href='javascript:voteDown("
+																						+ entryId
+																						+ ");'>"
+																						+ "<img width='25' height='25'"
+														+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
+																						+ "&nbsp;&nbsp;"
+																						+ '<span id="lblDownVote' + entryId + '">' + downVote + '</span>'
+																						+ " bekleyebilir";
+																				}
+																				else
+																				{
+																					voting = "Puanlayabilmek için giriş yapınız!";
+																				}
 																				var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
 																					+ image
 																					+ "'>"
 																					+ "<p></p><b>''"
 																					+ comment
 																					+ "''</b> <p></p>"
-																					+ upVote
-																					+ " acil &nbsp;&nbsp;"
-																					+ "<a rel='"
-																					+ entryId
-																					+ "' id='lnkUpVote' href='javascript:voteUp("
-																					+ entryId
-																					+ ");'"
-																					+ "><img width='25' height='25'" 
-													+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
-																					+ "<a rel='"
-																					+ entryId
-																					+ "' id='lnkDownVote' href='javascript:voteDown("
-																					+ entryId
-																					+ ");'>"
-																					+ "<img width='25' height='25'"
-													+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
-																					+ "&nbsp;&nbsp;"
-																					+ downVote
-																					+ " bekleyebilir <p></p>"
+																					+ voting
+																					+ "<p></p>"
 																					+ "<a style='text-decoration: underline' href='" 
 													+ entryDetailUrl + entryId + "'>Detay...</a></div>";
 																				var marker = new google.maps.Marker(
@@ -522,8 +498,6 @@ body {
 	 					$('#spnLogout').show();
 	 					$('#spnLogin').hide();
 	 					$('#liNewEntry').show();
-						//$('#spnLogin').show();
-						//$('#spnLogout').hide();
 						$('#loggedMu').val('true');
 					}
 				else
@@ -543,21 +517,18 @@ body {
 		$.ajax({
 			url : logOutUrl,
 			type : 'get',
-			success: function(msg){
-				if(msg.status == true)
-					{
-					alert("Başarıyla çıkış yaptınız!");
-					console.log(msg);
-					IsLoggedIn();
-					}
-				else
-					{
-						console.log(msg);
-						$('#spnLogout').show();
-						$('#spnLogin').hide();
-					}
-			},
-			error: function(){}
+			complete: function(xhr, statusText){
+				if(xhr.status == 200)
+ 				{
+	 				alert("Başarıyla çıkış yaptınız!");
+	 				IsLoggedIn();
+ 				}
+ 				else
+ 				{
+ 					$('#spnLogout').show();
+ 					$('#spnLogin').hide();
+ 				}
+		    }
 		})
 	};
 </script>

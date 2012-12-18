@@ -67,13 +67,13 @@ function IsLoggedIn() {
 				$('#welcomeText').show().html('Hoþgeldin ' + msg.username + '!');
 					$('#spnLogout').show();
 					$('#spnLogin').hide();
-				//$('#spnLogin').show();
-				//$('#spnLogout').hide();
+					$('#loggedMu').val('true');
 				}
 			else
 				{
 					$('#spnLogin').show();
 					$('#spnLogout').hide();
+					$('#loggedMu').val('false');
 				}
 		},
 		error: function(){}
@@ -84,27 +84,41 @@ function logOut() {
 	$.ajax({
 		url : logOutUrl,
 		type : 'get',
-		success: function(msg){
-			if(msg.status == true)
-				{
-				alert("Baþarýyla çýkýþ yaptýnýz!");
-				console.log(msg);
-				IsLoggedIn();
-				}
+		complete: function(xhr, statusText){
+			if(xhr.status == 200)
+			{
+ 				alert("Baþarýyla çýkýþ yaptýnýz!");
+ 				IsLoggedIn();
+			}
 			else
-				{
-					console.log(msg);
-					$('#spnLogout').show();
-					$('#spnLogin').hide();
-				}
-		},
-		error: function(){}
+			{
+				$('#spnLogout').show();
+				$('#spnLogin').hide();
+			}
+	    }
 	})
 };
 
 $(document).ready(function() {
 		
 	IsLoggedIn();
+	
+	$.ajax({
+		url : isLoggedInUrl,
+		type : 'get',
+		success: function(msg){
+			if(msg.loggedIn == false)
+				{
+					alert('Yeni bir ihlâl girebilmek için siteye giriþ yapmalýsýnýz!');
+					window.location.replace("default.html");
+					return;
+				}
+			else
+				{
+				}
+		},
+		error: function(){}
+	})
 		
 		$('#spnLogin').click(function(e) {
 		    $('#divlogin').lightbox_me({
@@ -303,7 +317,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 </head>
 
 <body>
-
+<input type="hidden" name="loggedMu" id="loggedMu" value="false">
 <div class="loginform" style="display: none; border:#111" id="divlogin">
 <form action="./service/login/sigin" accept-charset="UTF-8" method="post" id="frmlogin">
     <table class="clsTable">

@@ -133,21 +133,18 @@ body {
 		$.ajax({
 			url : logOutUrl,
 			type : 'get',
-			success: function(msg){
-				if(msg.status == true)
-					{
-					alert("Başarıyla çıkış yaptınız!");
-					console.log(msg);
-					IsLoggedIn();
-					}
+			complete: function(xhr, statusText){
+				if(xhr.status == 200)
+				{
+	 				alert("Başarıyla çıkış yaptınız!");
+	 				IsLoggedIn();
+				}
 				else
-					{
-						console.log(msg);
-						$('#spnLogout').show();
-						$('#spnLogin').hide();
-					}
-			},
-			error: function(){}
+				{
+					$('#spnLogout').show();
+					$('#spnLogin').hide();
+				}
+		    }
 		})
 	};
 </script>

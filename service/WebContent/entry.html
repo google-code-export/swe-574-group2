@@ -163,7 +163,6 @@ function initialize() {
 		var user = myData.userName;
 		var image = myData.imageMeta;
 		var comments = myData.comments;
-		var isFixe
 		coordX = myData.coordX;
 		coordY = myData.coordY;
 		var point = new google.maps.LatLng(parseFloat(coordX), parseFloat(coordY));
@@ -177,7 +176,20 @@ function initialize() {
 		bindInfoWindow(marker, map, infoWindow, html);
 
 		codeLatLng(coordX + ","+ coordY);
+		
+		var allComments = "</br></br>";
+		if(comments.length == 0)
+		{
+			allComments = "Hiç yorum girilmemiş";
+		}
+		else {
+			$.each(comments,function(index,element) {
+				var aCom = "<i>(" + element.insertDate + ", " + element.username + ")</i>&nbsp;&nbsp;" + element.text + "</br></br>";
+				allComments = allComments + aCom;
+			});
+		}
 
+		$('#spnComments').html(allComments);
 		$('#lblStatus').html(fixed);
 		$('#lblPriority').html(priority);
 		$('#lblComment').html(comment);
@@ -210,6 +222,12 @@ google.maps.event.addDomListener(window, 'load', initialize);
 var voteUrl = "./service/entries/thumbs";
 
 function voteUp() {
+	var loggedIn = $('#loggedMu').val();
+	if(loggedIn == "false")
+	{
+		alert('Oy kullanabilmek için giriş yapmalısınız!');
+		return;
+	}
 	var entryId = getParameterByName('id');
 	if($('#lnkUpVote').hasClass("disabled")){return};
 	$.ajax({
@@ -235,14 +253,20 @@ function voteUp() {
 	        {
 	        	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
 	        }
-	      },
+	    },
 	    error: function(data) {
 	    	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
-	      }
+	    }
 	})
 };
 
 function voteDown() {
+	var loggedIn = $('#loggedMu').val();
+	if(loggedIn == "false")
+	{
+		alert('Oy kullanabilmek için giriş yapmalısınız!');
+		return;
+	}
 	var entryId = getParameterByName('id');
 	if($('#lnkDownVote').hasClass("disabled")){return};
 	$.ajax({
@@ -260,14 +284,80 @@ function voteDown() {
 				$('#lnkDownVote').addClass("disabled");
 				alert('Bu kayıt için "bekleyebilir" oyu verdiniz.');
 	        }
+	        else if(data.resultStatus == "FAILURE" && data.resultId == 2)
+	        {
+	        	alert('Bu kayıt için daha önce oy vermişsiniz, başka oy veremezsiniz.');
+	        }
 	        else
 	        {
 	        	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
 	        }
-	      },
+	    },
 	    error: function(data) {
 	    	alert('Oy verirken bir hata oluştu, lütfen tekrar deneyin.');
-	      }
+	    }
+	})
+};
+
+var addCommentUrl = "./service/comments/add";
+var isLoggedInUrl = "./service/login/status";
+
+function addComment() {
+	
+	var txtVal = $('#txtComment').val();
+	if(txtVal == '')
+	{
+		return;
+	}
+	
+	var loggedIn = $('#loggedMu').val();
+	if(loggedIn == "false")
+	{
+		alert('Yorum ekleyebilmek için giriş yapmalısınız!');
+		return;
+	}
+	
+	var entryId = getParameterByName('id');
+	$.ajax({
+	    url: addCommentUrl,
+	    type: 'post',
+	    data: JSON.stringify({entryId:entryId, text:txtVal}),
+	    dataType: 'json',
+	    contentType: "application/json;charset=utf-8",
+	    success: function(data) {
+	        if(data.resultStatus == "success")
+	        {
+	        	alert('Yorumunuz kaydedildi, teşekkürler!');
+	        	$('#txtComment').val('');
+	        	
+	        	//update comments list
+	        	var entryId = getParameterByName('id');
+	        	var getEntryByIdUrl = "./service/entries/" + entryId;
+	        	$.getJSON(getEntryByIdUrl, function(data) {
+	        		var comments = data['data'][0].comments;
+	        		var allComments = "</br></br>";
+	        		if(comments.length == 0)
+	        		{
+	        			allComments = "Hiç yorum girilmemiş";
+	        		}
+	        		else 
+	        		{
+	        			$.each(comments,function(index,element) {
+	        				var aCom = "<i>(" + element.insertDate + ", " + element.username + ")</i>&nbsp;&nbsp;" + element.text + "</br></br>";
+	        				allComments = allComments + aCom;
+	        			});
+	        		}
+	        		$('#spnComments').html(allComments);
+	        	 });
+	        }
+	        else
+	        {
+	        	alert('Yorumunuz kaydedilirken bir hata oluştu, lütfen daha sonra tekrar deneyin.');
+	        }
+	    },
+	    error: function(data) {
+	    	alert('Yorumunuz kaydedilirken bir hata oluştu, lütfen daha sonra tekrar deneyin.');
+	    }
 	})
 };
 </script>
@@ -281,7 +371,7 @@ var logOutUrl = "./j_spring_security_logout";
 	$(document).ready(function() {
 		
 		IsLoggedIn();
-		
+
 		$('#spnLogin').click(function(e) {
 		    $('#divlogin').lightbox_me({
 		        centered: true, 
@@ -340,8 +430,6 @@ var logOutUrl = "./j_spring_security_logout";
 	 					$('#spnLogout').show();
 	 					$('#spnLogin').hide();
 	 					$('#liNewEntry').show();
-						//$('#spnLogin').show();
-						//$('#spnLogout').hide();
 						$('#loggedMu').val('true');
 					}
 				else
@@ -361,21 +449,18 @@ var logOutUrl = "./j_spring_security_logout";
 		$.ajax({
 			url : logOutUrl,
 			type : 'get',
-			success: function(msg){
-				if(msg.status == true)
-					{
-					alert("Başarıyla çıkış yaptınız!");
-					console.log(msg);
-					IsLoggedIn();
-					}
+			complete: function(xhr, statusText){
+				if(xhr.status == 200)
+				{
+	 				alert("Başarıyla çıkış yaptınız!");
+	 				IsLoggedIn();
+				}
 				else
-					{
-						console.log(msg);
-						$('#spnLogout').show();
-						$('#spnLogin').hide();
-					}
-			},
-			error: function(){}
+				{
+					$('#spnLogout').show();
+					$('#spnLogin').hide();
+				}
+		    }
 		})
 	};
 </script>
@@ -456,17 +541,24 @@ var logOutUrl = "./j_spring_security_logout";
 						<span id="lblComment"></span>						
 						<p style="height: 10px;"></p>
 						<span style="font-weight: bold;">"Acil" Oy:</span>
-						<span id="lblUpVote"></span>
-						<p style="height: 10px;"></p>
+						<span id="lblUpVote"></span>&nbsp;&nbsp;&nbsp;
 						<span style="font-weight: bold;">"Bekleyebilir" Oy:</span>
 						<span id="lblDownVote"></span>
-						<p style="height: 10px;"></p>
+						<p style="height: 10px;"></p>&nbsp;&nbsp;
 						<a id="lnkUpVote" href="javascript:voteUp();"><img width="50" height="50" 
-							src="images/upArrow.png" title="'Acil' oy ver"></a>&nbsp;&nbsp;&nbsp;
+							src="images/upArrow.png" title="'Acil' oy ver"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 						<a id="lnkDownVote" href="javascript:voteDown();"><img width="50" height="50" 
 							src="images/downArrow.png" title="'Bekleyebilir' oy ver"></a>&nbsp;&nbsp;&nbsp;
-						<p id="msgVote"><span id="lblVote"></span></p>
-						<p style="height: 20px;"></p>	
+						<p style="height: 20px;"></p>
+						<span style="font-weight: bold;">Yorumlar:</span>
+						<span id="spnComments"></span>
+						<p style="height: 10px;"></p>
+						<span style="font-weight: bold;">Yorumunuz:</span>
+						<textarea class="comment" name="txtComment"
+							id="txtComment" cols="20" rows="4" style="margin-bottom: -45px;"></textarea>
+						<input type="button" id="btnCommentSave" name="btnCommentSave" value="Gönder"
+							style="font-weight: bold;" onclick="addComment();" />
+						<p style="height: 60px;"></p>	
 						<a href="javascript: window.history.go(-1)" style="font-weight:bold; 
 							text-decoration: underline; color: #2AA8D2; font-size: 14px;"><--Geri</a>					
 					</div>
