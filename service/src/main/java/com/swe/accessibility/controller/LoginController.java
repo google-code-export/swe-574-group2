@@ -20,13 +20,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.swe.accessibility.domain.LoginStatus;
 import com.swe.accessibility.domain.User;
 import com.swe.accessibility.domain.UserType;
 import com.swe.accessibility.domain.proxy.SignupStatus;
-import com.swe.accessibilty.service.TypeService;
 import com.swe.accessibilty.service.UserService;
 
 @Controller
@@ -87,11 +85,10 @@ public class LoginController {
 		  return new ResponseEntity<LoginStatus>(status,responseHeaders,httpStatus);
 	  }
 	  
-	  @RequestMapping(method=RequestMethod.GET,value="/logoutsuccess",produces="application/json")
-	  public @ResponseBody String logoutSuccess(HttpServletRequest request, HttpServletResponse response) {
+	  @RequestMapping(method=RequestMethod.GET,value="/logoutsuccess",produces="text/plain;charset=UTF-8")
+	  public ResponseEntity<String>  logoutSuccess(HttpServletRequest request, HttpServletResponse response) {
 		  
-		
-		  return "Sucessfull logout from service";
+		  return new ResponseEntity<String>("Success",HttpStatus.OK);
 		  
 	  }
 	  
