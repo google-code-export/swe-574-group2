@@ -330,25 +330,20 @@ function addComment() {
 	        	alert('Yorumunuz kaydedildi, teşekkürler!');
 	        	$('#txtComment').val('');
 	        	
-	        	//update comments list
+	        	//////////update comments list
 	        	var entryId = getParameterByName('id');
 	        	var getEntryByIdUrl = "./service/entries/" + entryId;
+	        	
 	        	$.getJSON(getEntryByIdUrl, function(data) {
 	        		var comments = data['data'][0].comments;
 	        		var allComments = "</br></br>";
-	        		if(comments.length == 0)
-	        		{
-	        			allComments = "Hiç yorum girilmemiş";
-	        		}
-	        		else 
-	        		{
-	        			$.each(comments,function(index,element) {
-	        				var aCom = "<i>(" + element.insertDate + ", " + element.username + ")</i>&nbsp;&nbsp;" + element.text + "</br></br>";
-	        				allComments = allComments + aCom;
-	        			});
-	        		}
+	        		$.each(comments,function(index,element) {
+	        			var aCom = "<i>(" + element.insertDate + ", " + element.username + ")</i>&nbsp;&nbsp;" + element.text + "</br></br>";
+	        			allComments = allComments + aCom;
+	        		});
 	        		$('#spnComments').html(allComments);
-	        	 });
+	        	});
+	        	////////// 	
 	        }
 	        else
 	        {
