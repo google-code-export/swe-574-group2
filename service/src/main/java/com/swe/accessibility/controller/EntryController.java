@@ -49,6 +49,7 @@ import com.swe.accessibility.domain.InsertEntryResult;
 import com.swe.accessibility.domain.SubReason;
 import com.swe.accessibility.domain.User;
 import com.swe.accessibility.domain.proxy.Config;
+import com.swe.accessibility.domain.proxy.EditRequest;
 import com.swe.accessibility.domain.proxy.EntryList;
 import com.swe.accessibility.domain.proxy.EntryProxy;
 import com.swe.accessibility.domain.proxy.ThumbsObject;
@@ -178,12 +179,12 @@ public class EntryController {
 	}
 	
 	
-	@RequestMapping(value = "/edit", method = RequestMethod.POST,produces={"application/json"})
-	public  ResponseEntity<InsertEntryResult>  editEntry(HttpServletRequest request,
+	@RequestMapping(value = "/edit", method = RequestMethod.POST,produces={"application/json"},headers={"Content-Type=application/json"})
+	public  ResponseEntity<InsertEntryResult>  editEntry(@RequestBody EditRequest request,
 			HttpSession session, Principal principal) {
 		
 		InsertEntryResult entryResult = new InsertEntryResult();
-		int id = Integer.parseInt(request.getParameter("entryId"));
+		int id = request.getEntryId();
 		
 		
 		String value = null;
@@ -196,7 +197,7 @@ public class EntryController {
 			username = principal.getName();
 		try {
 			
-			value = request.getParameter("value");
+			value = request.getValue();
 			User currentUser = userService.getUserByName(username);
 		
 			
