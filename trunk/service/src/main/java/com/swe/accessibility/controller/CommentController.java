@@ -13,10 +13,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.swe.accessibility.domain.Comment;
+import com.swe.accessibility.domain.proxy.CommentObject;
 import com.swe.accessibility.domain.Entry;
 import com.swe.accessibility.domain.InsertEntryResult;
 import com.swe.accessibility.domain.User;
@@ -39,12 +41,12 @@ public class CommentController {
 	private EntryService entryService;
 	
 	
-	@RequestMapping(value="/add",method={RequestMethod.POST,RequestMethod.GET})
-	public ResponseEntity<InsertEntryResult> addComment(Principal principal, HttpServletRequest request, HttpServletResponse response){
+	@RequestMapping(value="/add",method={RequestMethod.POST,RequestMethod.GET},headers={"Content-Type=application/json"})
+	public ResponseEntity<InsertEntryResult> addComment(Principal principal,@RequestBody CommentObject request, HttpServletResponse response){
 		
 		InsertEntryResult entryResult = new InsertEntryResult();
-		String text = request.getParameter("text");
-		int id = Integer.parseInt(request.getParameter("entryId"));
+		String text = request.getText();
+		int id = request.getEntryId();
 		
 		String username = null;
 		if (principal == null)
