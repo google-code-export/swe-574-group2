@@ -264,6 +264,7 @@ public class EntryController {
 		BigDecimal coordX;
 		BigDecimal coordY;
 		String value = null;
+		int resultId = 0;
 		
 		String username = null;
 		if (principal == null)
@@ -313,7 +314,7 @@ public class EntryController {
 			
 			entry.getEntryReasons().add(entryReason);
 			
-			entryService.addEntry(entry);
+			resultId = entryService.addEntry(entry);
 			
 			page = "success";
 			
@@ -325,7 +326,12 @@ public class EntryController {
 			
 		} 
 		
-		String redirect = request.getContextPath() + "/" + page + ".html";
+		String redirect;
+		if (resultId > 0 && page.equals("success"))
+			redirect = request.getContextPath() + "/" + page + ".html?entryId=" + resultId;
+		else
+			redirect = request.getContextPath() + "/" + page + ".html";
+		 
 		try {
 			response.sendRedirect(redirect);
 		} catch (IOException e) {
