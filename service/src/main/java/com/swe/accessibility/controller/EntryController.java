@@ -263,7 +263,7 @@ public class EntryController {
 		format.setParseBigDecimal(true);
 		BigDecimal coordX;
 		BigDecimal coordY;
-		
+		String value = null;
 		
 		String username = null;
 		if (principal == null)
@@ -274,14 +274,27 @@ public class EntryController {
 		try {
 			coordX = (BigDecimal) format.parse(request.getParameter("coordX"));
 			coordY = (BigDecimal) format.parse(request.getParameter("coordY"));
-			
+			value = request.getParameter("value");
 			User currentUser = userService.getUserByName(username);
 			String comment = request.getParameter("comment");
 			Entry entry = new Entry();
 			
 			
 			SubReason reason = reasonService.getSubReason(categoryId);
-		
+			int priority = reason.getPriority();
+			String extra = reason.getExtra();
+			JSONObject obj = null;
+			
+			if (value != null && extra != null){
+				obj = new JSONObject(extra);
+				obj.put("value", value);
+				//Priority setting according to boundary
+				
+				if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 3){
+					priority++;
+				}
+			}
+			
 		
 			
 			String uri = saveFile(request);
@@ -290,11 +303,13 @@ public class EntryController {
 			entry.setCoordY(coordY);
 			entry.setImageMeta(uri);
 			entry.setUser(currentUser);
-			
+			entry.setPriority(priority);
 			
 			EntryReason entryReason = new EntryReason();
 			entryReason.setReason(reason);
 			entryReason.setEntry(entry);
+			if (obj != null)
+				entryReason.setExtra(obj.toString());
 			
 			entry.getEntryReasons().add(entryReason);
 			
