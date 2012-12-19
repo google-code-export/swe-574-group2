@@ -36,13 +36,16 @@ url pattern: {host}/service/entries/{entryid}
 
 ----------------------------------
 
-6. Add entry (Requires authentication)
+6. Add entry (Requires authentication) 
 
-url pattern: {host}/service/entries/add
+url pattern: {host}/service/entries/add -> for mobile
+             {host}/service/entries/add/web -> for web
 
 Sample form: {host}/test.jsp
 
 Multipart form post
+
+
 
 ----------------------------------
 
