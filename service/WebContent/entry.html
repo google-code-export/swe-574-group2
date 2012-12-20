@@ -205,6 +205,14 @@ function initialize() {
 		var pos = new google.maps.LatLng(coordX, coordY);
 		map.setCenter(pos);
 	 });
+	
+var getCategoriesUrl = './service/categories/1';
+	
+$.getJSON(getCategoriesUrl, function(data) {
+	var myData = data['data'][0];
+	console.log(myData);
+		
+	 });
 
 	map = new google.maps.Map(document.getElementById('map_canvas'),
 			myOptions);
