@@ -273,8 +273,23 @@ public class EntryController {
 		else
 			username = principal.getName();
 		try {
-			coordX = (BigDecimal) format.parse(request.getParameter("coordX"));
-			coordY = (BigDecimal) format.parse(request.getParameter("coordY"));
+			
+			String strCoordX = request.getParameter("coordX");
+			String strCoordY = request.getParameter("coordY");
+			
+			if(strCoordX.length() > 30)
+			{
+				strCoordX = strCoordX.substring(0, 30);
+			}
+			if(strCoordY.length() > 30)
+			{
+				strCoordY = strCoordY.substring(0, 30);
+			}
+			
+			coordX = (BigDecimal) format.parse(strCoordX.replace('.', ','));
+			coordY = (BigDecimal) format.parse(strCoordY.replace('.', ','));
+			
+			
 			value = request.getParameter("value");
 			User currentUser = userService.getUserByName(username);
 			String comment = request.getParameter("comment");
