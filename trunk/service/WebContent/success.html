@@ -52,16 +52,40 @@ body {
 <script type="text/javascript" src="js/jquery.lightbox_me.js"></script>
 
 <script type="text/javascript">
+
+function getParameterByName(name)
+{
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.search);
+  if(results == null)
+    return "";
+  else
+    return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
 	$(document).ready(function() {
 		
-		//this code only works if noone submits a new entry at the same second!
-		var getAllEntriesUrl = "./service/entries";
-		$.getJSON(getAllEntriesUrl, function(data) {
-			console.log(data['data'][data['data'].length-1]);
-    		var entryId = data['data'][data['data'].length-1].id;
-    		var href = 'entry.html?id=' + entryId;
-    		$('#lnkNewEntry').attr('href', href);
-    	});	
+// 		//this code only works if noone submits a new entry at the same second!
+// 		var getAllEntriesUrl = "./service/entries";
+// 		$.getJSON(getAllEntriesUrl, function(data) {
+// 			console.log(data['data'][data['data'].length-1]);
+//     		var entryId = data['data'][data['data'].length-1].id;
+//     		var href = 'entry.html?id=' + entryId;
+//     		$('#lnkNewEntry').attr('href', href);
+//     	});	
+
+	var entryId = getParameterByName('entryId');
+	if(entryId == null || entryId < 1)
+	{
+		window.location.replace("default.html");
+	}
+	else
+	{
+ 		var href = 'entry.html?id=' + entryId;
+ 		$('#lnkNewEntry').attr('href', href);
+	}
 						
 		
 		IsLoggedIn();
