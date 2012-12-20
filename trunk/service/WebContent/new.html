@@ -232,6 +232,25 @@ $(document).ready(function() {
 			}
 
 		});
+		
+		$('#btnDetail').click(function() {
+			var detail = $('#txtValue').val() + " " + $('#ddlKey').find(":selected").val();
+			var postDetail = "{'key':'" + $('#ddlKey').find(":selected").val() + "','value':'" 
+				+ $('#txtValue').val() + "','boundary':'" + $('#lblThreshold').html() + "'}" 
+				//{"key":"derece","value":"","boundary":"12"}
+			console.log(postDetail);
+			$('#lblDetail').html(detail);
+			$('#value').val(postDetail);
+			$('#btnDeleteDetail').show();
+			$('#btnDetail').hide();
+		});
+		
+		$('#btnDeleteDetail').click(function() {
+			$('#lblDetail').html('');
+			$('#value').val('');
+			$('#btnDeleteDetail').hide();
+			$('#btnDetail').show();
+		});
 	});
 </script>
 
@@ -340,6 +359,7 @@ function errorFunction(pos) {
 				<input type="hidden" id="coordX" value="0" name="coordX" />
 				<input type="hidden" id="coordY" value="0" name="coordY" />
 				<input type="hidden" id="category" value="0" name="category" />
+				<input type="hidden" id="value" value="" name="value" />
 				<p style="height: 5px;"></p>
 				<div id="submenu">
 				<ul>
@@ -358,7 +378,36 @@ function errorFunction(pos) {
 					<span style="font-weight: bold;">Açýklama:</span>
 					<textarea class="comment" name="comment"
 						id="comment" cols="30" rows="4" style="margin-bottom: -45px;"></textarea>
-					<p style="height: 85px;"></p>
+					<p style="height: 60px;"></p>
+					<span style="font-weight: bold;"><u>Detaylar:</u></span>
+					<div id="tblDetay">
+						<table cellspacing="10" style="margin-left: -5px;">
+							<tr>
+								<td><span style="font-weight: bold;">Birim:</span></td>
+								<td><select id="ddlKey" name="ddlKey">
+										<option value="0">Lütfen seçiniz...</option>
+										<option value="derece">derece (°)</option>
+										<option value="mm">milimetre (mm)</option>
+										<option value="cm">santimetre (cm)</option>
+										<option value="m">metre (m)</option>
+										<option value="%">yüzde (%)</option>
+									</select></td>
+							</tr>
+							<tr>
+								<td><span style="font-weight: bold;">Mevcut deðer:</span></td>
+								<td><input type="text" id="txtValue" name="txtValue"/></td>
+							</tr>
+							<tr>
+								<td><span style="font-weight: bold;">Olmasý gereken deðer:</span></td>
+								<td><span id="lblThreshold">12</span></td>
+							</tr>
+							<tr>
+								<td><input type="button" id="btnDetail" name="btnDetail" value="Detay ekle"/></td>
+								<td><span id="lblDetail"></span>&nbsp;<input style="display:none;" type="button" id="btnDeleteDetail" name="btnDeleteDetail" value="Sil"/></td>
+							</tr>
+					</table>
+					</div>
+					<p style="height:20px;"></p>
 					<span style="font-weight: bold;">Fotoðraf *:</span>
 					<!-- <div class="uploader"></div> -->
 					<input type="file" name="file" id="file" /> 
