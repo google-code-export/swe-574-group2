@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-<title>Fair Urban - Yeni Üye Kaydı</title>
+<title>Fair Urban</title>
 </head>
 <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 <style type="text/css">
@@ -53,6 +53,16 @@ body {
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		
+		//this code only works if noone submits a new entry at the same second!
+		var getAllEntriesUrl = "./service/entries";
+		$.getJSON(getAllEntriesUrl, function(data) {
+			console.log(data['data'][data['data'].length-1]);
+    		var entryId = data['data'][data['data'].length-1].id;
+    		var href = 'entry.html?id=' + entryId;
+    		$('#lnkNewEntry').attr('href', href);
+    	});	
+						
 		
 		IsLoggedIn();
 		
@@ -145,50 +155,6 @@ body {
 		    }
 		})
 	};
-	
-	var registerUserUrl = "./service/login/signup";
-	
-	function regUser() {
-		
-		if($('#regPassword').val() == "" || $('#regPassword2').val() == "" || $('#regUsername').val() == "")
-		{
-			return;
-		}
-		
-		if($('#regPassword').val() != $('#regPassword2').val())
-		{
-			alert('Girdiğiniz şifreler birbiriyle aynı olmalıdır.');
-			return;
-		}
-		
-		$.ajax({
-		    url: registerUserUrl,
-		    type: 'post',
-		    data: JSON.stringify({username:$('#regUsername').val(), password:$('#regPassword').val()}),
-		    dataType: 'json',
-		    contentType: "application/json;charset=utf-8",
-		    beforeSend : function() {
-				$("#spinner").show();
-			},
-			complete : function() {
-				$("#spinner").hide();
-			},
-		    success: function(data) {
-		        if(data.resultStatus == "success")
-		        {
-				    alert('Başarıyla kaydoldunuz! Anasayfaya yönlendirileceksiniz...');
-				    window.location.replace("default.html");
-		        }
-		        else
-		        {
-		        	alert('Kayıt sırasında bir hata oluştu, lütfen tekrar deneyin.');
-		        }
-		    },
-		    error: function(data) {
-		    	alert('Kayıt sırasında bir hata oluştu, lütfen tekrar deneyin.');
-		    }
-		})
-	};
 </script>
 
 <body>
@@ -220,7 +186,7 @@ body {
 	<input type="hidden" name="form_id" id="edit-user-login-block" value="user_login_block">
 </form>
 </div>
-	<div id="wrapper" class="container">
+	<div id="wrapper" class="container" style="height:500px;">
 		<div id="header">
 			<div id="logo">
 				<a href="default.html"><img src="images/logo.png" width="25%;" style="float: left"></a>
@@ -246,30 +212,11 @@ body {
 				<div id="cbox1">
 					<div style="font-size: 14px;">
 						<p style="height: 10px"></p>
-						<p>Siteye kaydolmak için lütfen aşağıdaki alanları doldurunuz.</p>
-						<div style="text-align: left; float: left;">
-						<table cellspacing="10" style="margin-left: -5px;">
-							<tr>
-								<td><span style="font-weight: bold;">Kullanıcı adı:</span> </td>
-								<td><input type="text" id="regUsername" name="regUsername"/></td>
-							</tr>
-							<tr>
-								<td><span style="font-weight: bold;">Şifre:</span> </td>
-								<td><input type="password" id="regPassword" name="regPassword"/></td>
-							</tr>
-							<tr>
-								<td><span style="font-weight: bold;">Şifre tekrar:</span> </td>
-								<td><input type="password" id="regPassword2" name="regPassword2"/></td>
-							</tr>
-						</table>
-						<p style="height: 10px;"></p>
-						<input type="submit" id="btnSave" name="submit" value="Gönder" onclick="regUser();"
-							style="font-weight: bold;" />
-						<span id="spinner" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="Kaydediliyor..."/></span>
-						<p style="height: 25px;"></p>
-						</div>
+						<p>Kayıt işlemi başarılı! Görmek için <a id="lnkNewEntry" href="#">buraya</a> tıklayın.</p>
 					</div>
 				</div>
+					<a href="javascript: window.history.go(-1)" style="font-weight:bold; text-decoration: underline; color: #2AA8D2; font-size: 14px;"><--Geri</a>
+					<p style="height: 5px;"></p>
 			</div>	
 		</div>
 	</div>
