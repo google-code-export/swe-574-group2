@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -25,6 +26,7 @@ import com.swe.accessibility.domain.LoginStatus;
 import com.swe.accessibility.domain.User;
 import com.swe.accessibility.domain.UserType;
 import com.swe.accessibility.domain.proxy.SignupStatus;
+import com.swe.accessibility.domain.proxy.UserObject;
 import com.swe.accessibilty.service.UserService;
 
 @Controller
@@ -92,8 +94,8 @@ public class LoginController {
 		  
 	  }
 	  
-	  @RequestMapping(method=RequestMethod.POST,value="/signup")
-	  public ResponseEntity<SignupStatus> signup(HttpServletRequest req, HttpServletResponse resp){
+	  @RequestMapping(method=RequestMethod.POST,value="/signup",headers={"Content-Type=application/json"})
+	  public ResponseEntity<SignupStatus> signup(@RequestBody UserObject userObj, HttpServletResponse resp){
 		  
 		  HttpHeaders responseHeaders = makeCORS();
 		  
@@ -102,14 +104,14 @@ public class LoginController {
 		  SignupStatus status = new SignupStatus();
 		  User user = new User();
 		  
-		  String username = req.getParameter("username");
-		  String password = req.getParameter("password");
+		  String username = userObj.getUsername();
+		  String password = userObj.getPassword();
 		  if (username == null || password == null){
 			  status.setStatus("Failed");
 			  status.setError("User name or password is null.");
 			  httpStatus = HttpStatus.BAD_REQUEST;
 		  }
-		  else if (userService.getUserByName(username) != null){
+		  else if (userService.getUserByName(username).getUsername() != null){
 			  status.setStatus("Failed");
 			  status.setError("User already exists");
 			  httpStatus = HttpStatus.BAD_REQUEST;
