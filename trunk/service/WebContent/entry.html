@@ -163,6 +163,29 @@ function initialize() {
 		var user = myData.userName;
 		var image = myData.imageMeta;
 		var comments = myData.comments;
+		var category = myData.category;
+		var extraKey = '';
+		var extraValue = '';
+		var extraBoundary = '';
+		if(myData.extra != null)
+		{
+			extraKey = myData.extra.key;
+			extraValue = myData.extra.value;
+			extraBoundary = myData.extra.boundary;
+			$('#lblDetail').html(extraValue);
+			$('#lblBoundary2').html(extraKey);
+			$('#lblDetailKey').html(extraKey);
+			$('#lblBoundary').html(extraBoundary + " " + extraKey);
+			$('#divDetailExists').show();
+			$('#divNoDetail').hide();
+		}
+		else
+		{
+			$('#lblDetailKey').html("-");
+			$('#divDetailExists').hide();
+			$('#divNoDetail').show();
+		}
+		
 		coordX = myData.coordX;
 		coordY = myData.coordY;
 		var point = new google.maps.LatLng(parseFloat(coordX), parseFloat(coordY));
@@ -189,6 +212,7 @@ function initialize() {
 			});
 		}
 
+		$('#lblCategory').html(category);
 		$('#spnComments').html(allComments);
 		$('#lblStatus').html(fixed);
 		$('#lblPriority').html(priority);
@@ -206,14 +230,6 @@ function initialize() {
 		map.setCenter(pos);
 	 });
 	
-var getCategoriesUrl = './service/categories/1';
-	
-$.getJSON(getCategoriesUrl, function(data) {
-	var myData = data['data'][0];
-	console.log(myData);
-		
-	 });
-
 	map = new google.maps.Map(document.getElementById('map_canvas'),
 			myOptions);
 
@@ -309,6 +325,7 @@ function voteDown() {
 
 var addCommentUrl = "./service/comments/add";
 var isLoggedInUrl = "./service/login/status";
+var saveDetailUrl = "./service/entries/edit";
 
 function addComment() {
 	
@@ -360,6 +377,52 @@ function addComment() {
 	    },
 	    error: function(data) {
 	    	alert('Yorumunuz kaydedilirken bir hata oluştu, lütfen daha sonra tekrar deneyin.');
+	    }
+	})
+};
+
+function saveDetail() {
+	
+	var txtVal = $('#txtDetail').val();
+	if(txtVal == '')
+	{
+		return;
+	}
+	
+	var loggedIn = $('#loggedMu').val();
+	if(loggedIn == "false")
+	{
+		alert('Detay ekleyebilmek için giriş yapmalısınız!');
+		return;
+	}
+	
+	var entryId = getParameterByName('id');
+	$.ajax({
+	    url: saveDetailUrl,
+	    type: 'post',
+	    data: JSON.stringify({entryId:entryId, value:txtVal}),
+	    dataType: 'json',
+	    contentType: "application/json;charset=utf-8",
+	    beforeSend : function() {
+			$("#spinner").show();
+		},
+		complete : function() {
+			$("#spinner").hide();
+		},
+	    success: function(data) {
+	        if(data.resultStatus == "success")
+	        {
+	        	alert('Detay kaydedildi, teşekkürler!');
+	        	$('#txtVal').val('');
+	        	$('#lblDetail').html(txtVal);
+	        }
+	        else
+	        {
+	        	alert('Detay kaydedilirken bir hata oluştu, lütfen daha sonra tekrar deneyin.');
+	        }
+	    },
+	    error: function(data) {
+	    	alert('Detay kaydedilirken bir hata oluştu, lütfen daha sonra tekrar deneyin.');
 	    }
 	})
 };
@@ -541,8 +604,31 @@ var logOutUrl = "./j_spring_security_logout";
 						<span id="lblAddress"></span>
 						<p style="height: 10px;"></p>
 						<span style="font-weight: bold;">Açıklama:</span>
-						<span id="lblComment"></span>						
-						<p style="height: 10px;"></p>
+						<span id="lblComment"></span>
+						<p style="height: 20px;"></p>
+						<span style="font-weight: bold;">Kategori:</span>
+						<span id="lblCategory"></span>	
+												
+						<p style="height: 10px;"></p>						
+						<div id="divDetailExists" style="display:none;">
+							<span style="font-weight: bold;">Mevcut durum:</span>
+							<span id="lblDetail"></span>&nbsp;<span id="lblBoundary2"></span>
+							&nbsp;&nbsp;
+							<span style="font-weight: bold;">Olması gereken üst sınır:</span>
+							<span id="lblBoundary"></span>								
+							<p style="height: 10px;"></p>
+						</div>
+						<div id="divNoDetail" style="display:none;">
+							<span style="font-weight: bold;">Mevcut durum:</span>
+							<span id="lblNoDetail">Girilmemiş</span>	
+							<p style="height: 10px;"></p>
+						</div>
+						<span style="font-weight: bold;">Veriyi düzelt:</span>
+						<input type="text" id="txtDetail" style="width: 50px;"/>&nbsp;<span id="lblDetailKey"></span>
+						&nbsp;&nbsp;<input type="button" id="btnDetail" value="Gönder" onclick="saveDetail();"/>	
+						<span id="spinner" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="Kaydediliyor..."/></span>						
+						<p style="height: 20px;"></p>
+						
 						<span style="font-weight: bold;">"Acil" Oy:</span>
 						<span id="lblUpVote"></span>&nbsp;&nbsp;&nbsp;
 						<span style="font-weight: bold;">"Bekleyebilir" Oy:</span>
