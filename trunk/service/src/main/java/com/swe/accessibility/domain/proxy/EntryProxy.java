@@ -92,8 +92,13 @@ public class EntryProxy implements Serializable {
 			
 			if (iter.hasNext()){
 				try {
-					JSONObject obj = new JSONObject(iter.next().getExtra());
-					this.extra = new Extra(obj.getString("key"), obj.getString("boundary"), obj.getString("value"));
+					
+					String extraStr = iter.next().getExtra();
+					if (extraStr != null){
+						JSONObject obj = new JSONObject(iter.next().getExtra());
+						this.extra = new Extra(obj.getString("key"), obj.getString("boundary"), obj.getString("value"));
+					}
+					
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
