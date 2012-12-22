@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import com.swe.accessibility.domain.Entry;
 import com.swe.accessibility.domain.EntryReason;
 import com.swe.accessibility.domain.Priority;
+import com.swe.accessibility.domain.SubReason;
 
 
 public class EntryProxy implements Serializable {
@@ -45,7 +46,7 @@ public class EntryProxy implements Serializable {
 	
 	private boolean fixed;
 	
-	private String category;
+	private SubReasonProxy category;
 	
 	
 	private List<CommentProxy> comments;
@@ -97,7 +98,7 @@ public class EntryProxy implements Serializable {
 					
 					EntryReason entryReason = iter.next();
 					String extraStr = entryReason.getExtra();
-					this.category = entryReason.getReason().getTitle();
+					this.category = new SubReasonProxy(entryReason.getReason());
 					
 					if (extraStr != null){
 						JSONObject obj = new JSONObject(extraStr);
@@ -216,11 +217,11 @@ public class EntryProxy implements Serializable {
 		this.extra = extra;
 	}
 	
-	public String getCategory() {
+	public SubReasonProxy getCategory() {
 		return category;
 	}
 	
-	public void setCategory(String category) {
+	public void setCategory(SubReasonProxy category) {
 		this.category = category;
 	}
 	

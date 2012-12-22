@@ -206,9 +206,11 @@ public class EntryController {
 		
 			String extra = null;
 			EntryReason entryReason = null;
+			EntryReason newEntryReason = null;
 			Iterator<EntryReason> iter = entry.getEntryReasons().iterator();
 			if (iter.hasNext()){
 				entryReason = iter.next();
+				newEntryReason = entryReason;
 				extra = entryReason.getExtra();
 			}
 		
@@ -216,10 +218,16 @@ public class EntryController {
 			int priority = entry.getPriority();
 		
 			JSONObject obj = null;
-				
 			
-			if (value != null && extra != null){
-				obj = new JSONObject(extra);
+			
+			
+			if (value != null){
+				
+				if (extra != null){
+					obj = new JSONObject(extra);
+				}else{
+					obj = new JSONObject(entryReason.getReason().getExtra());
+				}
 				obj.put("value", value);
 				//Priority setting according to boundary
 				
@@ -232,8 +240,9 @@ public class EntryController {
 			
 			
 			entry.setPriority(priority);
-			
-			
+//			entry.getEntryReasons().remove(entryReason);
+//			entry.getEntryReasons().add(newEntryReason);
+	
 			
 			
 			
