@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.swe.accessibility.domain.Priority;
 import com.swe.accessibility.domain.ReasonList;
+import com.swe.accessibility.domain.SubReason;
+import com.swe.accessibility.domain.proxy.Extra;
 import com.swe.accessibility.domain.proxy.PriorityList;
 import com.swe.accessibility.domain.proxy.SubReasonList;
 import com.swe.accessibility.domain.proxy.TypeList;
@@ -80,6 +84,34 @@ public class MainController {
 		result.setData(reasonService.getSubReasons(id));
 		HttpHeaders responseHeaders = makeCORS();
 		ResponseEntity<SubReasonList> entity = new ResponseEntity<SubReasonList>(result,responseHeaders,HttpStatus.OK );
+		
+		return entity;
+		
+		
+	}
+	
+	@RequestMapping(value="/categories/sub/{id}",
+			method = RequestMethod.GET,produces={"application/json"})
+	public  ResponseEntity<Extra> getSubCategoryExtra(@PathVariable int id){
+		
+		
+		SubReason reason = reasonService.getSubReason(id);
+		String extraStr = reason.getExtra();
+		JSONObject obj;
+		Extra result = null;
+		try {
+			if (extraStr != null){
+				obj = new JSONObject(extraStr);
+				result = new Extra(obj.getString("key"), obj.getString("boundary"), obj.getString("value"));
+			}
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		HttpHeaders responseHeaders = makeCORS();
+		ResponseEntity<Extra> entity = new ResponseEntity<Extra>(result,responseHeaders,HttpStatus.OK );
 		
 		return entity;
 		
