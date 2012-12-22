@@ -105,7 +105,6 @@ public class MainController {
 		PriorityList result = new PriorityList();
 		List<String> priorities = new ArrayList<String>();
 		priorities.add(Priority.LOW.getLabel());
-		priorities.add(Priority.HIGH.getLabel());
 		priorities.add(Priority.CRITICAL.getLabel());
 		
 		result.setData(priorities);

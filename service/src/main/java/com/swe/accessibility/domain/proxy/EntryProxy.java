@@ -2,17 +2,15 @@ package com.swe.accessibility.domain.proxy;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.swe.accessibility.domain.Comment;
 import com.swe.accessibility.domain.Entry;
 import com.swe.accessibility.domain.EntryReason;
 import com.swe.accessibility.domain.Priority;
-import com.swe.accessibility.domain.SubReason;
 
 
 public class EntryProxy implements Serializable {
@@ -50,16 +48,19 @@ public class EntryProxy implements Serializable {
 	
 	private List<CommentProxy> comments;
 	
-	private List<SubReason> reasons;
+	
 	
 	private String priority;
 	
+	private Extra extra;
 	
+	
+
 	public EntryProxy() {
 		
 	}
 
-	public EntryProxy(Entry entry) {
+	public EntryProxy(Entry entry, boolean fetchExtra) {
 		
 		this.id = entry.getId();
 		setImageMeta(entry.getImageMeta());
@@ -72,6 +73,7 @@ public class EntryProxy implements Serializable {
         	this.setUserName(entry.getUser().getUsername());
         this.fixed = entry.isFixed();
         
+        
         int code = entry.getPriority();
 
 		switch (code) {
@@ -79,15 +81,30 @@ public class EntryProxy implements Serializable {
 			this.priority = Priority.LOW.getLabel();
 			break;
 		case 2:
-			this.priority = Priority.HIGH.getLabel();
-		case 3:
 			this.priority = Priority.CRITICAL.getLabel();
 			break;
 		default:
 			this.priority = null;
 		}
        
+		if (fetchExtra){
+			Iterator<EntryReason> iter = entry.getEntryReasons().iterator();
+			
+			if (iter.hasNext()){
+				try {
+					JSONObject obj = new JSONObject(iter.next().getExtra());
+					this.extra = new Extra(obj.getString("key"), obj.getString("boundary"), obj.getString("value"));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+			
 	}
+	
+	
 
 	public String getImageMeta() {
 		return imageMeta;
@@ -179,6 +196,14 @@ public class EntryProxy implements Serializable {
 	
 	public void setPriority(String priority) {
 		this.priority = priority;
+	}
+	
+	public Extra getExtra() {
+		return extra;
+	}
+	
+	public void setExtra(Extra extra) {
+		this.extra = extra;
 	}
 	
 	

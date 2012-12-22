@@ -204,8 +204,15 @@ public class EntryController {
 			Entry entry = entryService.getRawEntry(id);
 			
 		
-			EntryReason entryReason = entry.getEntryReasons().iterator().next();
-			String extra = entryReason.getExtra();
+			String extra = null;
+			EntryReason entryReason = null;
+			Iterator<EntryReason> iter = entry.getEntryReasons().iterator();
+			if (iter.hasNext()){
+				entryReason = iter.next();
+				extra = entryReason.getExtra();
+			}
+		
+		
 			int priority = entry.getPriority();
 		
 			JSONObject obj = null;
@@ -216,16 +223,17 @@ public class EntryController {
 				obj.put("value", value);
 				//Priority setting according to boundary
 				
-				if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 3){
+				if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 2){
 					priority++;
 				}
+				if (obj != null && entryReason != null)
+					entryReason.setExtra(obj.toString());
 			}
 			
 			
 			entry.setPriority(priority);
 			
-			if (obj != null)
-				entryReason.setExtra(obj.toString());
+			
 			
 			
 			
@@ -240,6 +248,52 @@ public class EntryController {
 			entryResult.setResultStatus("Error adding entry");
 			entryResult.setResultId(4);
 		}
+		
+		HttpHeaders responseHeaders = makeCORS();
+		ResponseEntity<InsertEntryResult> entity = new ResponseEntity<InsertEntryResult>(entryResult,responseHeaders,HttpStatus.OK );
+		
+		
+		
+		
+		return entity;
+
+	}
+	
+	
+	@RequestMapping(value = "/edit/status", method = RequestMethod.POST,produces={"application/json"},headers={"Content-Type=application/json"})
+	public  ResponseEntity<InsertEntryResult>  editEntryStatus(@RequestBody EditRequest request,
+			HttpSession session, Principal principal) {
+		
+		InsertEntryResult entryResult = new InsertEntryResult();
+		int id = request.getEntryId();
+		
+		boolean  value = Boolean.parseBoolean(request.getValue());
+		
+		String username = null;
+		if (principal == null)
+		
+			username = "anonymousUser";
+		else
+			username = principal.getName();
+		Entry entry = entryService.getRawEntry(id);
+		User entryUser = entry.getUser();
+		
+		if (!username.equals(entryUser.getUsername())){
+			entryResult.setEntryId(id);
+			entryResult.setResultId(2);
+			entryResult.setResultStatus("Only submitter can change entry");
+		}
+		else{
+			
+		}
+		
+		entry.setFixed(value);
+		
+		entryService.editEntry(entry);
+		
+		entryResult.setEntryId(id);
+		entryResult.setResultId(1);
+		entryResult.setResultStatus("Success");
 		
 		HttpHeaders responseHeaders = makeCORS();
 		ResponseEntity<InsertEntryResult> entity = new ResponseEntity<InsertEntryResult>(entryResult,responseHeaders,HttpStatus.OK );
@@ -286,8 +340,8 @@ public class EntryController {
 				strCoordY = strCoordY.substring(0, 30);
 			}
 			
-			coordX = (BigDecimal) format.parse(strCoordX.replace('.', ','));
-			coordY = (BigDecimal) format.parse(strCoordY.replace('.', ','));
+			coordX = (BigDecimal) format.parse(strCoordX);
+			coordY = (BigDecimal) format.parse(strCoordY);
 			
 			
 			value = request.getParameter("value");

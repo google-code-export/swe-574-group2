@@ -71,7 +71,7 @@ public class EntryServiceImpl implements EntryService {
 		
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
 		for (Entry entry : getEntries()){
-			EntryProxy proxy = new EntryProxy(entry);
+			EntryProxy proxy = new EntryProxy(entry, false);
 		
 			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
 			entries.add(proxy);
@@ -84,7 +84,7 @@ public class EntryServiceImpl implements EntryService {
 		
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
 		for (Entry entry : getEntry(coordX, coordY)){
-			EntryProxy proxy = new EntryProxy(entry);
+			EntryProxy proxy = new EntryProxy(entry, false);
 			
 			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
 			entries.add(proxy);
@@ -99,7 +99,7 @@ public class EntryServiceImpl implements EntryService {
 		
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
 		for (Entry entry : entryDao.getEntriesByType(typeId)){
-			EntryProxy proxy = new EntryProxy(entry);
+			EntryProxy proxy = new EntryProxy(entry, false);
 			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
 			entries.add(proxy);
 		}
@@ -115,7 +115,7 @@ public class EntryServiceImpl implements EntryService {
 		
 		SubReason reason = reasonDao.getEntriesBySub(Integer.parseInt(categoryId));
 		for (Entry entry : entryDao.getEntriesByCategory(reason)){
-			EntryProxy proxy = new EntryProxy(entry);
+			EntryProxy proxy = new EntryProxy(entry, false);
 			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
 			entries.add(proxy);
 		}
@@ -148,7 +148,7 @@ public class EntryServiceImpl implements EntryService {
 		
 		Entry entry =  entryDao.getById(id);
 		
-		EntryProxy result = new EntryProxy(entry);
+		EntryProxy result = new EntryProxy(entry, true);
 		
 		//result.setComments(entry.getComments());
 		
@@ -187,7 +187,7 @@ public class EntryServiceImpl implements EntryService {
 		
 		List<EntryProxy> entries = new ArrayList<EntryProxy>();
 		for (Entry entry : entryDao.getEntriesByPriority(priority)){
-			EntryProxy proxy = new EntryProxy(entry);
+			EntryProxy proxy = new EntryProxy(entry, false);
 		
 			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
 			entries.add(proxy);
