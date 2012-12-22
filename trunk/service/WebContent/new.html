@@ -235,12 +235,15 @@ $(document).ready(function() {
 		
 		$('#btnDetail').click(function() {
 			var detail = $('#txtValue').val() + " " + $('#ddlKey').find(":selected").val();
+			
 			var postDetail = "{'key':'" + $('#ddlKey').find(":selected").val() + "','value':'" 
 				+ $('#txtValue').val() + "','boundary':'" + $('#lblThreshold').html() + "'}" 
 				//{"key":"derece","value":"","boundary":"12"}
 			console.log(postDetail);
 			$('#lblDetail').html(detail);
-			$('#value').val(postDetail);
+			//Need only to send value not the whole detail
+			//$('#value').val(postDetail);
+			$('#value').val($('#txtValue').val());
 			$('#btnDeleteDetail').show();
 			$('#btnDetail').hide();
 		});
