@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,19 @@ public class EntryDaoImpl implements EntryDao {
 
 		return (Entry) sessionFactory.getCurrentSession().get(Entry.class, id);
 	}
+	
+	@Override
+	public Entry getByIdFetchExtra(int id) {
+
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createQuery("FROM Entry as e LEFT JOIN FETCH e.entryReasons where e.id = :id");
+		query.setParameter("id", id);
+		
+		
+		
+		return (Entry) query.list().get(0);
+	}
+	
 
 	@Override
 	public List<Entry> get(BigDecimal coordX, BigDecimal coordY) {
@@ -165,8 +179,6 @@ public class EntryDaoImpl implements EntryDao {
 		
 		if (priority.equals(Priority.LOW.getLabel()))
 			code = Priority.LOW.getDegree();
-		else if (priority.equals(Priority.HIGH.getLabel()))
-			code = Priority.HIGH.getDegree();
 		else
 			code = Priority.CRITICAL.getDegree();
 		String queryStr = "SELECT e.id,e.comment,e.coordX,e.coordY,e.upVoteCount,e.downVoteCount,e.imageMeta,e.priority,u.username from Reason r  join EntryReason er on er.ReasonId = r.id join Entry e on er.EntryID = e.id  "

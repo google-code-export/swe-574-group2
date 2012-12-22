@@ -2,7 +2,7 @@ package com.swe.accessibility.domain;
 
 public enum Priority {
 	
-	LOW("Low",1),HIGH("High",2),CRITICAL("Critical",3);
+	LOW("Low",1),CRITICAL("Critical",2);
 	
 	private String label;
 	

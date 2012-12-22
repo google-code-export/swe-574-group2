@@ -62,10 +62,8 @@ public class SubReasonProxy implements Serializable {
 			this.priority = Priority.LOW.getLabel();
 			break;
 		case 2:
-			this.priority = Priority.HIGH.getLabel();
-		case 3:
 			this.priority = Priority.CRITICAL.getLabel();
-			break;
+		
 		default:
 			this.priority = null;
 		}

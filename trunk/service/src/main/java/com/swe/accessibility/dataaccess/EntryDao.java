@@ -27,6 +27,8 @@ public interface EntryDao {
 	List<Entry> getEntriesByCategory(SubReason reason);
 
 	List<Entry> getEntriesByPriority(String priority);
+
+	Entry getByIdFetchExtra(int id);
 	
 	
 
