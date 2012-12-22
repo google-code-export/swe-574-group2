@@ -146,7 +146,7 @@ public class EntryServiceImpl implements EntryService {
 	@Override
 	public EntryProxy getEntryById(int id) {
 		
-		Entry entry =  entryDao.getById(id);
+		Entry entry =  entryDao.getByIdFetchExtra(id);
 		
 		EntryProxy result = new EntryProxy(entry, true);
 		
