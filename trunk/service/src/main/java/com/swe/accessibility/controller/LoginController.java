@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
@@ -118,7 +119,7 @@ public class LoginController {
 		  }
 		  else{
 			  user.setUsername(username);
-			  user.setPassword(password);
+			  user.setPassword(DigestUtils.sha1Hex(password));
 			  
 			  UserType type = new UserType();
 			  type.setId(2);
