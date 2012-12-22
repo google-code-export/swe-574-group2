@@ -160,7 +160,7 @@ public class EntryServiceImpl implements EntryService {
 	@Override
 	public Entry getRawEntry(int id){
 		
-		return entryDao.getById(id);
+		return entryDao.getByIdFetchExtra(id);
 	}
 	
 	@Override
