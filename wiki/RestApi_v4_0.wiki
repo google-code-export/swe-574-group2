@@ -151,3 +151,11 @@ url pattern:{host}/service/entries?priority={priority}
 url pattern:{host}/service/entries/edit
 
 http post with "value" and "entryId" as parameters
+
+----------------------------------
+
+20. Mark entry as fixed
+
+url pattern:{host}/service/entries/edit/status
+
+http post with "value"(bool) and "entryId" as parameters
