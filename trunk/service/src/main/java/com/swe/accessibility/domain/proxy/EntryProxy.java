@@ -45,6 +45,8 @@ public class EntryProxy implements Serializable {
 	
 	private boolean fixed;
 	
+	private String category;
+	
 	
 	private List<CommentProxy> comments;
 	
@@ -93,9 +95,12 @@ public class EntryProxy implements Serializable {
 			if (iter.hasNext()){
 				try {
 					
-					String extraStr = iter.next().getExtra();
+					EntryReason entryReason = iter.next();
+					String extraStr = entryReason.getExtra();
+					this.category = entryReason.getReason().getTitle();
+					
 					if (extraStr != null){
-						JSONObject obj = new JSONObject(iter.next().getExtra());
+						JSONObject obj = new JSONObject(extraStr);
 						this.extra = new Extra(obj.getString("key"), obj.getString("boundary"), obj.getString("value"));
 					}
 					
@@ -209,6 +214,14 @@ public class EntryProxy implements Serializable {
 	
 	public void setExtra(Extra extra) {
 		this.extra = extra;
+	}
+	
+	public String getCategory() {
+		return category;
+	}
+	
+	public void setCategory(String category) {
+		this.category = category;
 	}
 	
 	
