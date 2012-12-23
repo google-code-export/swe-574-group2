@@ -261,9 +261,12 @@ function displayPosition(pos) {
     var thediv = document.getElementById('locationinfo');
     thediv.innerHTML = '<p><strong>Koordinatlarýnýz: </strong>' + mylat + ' , ' + mylong + '</p>'
     	+ '<p><strong>Hassasiyet: </strong>' + accuracy + ' metre</p>';
+    	
+    var lngStr = mylong.toString().replace('.', ',');
+	var latStr = mylat.toString().replace('.', ',');
 
-    $('#coordY').val(mylong.toString().replace('.', ','));
-    $('#coordX').val(mylat.toString().replace('.', ','));
+    $('#coordY').val(mylong);
+    $('#coordX').val(mylat);
 
 //Load Google Map
 var latlng = new google.maps.LatLng(mylat, mylong);
