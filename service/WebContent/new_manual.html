@@ -134,7 +134,6 @@ $(document).ready(function() {
 		    e.preventDefault();
 		});
 		
-		//testuser - swe574TEST!
 		$('#frmlogin').submit(function() {
 			
 			if($('#username').val() == "" || $('#password').val() == "")
@@ -145,42 +144,29 @@ $(document).ready(function() {
 			}
 			else
 			{
-				//alert($("#frmlogin").serialize())
 				$.ajax({
 					type: 'POST',
 					data: $("#frmlogin").serialize(),
 		          	url: './service/login/sigin',
 		            success: function(msg,textStatus) {
-		            	//alert("Baþarýyla giriþ yaptýnýz!");
-		            	//$('#spnLogout').show();
-	 					//$('#spnLogin').hide();
 		            	$('#divlogin').trigger('close');
 		            	IsLoggedIn();
 		            },
 		            error:function(jqXHR, textStatus, errorThrown){
 			          alert("Yanlýþ kullanýcý adý/þifre, lütfen tekrar deneyiniz.");
-		              //alert(errorThrown);
 		            }
 		        });
 				  return false;
 			}	
 		});
 
-		//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
-		//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
 		var getCategoriesUrl = './service/categories';
 		var getEntriesByCategoryUrl = './service/entries?categoryId=';
+		var getExtraDataBySubCategoryIdUrl = './service/categories/sub/';
 
 		var selectParent = $('#ddlCategories');
 		var selectChild = $('#ddlChildren');
 		$.getJSON(getCategoriesUrl, function(data) {
-// 			$.each(data['data'], function(index, element) {
-// 		        $('#feed').append(element.id + " " + element.title + " " + " " + element.parentReasonId + "</br>");
-// 		        $.each(element.violationTypes, function(index, element2)
-// 		        {
-// 		        	$('#feed').append(element2.id + " " + element2.title + " " + " " + element2.description + " " + element2.imageMeta);
-// 		        });
-// 		    });
 			$.each(data['data'], function(index, element) {
 		        $(selectParent).append(
 		        	$('<option></option>').val(element.id).html(element.title)
@@ -189,6 +175,9 @@ $(document).ready(function() {
 		 });
 		
 		selectParent.change(function() {
+
+			$('#lblKey').html('');
+			$('#lblThreshold').html('-');
 
 			$('#category').val(selectParent.find(":selected").val());
 			
@@ -202,7 +191,7 @@ $(document).ready(function() {
 					if(data['data'].length > 0){
 						selectChild.empty();
 						selectChild.append(
-					        $('<option></option>').val(0).html("Alt kategori seçebilirsiniz...")
+					        $('<option></option>').val(0).html("Alt kategori seçiniz...")
 					    );
 						
 						$.each(data['data'], function(index, element) {
@@ -222,15 +211,34 @@ $(document).ready(function() {
 		
 		selectChild.change(function() {
 
-			if(selectChild.find(":selected").val() != 0)
-			{
-				$('#category').val(selectChild.find(":selected").val());
-			}
-			else
-			{
-				$('#category').val(selectParent.find(":selected").val());
-			}
+			$.getJSON(getExtraDataBySubCategoryIdUrl + selectChild.find(":selected").val(), function(data) {
+					$('#lblKey').html(data.key);
+					$('#lblThreshold').html(data.boundary + " " + data.key);
+			 });
 
+		});
+		
+		$('#btnDetail').click(function() {
+// 			var postDetail = "{'key':'" + $('#ddlKey').find(":selected").val() + "','value':'" 
+//				+ $('#txtValue').val() + "','boundary':'" + $('#lblThreshold').html() + "'}" 
+			//{"key":"derece","value":"","boundary":"12"}
+			var txtValue = $('#txtValue').val();
+			if(txtValue == "") return;
+			
+ 			var detail = txtValue + " " + $('#lblKey').html();
+			$('#lblDetail').html(detail);
+			//Need only to send value not the whole detail
+			//$('#value').val(postDetail);
+			$('#value').val(txtValue);
+			$('#btnDeleteDetail').show();
+			$('#btnDetail').hide();
+		});
+		
+		$('#btnDeleteDetail').click(function() {
+			$('#lblDetail').html('');
+			$('#value').val('');
+			$('#btnDeleteDetail').hide();
+			$('#btnDetail').show();
 		});
 	});
 </script>
@@ -259,8 +267,9 @@ function codeLatLng(latLng) {
           var latlngStr = latLong.split(",",2);
 		  var lat = parseFloat(latlngStr[0]);
 		  var lng = parseFloat(latlngStr[1]);
-		  $('#coordY').val(lng);
-		  $('#coordX').val(lat);
+		  
+		  $('#coordY').val(lng.toString().replace('.', ','));
+		  $('#coordX').val(lat.toString().replace('.', ','));
         }
       } else {
         alert("Adres bulma hatasý: " + status);
@@ -377,6 +386,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 				<input type="hidden" id="coordX" value="0" name="coordX" />
 				<input type="hidden" id="coordY" value="0" name="coordY" />
 				<input type="hidden" id="category" value="0" name="category" />
+				<input type="hidden" id="value" value="" name="value" />
 				<p style="height: 5px;"></p>
 				<div id="submenu">
 				<ul>
@@ -386,7 +396,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
 				</div>
 				<div style="text-align: left; float: left;">
 					<span style="font-weight: bold;">Kategori *:</span> 
-					<select id="ddlCategories" name="ddlCategories">
+					<select id="ddlCategories" name="ddlCategories" style="margin-bottom: 5px;">
 						<option value="0">Lütfen seçiniz...</option>
 					</select>
 					<select id="ddlChildren" name="ddlChildren" style="display: none">
@@ -395,7 +405,29 @@ google.maps.event.addDomListener(window, 'load', initialize);
 					<span style="font-weight: bold;">Açýklama:</span>
 					<textarea class="comment" name="comment"
 						id="comment" cols="30" rows="4" style="margin-bottom: -45px;"></textarea>
-					<p style="height: 85px;"></p>
+					<p style="height: 60px;"></p>
+					<span style="font-weight: bold;"><u>Detaylar:</u></span>
+					<div id="tblDetay">
+						<table cellspacing="10" style="margin-left: -5px;">
+<!-- 							<tr> -->
+<!-- 								<td><span style="font-weight: bold;">Birim:</span></td> -->
+<!-- 								<td><span id="lblKey"></span></td> -->
+<!-- 							</tr> -->
+							<tr>
+								<td><span style="font-weight: bold;">Olmasý gereken üst sýnýr:</span></td>
+								<td><span id="lblThreshold">-</span></td>
+							</tr>
+							<tr>
+								<td><span style="font-weight: bold;">Mevcut deðer:</span></td>
+								<td><input type="text" id="txtValue" name="txtValue" style="width: 50px;"/>&nbsp;<span id="lblKey"></span></td>
+							</tr>
+							<tr>
+								<td><input type="button" id="btnDetail" name="btnDetail" value="Detayý ekle"/></td>
+								<td><span id="lblDetail"></span>&nbsp;<input style="display:none;" type="button" id="btnDeleteDetail" name="btnDeleteDetail" value="Sil"/></td>
+							</tr>
+					</table>
+					</div>
+					<p style="height:20px;"></p>
 					<span style="font-weight: bold;">Fotoðraf *:</span>
 					<!-- <div class="uploader"></div> -->
 					<input type="file" name="file" id="file" /> 
@@ -406,11 +438,10 @@ google.maps.event.addDomListener(window, 'load', initialize);
 					<p style="height: 20px;"></p>
 					<div id="locationinfo"></div>
 					<p style="height: 5px;"></p>
-					<a href="javascript: window.history.go(-1)" style="font-weight:bold; text-decoration: underline; color: #2AA8D2; font-size: 14px;"><--Geri</a>
+					<a href="javascript: window.history.go(-1)" style="font-weight:bold; 
+						text-decoration: underline; color: #2AA8D2; font-size: 14px;"><--Geri</a>
 					<p style="height: 5px;"></p>
 				</div>
-			
-				
 				<p style="height: 60px;"></p>
 			</form>
 			</div>

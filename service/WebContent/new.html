@@ -134,7 +134,6 @@ $(document).ready(function() {
 		    e.preventDefault();
 		});
 		
-		//testuser - swe574TEST!
 		$('#frmlogin').submit(function() {
 			
 			if($('#username').val() == "" || $('#password').val() == "")
@@ -145,15 +144,11 @@ $(document).ready(function() {
 			}
 			else
 			{
-				//alert($("#frmlogin").serialize())
 				$.ajax({
 					type: 'POST',
 					data: $("#frmlogin").serialize(),
 		          	url: './service/login/sigin',
 		            success: function(msg,textStatus) {
-		            	//alert("Baþarýyla giriþ yaptýnýz!");
-		            	//$('#spnLogout').show();
-	 					//$('#spnLogin').hide();
 		            	$('#divlogin').trigger('close');
 		            	IsLoggedIn();
 		            },
@@ -166,21 +161,13 @@ $(document).ready(function() {
 			}	
 		});
 
-		//var getCategoriesUrl = 'http://172.20.2.5:8080/RestAccessibilty/service/categories';
-		//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
 		var getCategoriesUrl = './service/categories';
 		var getEntriesByCategoryUrl = './service/entries?categoryId=';
+		var getExtraDataBySubCategoryIdUrl = './service/categories/sub/';
 
 		var selectParent = $('#ddlCategories');
 		var selectChild = $('#ddlChildren');
 		$.getJSON(getCategoriesUrl, function(data) {
-// 			$.each(data['data'], function(index, element) {
-// 		        $('#feed').append(element.id + " " + element.title + " " + " " + element.parentReasonId + "</br>");
-// 		        $.each(element.violationTypes, function(index, element2)
-// 		        {
-// 		        	$('#feed').append(element2.id + " " + element2.title + " " + " " + element2.description + " " + element2.imageMeta);
-// 		        });
-// 		    });
 			$.each(data['data'], function(index, element) {
 		        $(selectParent).append(
 		        	$('<option></option>').val(element.id).html(element.title)
@@ -189,6 +176,9 @@ $(document).ready(function() {
 		 });
 		
 		selectParent.change(function() {
+
+			$('#lblKey').html('');
+			$('#lblThreshold').html('-');
 
 			$('#category').val(selectParent.find(":selected").val());
 			
@@ -202,7 +192,7 @@ $(document).ready(function() {
 					if(data['data'].length > 0){
 						selectChild.empty();
 						selectChild.append(
-					        $('<option></option>').val(0).html("Alt kategori seçebilirsiniz...")
+					        $('<option></option>').val(0).html("Alt kategori seçiniz...")
 					    );
 						
 						$.each(data['data'], function(index, element) {
@@ -222,28 +212,25 @@ $(document).ready(function() {
 		
 		selectChild.change(function() {
 
-			if(selectChild.find(":selected").val() != 0)
-			{
-				$('#category').val(selectChild.find(":selected").val());
-			}
-			else
-			{
-				$('#category').val(selectParent.find(":selected").val());
-			}
+			$.getJSON(getExtraDataBySubCategoryIdUrl + selectChild.find(":selected").val(), function(data) {
+					$('#lblKey').html(data.key);
+					$('#lblThreshold').html(data.boundary + " " + data.key);
+			 });
 
 		});
 		
 		$('#btnDetail').click(function() {
-			var detail = $('#txtValue').val() + " " + $('#ddlKey').find(":selected").val();
+// 			var postDetail = "{'key':'" + $('#ddlKey').find(":selected").val() + "','value':'" 
+//				+ $('#txtValue').val() + "','boundary':'" + $('#lblThreshold').html() + "'}" 
+			//{"key":"derece","value":"","boundary":"12"}
+			var txtValue = $('#txtValue').val();
+			if(txtValue == "") return;
 			
-			var postDetail = "{'key':'" + $('#ddlKey').find(":selected").val() + "','value':'" 
-				+ $('#txtValue').val() + "','boundary':'" + $('#lblThreshold').html() + "'}" 
-				//{"key":"derece","value":"","boundary":"12"}
-			console.log(postDetail);
+ 			var detail = txtValue + " " + $('#lblKey').html();
 			$('#lblDetail').html(detail);
 			//Need only to send value not the whole detail
 			//$('#value').val(postDetail);
-			$('#value').val($('#txtValue').val());
+			$('#value').val(txtValue);
 			$('#btnDeleteDetail').show();
 			$('#btnDetail').hide();
 		});
@@ -275,8 +262,8 @@ function displayPosition(pos) {
     thediv.innerHTML = '<p><strong>Koordinatlarýnýz: </strong>' + mylat + ' , ' + mylong + '</p>'
     	+ '<p><strong>Hassasiyet: </strong>' + accuracy + ' metre</p>';
 
-    $('#coordY').val(mylong);
-    $('#coordX').val(mylat);
+    $('#coordY').val(mylong.toString().replace('.', ','));
+    $('#coordX').val(mylat.toString().replace('.', ','));
 
 //Load Google Map
 var latlng = new google.maps.LatLng(mylat, mylong);
@@ -372,7 +359,7 @@ function errorFunction(pos) {
 				</div>
 				<div style="text-align: left; float: left;">
 					<span style="font-weight: bold;">Kategori *:</span> 
-					<select id="ddlCategories" name="ddlCategories">
+					<select id="ddlCategories" name="ddlCategories" style="margin-bottom: 5px;">
 						<option value="0">Lütfen seçiniz...</option>
 					</select>
 					<select id="ddlChildren" name="ddlChildren" style="display: none">
@@ -385,27 +372,20 @@ function errorFunction(pos) {
 					<span style="font-weight: bold;"><u>Detaylar:</u></span>
 					<div id="tblDetay">
 						<table cellspacing="10" style="margin-left: -5px;">
+<!-- 							<tr> -->
+<!-- 								<td><span style="font-weight: bold;">Birim:</span></td> -->
+<!-- 								<td><span id="lblKey"></span></td> -->
+<!-- 							</tr> -->
 							<tr>
-								<td><span style="font-weight: bold;">Birim:</span></td>
-								<td><select id="ddlKey" name="ddlKey">
-										<option value="0">Lütfen seçiniz...</option>
-										<option value="derece">derece (°)</option>
-										<option value="mm">milimetre (mm)</option>
-										<option value="cm">santimetre (cm)</option>
-										<option value="m">metre (m)</option>
-										<option value="%">yüzde (%)</option>
-									</select></td>
+								<td><span style="font-weight: bold;">Olmasý gereken üst sýnýr:</span></td>
+								<td><span id="lblThreshold">-</span></td>
 							</tr>
 							<tr>
 								<td><span style="font-weight: bold;">Mevcut deðer:</span></td>
-								<td><input type="text" id="txtValue" name="txtValue"/></td>
+								<td><input type="text" id="txtValue" name="txtValue" style="width: 50px;"/>&nbsp;<span id="lblKey"></span></td>
 							</tr>
 							<tr>
-								<td><span style="font-weight: bold;">Olmasý gereken deðer:</span></td>
-								<td><span id="lblThreshold">12</span></td>
-							</tr>
-							<tr>
-								<td><input type="button" id="btnDetail" name="btnDetail" value="Detay ekle"/></td>
+								<td><input type="button" id="btnDetail" name="btnDetail" value="Detayý ekle"/></td>
 								<td><span id="lblDetail"></span>&nbsp;<input style="display:none;" type="button" id="btnDeleteDetail" name="btnDeleteDetail" value="Sil"/></td>
 							</tr>
 					</table>
@@ -425,8 +405,6 @@ function errorFunction(pos) {
 						text-decoration: underline; color: #2AA8D2; font-size: 14px;"><--Geri</a>
 					<p style="height: 5px;"></p>
 				</div>
-			
-				
 				<p style="height: 60px;"></p>
 			</form>
 			</div>

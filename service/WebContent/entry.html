@@ -125,6 +125,12 @@ function initialize() {
 			new google.maps.Point(18, 42));
 
 	var entryId = getParameterByName('id');
+	
+	if(entryId == "")
+	{
+		window.location.replace("default.html");
+	}
+	
 	var getEntryByIdUrl = "./service/entries/" + entryId;
 	var coordX = 0;
 	var coordY = 0;
@@ -151,11 +157,15 @@ function initialize() {
 		if(myData.fixed == false)
 		{
 			fixed = "<font color='red'>Henüz düzeltilmedi</font>";
+			$('#chkFixed').prop('checked', false);
 		}
 		else if(myData.fixed == true)
 		{
 			fixed = "<font color='green'>Düzeltildi</font>";
+			$('#chkFixed').prop('checked', true);
 		}
+		
+		IsSameUser(myData.userName);
 		
 	    var comment = myData.comment;
 		var upVote = myData.upVoteCount;
@@ -167,23 +177,36 @@ function initialize() {
 		var extraKey = '';
 		var extraValue = '';
 		var extraBoundary = '';
+		var catKey = '';
+		var catBoundary = '';
+		var catTitle = category.title;
+		
 		if(myData.extra != null)
 		{
 			extraKey = myData.extra.key;
 			extraValue = myData.extra.value;
 			extraBoundary = myData.extra.boundary;
-			$('#lblDetail').html(extraValue);
-			$('#lblBoundary2').html(extraKey);
+			$('#lblValue').html(extraValue);
 			$('#lblDetailKey').html(extraKey);
-			$('#lblBoundary').html(extraBoundary + " " + extraKey);
-			$('#divDetailExists').show();
-			$('#divNoDetail').hide();
 		}
 		else
 		{
-			$('#lblDetailKey').html("-");
-			$('#divDetailExists').hide();
-			$('#divNoDetail').show();
+			$('#lblValue').html("Detay girilmemiş");
+			$('#lblDetailKey').html("");
+		}
+		
+		if(category.extra != null)
+		{
+			catKey = category.extra.key;
+			catBoundary = category.extra.boundary;
+			$('#lblRequired').html(catBoundary + " " + catKey);
+			$('#lblDetailKey2').html(catKey);
+		}
+		
+		else
+		{
+			$('#lblRequired').html("-");
+			$('#lblDetailKey2').html("-");
 		}
 		
 		coordX = myData.coordX;
@@ -212,7 +235,7 @@ function initialize() {
 			});
 		}
 
-		$('#lblCategory').html(category);
+		$('#lblCategory').html(catTitle);
 		$('#spnComments').html(allComments);
 		$('#lblStatus').html(fixed);
 		$('#lblPriority').html(priority);
@@ -326,6 +349,7 @@ function voteDown() {
 var addCommentUrl = "./service/comments/add";
 var isLoggedInUrl = "./service/login/status";
 var saveDetailUrl = "./service/entries/edit";
+var isFixedUrl = "./service/entries/edit/status";
 
 function addComment() {
 	
@@ -349,6 +373,12 @@ function addComment() {
 	    data: JSON.stringify({entryId:entryId, text:txtVal}),
 	    dataType: 'json',
 	    contentType: "application/json;charset=utf-8",
+	    beforeSend : function() {
+			$("#spinner2").show();
+		},
+		complete : function() {
+			$("#spinner2").hide();
+		},
 	    success: function(data) {
 	        if(data.resultStatus == "success")
 	        {
@@ -410,11 +440,11 @@ function saveDetail() {
 			$("#spinner").hide();
 		},
 	    success: function(data) {
-	        if(data.resultStatus == "success")
+	        if(data.resultStatus == "Success")
 	        {
 	        	alert('Detay kaydedildi, teşekkürler!');
-	        	$('#txtVal').val('');
-	        	$('#lblDetail').html(txtVal);
+	        	$('#txtDetail').val('');
+	        	$('#lblValue').html(txtVal);
 	        }
 	        else
 	        {
@@ -423,6 +453,50 @@ function saveDetail() {
 	    },
 	    error: function(data) {
 	    	alert('Detay kaydedilirken bir hata oluştu, lütfen daha sonra tekrar deneyin.');
+	    }
+	})
+};
+
+
+function entryFixed() {
+	
+	var fixed = $('#chkFixed').is(':checked');
+	var entryId = getParameterByName('id');
+	
+	$.ajax({
+	    url: isFixedUrl,
+	    type: 'post',
+	    data: JSON.stringify({entryId:entryId, value:fixed}),
+	    dataType: 'json',
+	    contentType: "application/json;charset=utf-8",
+	    beforeSend : function() {
+			$("#spinner3").show();
+		},
+		complete : function() {
+			$("#spinner3").hide();
+		},
+	    success: function(data) {
+	        if(data.resultStatus == "Success")
+	        {
+	        	var fixedTxt = "<font color='red'>Henüz düzeltilmedi</font>";
+	    		if(fixed == false)
+	    		{
+	    			fixedTxt = "<font color='red'>Henüz düzeltilmedi</font>";
+	    		}
+	    		else if(fixed == true)
+	    		{
+	    			fixedTxt = "<font color='green'>Düzeltildi</font>";
+	    		}
+	    		
+	    		$('#lblStatus').html(fixedTxt);
+	        }
+	        else
+	        {
+	        	alert('Bir hata oluştu, lütfen daha sonra tekrar deneyin.');
+	        }
+	    },
+	    error: function(data) {
+	    	alert('Bir hata oluştu, lütfen daha sonra tekrar deneyin.');
 	    }
 	})
 };
@@ -480,10 +554,24 @@ var logOutUrl = "./j_spring_security_logout";
 			}	
 		});
 	});
-
-	function IsLoggedReturn(nedir) {
-		return nedir;
-	};
+	
+	function IsSameUser(username) {
+		$.ajax({
+			url : isLoggedInUrl,
+			type : 'get',
+			success: function(msg){
+				if(msg.loggedIn == true && msg.username == username)
+					{
+						$('#divFixed').show();
+					}
+				else
+					{
+						$('#divFixed').hide();
+					}
+			},
+			error: function(){}
+		})
+	}
 	
 	function IsLoggedIn() {
 		$.ajax({
@@ -596,6 +684,11 @@ var logOutUrl = "./j_spring_security_logout";
 						<p style="height: 10px;"></p>
 						<span style="font-weight: bold;">Durum:</span>
 						<span id="lblStatus"></span>
+						<div id="divFixed" style="display:none;">
+							<input type="checkbox" id="chkFixed"/><label for="chkFixed">Düzeltildi</label>
+							&nbsp;<input type="button" value="Gönder" id="btnFixed" onclick="entryFixed();"/>
+							<span id="spinner3" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="Kaydediliyor..."/></span>
+						</div>	
 						<p style="height: 10px;"></p>
 						<span style="font-weight: bold;">Girişi yapan:</span>
 						<span id="lblUser"></span>
@@ -606,25 +699,18 @@ var logOutUrl = "./j_spring_security_logout";
 						<span style="font-weight: bold;">Açıklama:</span>
 						<span id="lblComment"></span>
 						<p style="height: 20px;"></p>
+						
 						<span style="font-weight: bold;">Kategori:</span>
-						<span id="lblCategory"></span>	
-												
-						<p style="height: 10px;"></p>						
-						<div id="divDetailExists" style="display:none;">
-							<span style="font-weight: bold;">Mevcut durum:</span>
-							<span id="lblDetail"></span>&nbsp;<span id="lblBoundary2"></span>
-							&nbsp;&nbsp;
-							<span style="font-weight: bold;">Olması gereken üst sınır:</span>
-							<span id="lblBoundary"></span>								
-							<p style="height: 10px;"></p>
-						</div>
-						<div id="divNoDetail" style="display:none;">
-							<span style="font-weight: bold;">Mevcut durum:</span>
-							<span id="lblNoDetail">Girilmemiş</span>	
-							<p style="height: 10px;"></p>
-						</div>
+						<span id="lblCategory"></span>				
+						<p style="height: 5px;"></p>						
+						<span style="font-weight: bold;">Mevcut durum:</span>
+						<span id="lblValue"></span>&nbsp;<span id="lblDetailKey"></span>
+						<p style="height: 5px;"></p>	
+						<span style="font-weight: bold;">Olması gereken üst sınır:</span>
+						<span id="lblRequired"></span>								
+						<p style="height: 5px;"></p>
 						<span style="font-weight: bold;">Veriyi düzelt:</span>
-						<input type="text" id="txtDetail" style="width: 50px;"/>&nbsp;<span id="lblDetailKey"></span>
+						<input type="text" id="txtDetail" style="width: 50px;"/>&nbsp;<span id="lblDetailKey2"></span>
 						&nbsp;&nbsp;<input type="button" id="btnDetail" value="Gönder" onclick="saveDetail();"/>	
 						<span id="spinner" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="Kaydediliyor..."/></span>						
 						<p style="height: 20px;"></p>
@@ -646,7 +732,8 @@ var logOutUrl = "./j_spring_security_logout";
 						<textarea class="comment" name="txtComment"
 							id="txtComment" cols="20" rows="4" style="margin-bottom: -45px;"></textarea>
 						<input type="button" id="btnCommentSave" name="btnCommentSave" value="Gönder"
-							style="font-weight: bold;" onclick="addComment();" />
+							onclick="addComment();" />
+						<span id="spinner2" class="spinner" style="display:none;"><img id="img-spinner" src="images/spinner.gif" alt="Kaydediliyor..."/></span>	
 						<p style="height: 60px;"></p>	
 						<a href="javascript: window.history.go(-1)" style="font-weight:bold; 
 							text-decoration: underline; color: #2AA8D2; font-size: 14px;"><--Geri</a>					
