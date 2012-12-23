@@ -149,7 +149,7 @@ public class EntryServiceImpl implements EntryService {
 		Entry entry =  entryDao.getByIdFetchExtra(id);
 		
 		EntryProxy result = new EntryProxy(entry, true);
-		
+		result.setImageMeta(config.getImageHost() + "/" + result.getImageMeta());
 		//result.setComments(entry.getComments());
 		
 		return result;
