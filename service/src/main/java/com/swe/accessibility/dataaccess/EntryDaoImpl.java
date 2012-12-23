@@ -185,7 +185,7 @@ public class EntryDaoImpl implements EntryDao {
 				+ "join User u on e.submittedBy = u.id where e.priority = :priority";
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(
 				queryStr);
-		query.setParameter("p", code);
+		query.setParameter("priority", code);
 		
 		Iterator<Object[]> iter = query.list().iterator();
 
