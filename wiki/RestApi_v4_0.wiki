@@ -142,7 +142,7 @@ url pattern: {host}/service/priorities
 
 url pattern:{host}/service/entries?priority={priority}
 
-"priority" can be "low", "high", "critical".
+"priority" can be "low" or "critical".
 
 ----------------------------------
 
