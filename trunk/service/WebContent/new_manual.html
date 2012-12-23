@@ -268,8 +268,11 @@ function codeLatLng(latLng) {
 		  var lat = parseFloat(latlngStr[0]);
 		  var lng = parseFloat(latlngStr[1]);
 		  
-		  $('#coordY').val(lng.toString().replace('.', ','));
-		  $('#coordX').val(lat.toString().replace('.', ','));
+		  var lngStr = lng.toString().replace('.', ',');
+		  var latStr = lat.toString().replace('.', ',');
+		  
+		  $('#coordY').val(lng);
+		  $('#coordX').val(lat);
         }
       } else {
         alert("Adres bulma hatasý: " + status);
