@@ -174,13 +174,14 @@ body {
 				$("#spinner").hide();
 			},
 		    success: function(data) {
-		        if(data.resultStatus == "success")
+		        if(data.status == "Success")
 		        {
 				    alert('Başarıyla kaydoldunuz! Anasayfaya yönlendirileceksiniz...');
 				    window.location.replace("default.html");
 		        }
 		        else
 		        {
+		        	alert('osman');
 		        	alert('Kayıt sırasında bir hata oluştu, lütfen tekrar deneyin.');
 		        }
 		    },

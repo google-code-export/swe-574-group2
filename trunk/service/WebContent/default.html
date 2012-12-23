@@ -343,6 +343,16 @@ body {
 						//var getCategoriesUrl = 'http://testpalette.com:8080/RestAccessibilty/service/categories';
 						var getCategoriesUrl = './service/categories';
 						var getEntriesByCategoryUrl = './service/entries?categoryId=';
+						
+// 						var getPrioritiesUrl = './service/priorities';
+// 						var selectPriorities = $('#ddlPriorities');
+// 						$.getJSON(getPrioritiesUrl, function(data) {
+// 							$.each(data['data'], function(index, element) {
+// 								$(selectPriorities).append(
+// 										$('<option></option>').val(element.id)
+// 												.html(element.title));
+// 							});
+// 						});
 
 						var selectParent = $('#ddlCategories');
 						var selectChild = $('#ddlChildren');
@@ -385,6 +395,9 @@ body {
 						selectChild.change(function() {});
 
 						$('#btnSearch').click(function() {
+							
+							$("#ddlPriorities option[value='0']")[0].selected = true;
+							
 											var valToSearch = 0;
 											if (selectChild.val() == "0") 
 											{
@@ -542,6 +555,168 @@ body {
 												}
 											});
 										});
+						
+						$('#btnPrior').click(function() {
+							
+							$("#ddlCategories option[value='0']")[0].selected = true;
+							$('#ddlChildren').hide();
+							
+							var valToSearch = 0;
+							if ($('#ddlPriorities').find(":selected").val() == "0") 
+							{
+								valToSearch = "0";
+							} 
+							else
+							{
+								valToSearch = $('#ddlPriorities').find(":selected").val();
+							}
+							
+							var searchUrl = "";
+							var getAllEntriesUrl = "./service/entries";
+							var getEntriesByPriorityUrl = './service/entries?priority=';
+							
+							if(valToSearch != "0")
+							{
+								searchUrl = getEntriesByPriorityUrl + valToSearch;
+							}
+							else
+							{
+								searchUrl = getAllEntriesUrl;
+							}
+
+							var scriptUrl = searchUrl;
+							
+							var loggedIn = $('#loggedMu').val();
+							
+							$.ajax({
+								url : scriptUrl,
+								type : 'get',
+								dataType : 'json',
+								beforeSend : function() {
+									$("#spinner2").show();
+								},
+								complete : function() {
+									$("#spinner2").hide();
+								},
+								success : function(data) {
+									var dataS = data['data'];
+
+									$('#divCount').html("Filtreleme sonucu "
+															+ dataS.length
+															+ " adet ihlâl bulundu.");
+
+									var pinImg = new google.maps.MarkerImage('images/markers/wheelchair.png',
+											// This marker is 129 pixels wide by 42 pixels tall.
+											new google.maps.Size(129,42),
+											// The origin for this image is 0,0.
+											new google.maps.Point(0,0),
+											// The anchor for this image is the base of the flagpole at 18,42.
+											new google.maps.Point(18,42));
+
+									var infoWindow = new google.maps.InfoWindow;
+
+									clearOverlays();
+
+									$.each(dataS, function(index,element) {
+														var comment = element.comment;
+														var entryId = element.id;
+														var upVote = element.upVoteCount;
+														var downVote = element.downVoteCount;
+														var point = new google.maps.LatLng(
+																parseFloat(element.coordX),
+																parseFloat(element.coordY));
+														var image = element.imageMeta; //"images/generic.png";
+														var voting = "";
+														var priority = "<font color='olive'>Düşük</font>";
+														var fixed = "";
+														
+														if(loggedIn == "true")
+														{
+															voting = 
+																'<span id="lblUpVote' + entryId + '">' + upVote + '</span>'
+																+ " acil &nbsp;&nbsp;"
+																+ "<a rel='"
+																+ entryId
+																+ "' id='lnkUpVote" + entryId + "' href='javascript:voteUp("
+																+ entryId
+																+ ");'"
+																+ "><img width='25' height='25'" 
+								+ "src='images/upArrow.png' title='Acil olarak işaretle'></a>&nbsp;&nbsp;&nbsp;"
+																+ "<a rel='"
+																+ entryId
+																+ "' id='lnkDownVote" + entryId + "' href='javascript:voteDown("
+																+ entryId
+																+ ");'>"
+																+ "<img width='25' height='25'"
+								+ "src='images/downArrow.png' title='Bekleyebilir olarak işaretle'></a>"
+																+ "&nbsp;&nbsp;"
+																+ '<span id="lblDownVote' + entryId + '">' + downVote + '</span>'
+																+ " bekleyebilir";
+														}
+														else
+														{
+															voting = "Puanlayabilmek için giriş yapınız!";
+														}
+														
+														if(element.fixed)
+														{
+															fixed = "<font color='green'>Düzeltildi</font>";
+														}
+														else
+														{
+															fixed = "<font color='red'>Henüz düzeltilmedi</font>";
+														}
+														
+														if(element.priority == "Low")
+														{
+															priority = "<font color='olive'>Düşük</font>";
+														}
+														else if(element.priority == "High")
+														{
+															priority = "<font color='orange'>Yüksek</font>";
+														}
+														else if(element.priority == "Critical")
+														{
+															priority = "<font color='red'>Kritik</font>";
+														}
+														
+														var html = "<div style='text-align: center;'><img width='70%' height='70%' src='"
+															+ image
+															+ "'>"
+															+ "<p></p><b>''"
+															+ comment
+															+ "''</b> <p></p>"
+															+ fixed
+															+ "<p></p>"
+															+ "<b>Öncelik:</b>&nbsp;"
+															+ priority
+															+ "<p></p>"
+															+ voting
+															+ "<p></p>"
+															+ "<a style='text-decoration: underline' href='" 
+							+ entryDetailUrl + entryId + "'>Detay...</a></div>";
+														var marker = new google.maps.Marker(
+																{
+																	map : map,
+																	position : point,
+																	icon : pinImg
+																});
+
+														bindInfoWindow(
+																marker,
+																map,
+																infoWindow,
+																html);
+
+													});
+								},
+								error : function(data) {
+									alert("Bir hata oluştu, lütfen tekrar deneyin.");
+								}
+							});
+						});
+						
+						
 
 					});
 	
@@ -649,7 +824,7 @@ body {
 			<div id="content" style="width: 900px;">
 				<div id="cbox1">
 					<div>
-						<h4>Kategori filtreleme:</h4>
+						<span style="font-weight: bold;">Kategori filtreleme:</span>&nbsp;&nbsp;
 						<select id="ddlCategories">
 							<option value="0">Tamamı</option>
 						</select> <select id="ddlChildren" style="display: none">
@@ -657,9 +832,20 @@ body {
 						</select> <input type="button" id="btnSearch" name="formSearch" value="Ara" style="font-weight: bold;" />
 						<span id="spinner" class="spinner" style="display: none;"><img
 							id="img-spinner" src="images/spinner.gif" alt="Yükleniyor" /> </span>
-						<p style="height: 7px"></p>
-						<div id="divCount" style="font-weight: bold;"></div>
 					</div>
+					<p style="height: 12px"></p>
+					<div> 
+						<span style="font-weight: bold;">Öncelik filtreleme:</span>&nbsp;&nbsp;&nbsp;&nbsp;
+						<select id="ddlPriorities">
+							<option value="0">Tamamı</option>
+							<option value="Low">Düşük</option>
+							<option value="Critical">Kritik</option>
+						</select> <input type="button" id="btnPrior" value="Ara" style="font-weight: bold;" />
+						<span id="spinner2" class="spinner" style="display: none;"><img
+							id="img-spinner" src="images/spinner.gif" alt="Yükleniyor" /> </span>
+					</div>
+					<p style="height: 12px"></p>
+					<div id="divCount" style="font-weight: bold;"></div>
 				</div>
 				<div id="two-column" style="border-top: 0px; padding-top: 0px;">
 					<div id="map_canvas" style="width: 900px; height: 500px;"></div>
