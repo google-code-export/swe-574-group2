@@ -180,14 +180,20 @@ body {
 				    alert('Başarıyla kaydoldunuz! Anasayfaya yönlendirileceksiniz...');
 				    window.location.replace("default.html");
 		        }
+		        else if(data.status == "Failed" && data.error == "User already exists")
+		        {
+		        	alert('Bu kullanıcı adı daha önce alınmış. Lütfen başka bir kullanıcı adı deneyin.');
+		        }
 		        else
 		        {
-		        	alert('osman');
 		        	alert('Kayıt sırasında bir hata oluştu, lütfen tekrar deneyin.');
 		        }
 		    },
-		    error: function(data) {
-		    	alert('Kayıt sırasında bir hata oluştu, lütfen tekrar deneyin.');
+		    error: function(xhr, statusText){
+				if(xhr.status == 400)
+				{
+					alert('Bu kullanıcı adı daha önce alınmış. Lütfen başka bir kullanıcı adı deneyin.');
+				}
 		    }
 		})
 	};
