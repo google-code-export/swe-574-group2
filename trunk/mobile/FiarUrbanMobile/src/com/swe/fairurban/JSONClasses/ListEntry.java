@@ -15,7 +15,9 @@ public class ListEntry implements Parcelable {
 	public Integer upVoteCount;
 	public Integer downVoteCount;
 	public String userName;
-	
+	public EntryCategory category;
+	public ExtraData extra;
+	public Boolean fixed;
 	
 	public int describeContents() {
 		return 0;
