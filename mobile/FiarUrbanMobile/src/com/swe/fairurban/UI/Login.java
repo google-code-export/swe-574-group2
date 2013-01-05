@@ -3,6 +3,7 @@ package com.swe.fairurban.UI;
 import org.json.JSONObject;
 
 import com.swe.fairurban.R;
+import com.swe.fairurban.Data.User;
 import com.swe.fairurban.Helpers.OnServiceConnectionFinishedEvent;
 import com.swe.fairurban.Helpers.ServiceConnector;
 import com.swe.fairurban.Helpers.ServiceHelper;
@@ -59,8 +60,8 @@ public class Login extends Activity {
 				
 				
 				
-				String username = txtUsername.getText().toString();
-				String password = txtPassword.getText().toString();
+				final String username = txtUsername.getText().toString();
+				final String password = txtPassword.getText().toString();
 				
 				ServiceConnector sc = new ServiceConnector(ServiceHelper.GetLoginUrl());
 				
@@ -95,6 +96,14 @@ public class Login extends Activity {
 										
 										if (jObj.getBoolean("loggedIn")) {
 											//Login successful
+											
+											User loggedInUser = new User();
+											
+											loggedInUser.Username = username;
+											loggedInUser.Password = password;
+											
+											UserHelper.CurrentUser = loggedInUser;
+											
 											Intent mapIntent = new Intent(Login.this, Map.class);
 							                startActivity(mapIntent);
 										}

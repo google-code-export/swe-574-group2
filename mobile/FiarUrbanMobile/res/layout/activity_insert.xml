@@ -42,7 +42,7 @@
         android:layout_above="@+id/btnInsert"
         android:layout_alignLeft="@+id/btnSelectPhoto"
         android:layout_alignRight="@+id/btnInsert"
-        android:layout_below="@+id/spnSubCategories" />
+        android:layout_below="@+id/lblExtraData" />
 
     <Spinner
         android:id="@+id/spnMainCategories"
@@ -52,14 +52,6 @@
         android:layout_below="@+id/txtComment"
         android:layout_marginTop="16dp" />
 
-    <Spinner
-        android:id="@+id/spnSubCategories"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/spnMainCategories"
-        android:layout_below="@+id/spnMainCategories"
-        android:layout_marginTop="14dp" />
-
     <Button
         android:id="@+id/btnTakePhoto"
         android:layout_width="wrap_content"
@@ -68,5 +60,31 @@
         android:layout_toLeftOf="@+id/btnInsert"
         android:layout_toRightOf="@+id/btnSelectPhoto"
         android:text="Ft. Çek" />
+
+    <Spinner
+        android:id="@+id/spnSubCategories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spnMainCategories"
+        android:layout_below="@+id/spnMainCategories"
+        android:layout_marginTop="14dp" />
+
+    <TextView
+        android:id="@+id/lblExtraData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/spnSubCategories"
+        android:layout_below="@+id/spnSubCategories"
+        android:layout_marginTop="30dp"
+        android:text="Ekstra" />
+
+    <EditText
+        android:id="@+id/txtExtraData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/lblExtraData"
+        android:layout_alignRight="@+id/txtComment"
+        android:layout_toRightOf="@+id/btnSelectPhoto"
+        android:ems="10" />
 
 </RelativeLayout>

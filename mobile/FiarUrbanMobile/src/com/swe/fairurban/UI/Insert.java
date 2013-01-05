@@ -48,13 +48,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 public class Insert extends Activity {
 
 	EditText txtComment;
-	EditText txtPassword;
+	EditText txtExtraData;
+	TextView lblExtraData;
 	Button btnInsert, btnSelectPhoto, btnTakePhoto;
 	Context appContext;
 
@@ -83,6 +85,14 @@ public class Insert extends Activity {
         txtComment = (EditText) findViewById(R.id.txtComment);
 		btnInsert = (Button) findViewById(R.id.btnInsert);
 	
+		lblExtraData = (TextView) findViewById(R.id.lblExtraData);
+		
+		txtExtraData = (EditText) findViewById(R.id.txtExtraData);
+		
+		lblExtraData.setVisibility(View.INVISIBLE);
+		
+		txtExtraData.setVisibility(View.INVISIBLE);
+		
 		btnSelectPhoto = (Button) findViewById(R.id.btnSelectPhoto);
 		
 		btnTakePhoto = (Button) findViewById(R.id.btnTakePhoto);
@@ -128,6 +138,7 @@ public class Insert extends Activity {
 				
 				String comment = txtComment.getText().toString();
 				
+				String extra = txtExtraData.getText().toString();
 				
 				pdUpload = ProgressDialog.show(appContext, "Kayýt","Sunucuya baðlanýlýyor.", true);
 				
@@ -146,6 +157,7 @@ public class Insert extends Activity {
 				
 				conn.AddParameter("comment", comment);
 				
+				conn.AddParameter("value", extra);
 				
 				conn.AddListener(new OnServiceConnectionFinishedEvent() {
 					
@@ -250,6 +262,33 @@ public class Insert extends Activity {
 				
 			}
 			
+		});
+		
+		spnSubCategories.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			public void onItemSelected(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				// TODO Auto-generated method stub
+					EntryCategory subCatSelected = (EntryCategory) arg0.getSelectedItem();
+					if (subCatSelected.id > 0) {
+						lblExtraData.setText(subCatSelected.extra.key);
+						
+						lblExtraData.setVisibility(View.VISIBLE);
+						
+						txtExtraData.setVisibility(View.VISIBLE);
+					}
+					else {
+						lblExtraData.setVisibility(View.INVISIBLE);
+						
+						txtExtraData.setVisibility(View.INVISIBLE);
+					}
+				
+			}
+
+			public void onNothingSelected(AdapterView<?> arg0) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 		
     }

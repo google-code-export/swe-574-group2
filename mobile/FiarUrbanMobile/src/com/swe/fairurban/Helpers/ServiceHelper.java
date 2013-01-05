@@ -16,6 +16,12 @@ public class ServiceHelper {
 	
 	private final static String VOTE_URL = "/service/entries/thumbs";
 	
+	private final static String MARK_FIXED_URL = "/service/entries/edit/status";
+	
+	private final static String EDIT_ENTRY_URL = "/service/entries/edit";
+	
+	public final static String IMAGES_FOLDER = "http://testpalette.com/";
+	
 	
 	public static String GetEntiryDetailsUrl(Integer entityId)
 	{
@@ -25,6 +31,19 @@ public class ServiceHelper {
 	public static String GetVotingUrl()
 	{
 		return MAIN_SERVICE_HOST + VOTE_URL;
+	}
+	
+
+	public static String GetEditEtryUrl()
+	{
+		return MAIN_SERVICE_HOST + EDIT_ENTRY_URL;
+	}
+	
+	
+	
+	public static String GetMarFixedUrl()
+	{
+		return MAIN_SERVICE_HOST + MARK_FIXED_URL;
 	}
 	
 	public static String GetListDataUrl()
