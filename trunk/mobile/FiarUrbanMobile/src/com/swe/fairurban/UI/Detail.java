@@ -48,228 +48,485 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Detail extends Activity {
+public class Detail extends Activity
+{
 
-	TextView lblCommentText, lblUsernameText,lblVote;
+	TextView lblCommentText, lblUsernameText, lblVote;
 
 	ImageButton ibThumbUp, ibThumbDown;
 	Context appContext;
 	ImageView imgEntry;
 	ProgressDialog pd;
-	
+	EditText txtExtraData;
+	TextView lblExtraData;
+	TextView lblCurrentStatus;
 	ListEntry entry;
-	
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
-        appContext = this;
-        
-        pd = new ProgressDialog(this);
-        
-        lblCommentText = (TextView) findViewById(R.id.lblCommentText);
-        lblUsernameText = (TextView) findViewById(R.id.lblUsernameText);
-        
-        lblVote = (TextView) findViewById(R.id.lblVoteText);
-        
-        ibThumbUp = (ImageButton) findViewById(R.id.ibThumbUp);
-        ibThumbDown = (ImageButton) findViewById(R.id.ibThumbDown);
-        
-        imgEntry = (ImageView) findViewById(R.id.imgEntry);
-        
-        Bundle b = getIntent().getExtras();
+
+	Button btnSolved, btnSave;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_detail);
+		appContext = this;
+
+		pd = new ProgressDialog(this);
+
+		lblCommentText = (TextView) findViewById(R.id.lblCommentText);
+		lblUsernameText = (TextView) findViewById(R.id.lblUsernameText);
+
+		lblVote = (TextView) findViewById(R.id.lblVoteText);
+
+		ibThumbUp = (ImageButton) findViewById(R.id.ibThumbUp);
+		ibThumbDown = (ImageButton) findViewById(R.id.ibThumbDown);
+
+		imgEntry = (ImageView) findViewById(R.id.imgEntry);
+
+		Bundle b = getIntent().getExtras();
+
+		entry = (ListEntry) b.get("entry");
+
+		lblCommentText.setText(entry.comment);
+		lblUsernameText.setText(entry.userName);
+
+		lblExtraData = (TextView) findViewById(R.id.lblExtraData);
 		
-        entry = (ListEntry) b.get("entry");
-        
-        lblCommentText.setText(entry.comment);
-        lblUsernameText.setText(entry.userName);
-        
-        //lblVote.setText(entry.upVoteCount + " / " + entry.downVoteCount);
-        
-        Thread thImage = new Thread(new Runnable() {
-			
-			public void run() {
+		lblCurrentStatus = (TextView) findViewById(R.id.lblCurrentStatus);
+
+		txtExtraData = (EditText) findViewById(R.id.txtExtraData);
+
+		btnSolved = (Button) findViewById(R.id.btnSolved);
+
+		btnSave = (Button) findViewById(R.id.btnSave);
+		
+		// lblVote.setText(entry.upVoteCount + " / " + entry.downVoteCount);
+
+		pd.setMessage("Ýçerik yükleniyor.");
+
+		ServiceConnector conn = new ServiceConnector(ServiceHelper.GetEntiryDetailsUrl(entry.id));
+
+		conn.SetPostRequest(false);
+
+		conn.AddListener(new OnServiceConnectionFinishedEvent()
+		{
+
+			@Override
+			public void ExceptionOccured()
+			{
 				// TODO Auto-generated method stub
-				 try {
-		        	 URL url = new URL(entry.imageMeta);
-		             final Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-		        
-		             runOnUiThread(new Runnable() {
-						public void run() {
-						     imgEntry.setImageBitmap(bmp);
-						}
-					});
-		             
-				} catch (Exception e) {
-					runOnUiThread(new Runnable() {
-						public void run() {
-							Toast tImageError = Toast.makeText(appContext, "Ýmaj bulunamadý.",1000);
-							tImageError.show();
-						}
-					});
-					
-				}
-			}
-		});
-        
-        thImage.start();
-        
-        ibThumbUp.setOnClickListener(new OnClickListener() {
-			
-			public void onClick(View arg0) {
-				ServiceConnector conn = new ServiceConnector(ServiceHelper.GetVotingUrl());
-				
-				conn.AddParameter("entryId", entry.id.toString());
-				
-				conn.AddParameter("up", "true");
-				
-				conn.AddListener(new OnServiceConnectionFinishedEvent() {
-					
-					@Override
-					public void ExceptionOccured() {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								pd.dismiss();
-								
-								Toast tConnError = Toast.makeText(appContext, "Sunucu ile baðlantý kurulamadý.",1000);
-								tConnError.show();
-							}
-						});
-					}
-					
-					@Override
-					public void ConnectionFinished(String result) {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								pd.dismiss();
-								
-								Toast tConnSuccess = Toast.makeText(appContext, "Oyunuz baþarý ile eklendi.",1000);
-								tConnSuccess.show();
-								
-								RefreshVoteCount();
-							}
-						});
-					}
-				});
-				
-				conn.ConnectUsingJsonPost();
-				
-				pd.setMessage("Oyunuz kaydediliyor...");
-				
-				pd.show();
-			}
-		});
-        
-        
-        ibThumbDown.setOnClickListener(new OnClickListener() {
-			
-			public void onClick(View arg0) {
-				ServiceConnector conn = new ServiceConnector(ServiceHelper.GetVotingUrl());
-				
-				conn.AddParameter("entryId", entry.id.toString());
-				
-				conn.AddParameter("up", "false");
-				
-				conn.AddListener(new OnServiceConnectionFinishedEvent() {
-					
-					@Override
-					public void ExceptionOccured() {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								pd.dismiss();
-								
-								Toast tConnError = Toast.makeText(appContext, "Sunucu ile baðlantý kurulamadý.",1000);
-								tConnError.show();
-							}
-						});
-					}
-					
-					@Override
-					public void ConnectionFinished(String result) {
-						runOnUiThread(new Runnable() {
-							public void run() {
-								pd.dismiss();
-								
-								Toast tConnSuccess = Toast.makeText(appContext, "Oyunuz baþarý ile eklendi.",1000);
-								tConnSuccess.show();
-								
-								RefreshVoteCount();
-							}
-						});
-					}
-				});
-				
-				conn.ConnectUsingJsonPost();
-				
-				pd.setMessage("Oyunuz kaydediliyor...");
-				
-				pd.show();
-			}
-		});
-       
-       RefreshVoteCount();
-    }
-    
+				runOnUiThread(new Runnable()
+				{
 
-    
-    
-    private void RefreshVoteCount()
-    {
-    	ServiceConnector conn = new ServiceConnector(ServiceHelper.GetEntiryDetailsUrl(entry.id));
-	
-    	conn.SetPostRequest(false);
-    	
-		conn.AddListener(new OnServiceConnectionFinishedEvent() {
-			
-			@Override
-			public void ExceptionOccured() {
-				runOnUiThread(new Runnable() {
-					public void run() {
+					public void run()
+					{
+						// TODO Auto-generated method stub
 						pd.dismiss();
-						
-						Toast tConnError = Toast.makeText(appContext, "Oy durumu güncellenirken bir hata oluþtu.",1000);
-						tConnError.show();
+						Toast tConnectionException = Toast.makeText(appContext, "Baðlantý hatasý", 1000);
+						tConnectionException.show();
 					}
 				});
-			}
-			
-			@Override
-			public void ConnectionFinished(final String result) {
-				
 
-				Type listType = new TypeToken<JSONDataContainer<ListEntry>>() {}.getType();
-				
-				JSONDataContainer<ListEntry> data = null;
-				
-				data = (JSONDataContainer<ListEntry>)JSONHelper.FromJson(result,listType);	
-				
-				if (data.data.size() > 0) {
-					final ListEntry entryUpdated = data.data.get(0);
-					
-					entry = entryUpdated;
-					
-					runOnUiThread(new Runnable() {
-						public void run() {
-							pd.dismiss();
-							
-							lblVote.setText(entryUpdated.upVoteCount + " / " + entryUpdated.downVoteCount);
-							
-							Toast tConnSuccess = Toast.makeText(appContext, "Oy durumu güncellendi.",1000);
-							tConnSuccess.show();
-						}
-					});
-				}
-				
+			}
+
+			@Override
+			public void ConnectionFinished(final String result)
+			{
+				// TODO Auto-generated method stub
+				// Parse data and show on map
+				runOnUiThread(new Runnable()
+				{
+
+					public void run()
+					{
+						// TODO Auto-generated method stub
+
+						Type listType = new TypeToken<JSONDataContainer<ListEntry>>()
+						{
+						}.getType();
+
+						JSONDataContainer<ListEntry> data = null;
+
+						data = (JSONDataContainer<ListEntry>) JSONHelper.FromJson(result, listType);
+
+						entry = data.data.get(0);
+						
+						CreateForm();
+
+						pd.dismiss();
+					}
+				});
+
 			}
 		});
 		
 		conn.Connect();
 		
-		pd.setMessage("Sunucudan son oy durumu sorgulanýyor...");
-		
 		pd.show();
-    }
+	}
+	
+	private void CreateForm()
+	{
+		if (entry.fixed)
+		{
+			lblCurrentStatus.setText("Çözüldü");
+		} 
+		else
+		{
+			lblCurrentStatus.setText("Çözülmedi");
+		}
+		
+		Thread thImage = new Thread(new Runnable()
+		{
 
-    
+			public void run()
+			{
+				// TODO Auto-generated method stub
+				try
+				{
+					URL url = new URL(ServiceHelper.IMAGES_FOLDER + entry.imageMeta);
+					final Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+
+					runOnUiThread(new Runnable()
+					{
+						public void run()
+						{
+							imgEntry.setImageBitmap(bmp);
+						}
+					});
+
+				} catch (Exception e)
+				{
+					runOnUiThread(new Runnable()
+					{
+						public void run()
+						{
+							Toast tImageError = Toast.makeText(appContext, "Ýmaj bulunamadý.", 1000);
+							tImageError.show();
+						}
+					});
+
+				}
+			}
+		});
+
+		thImage.start();
+
+		ibThumbUp.setOnClickListener(new OnClickListener()
+		{
+
+			public void onClick(View arg0)
+			{
+				ServiceConnector conn = new ServiceConnector(ServiceHelper.GetVotingUrl());
+
+				conn.AddParameter("entryId", entry.id.toString());
+
+				conn.AddParameter("up", "true");
+
+				conn.AddListener(new OnServiceConnectionFinishedEvent()
+				{
+
+					@Override
+					public void ExceptionOccured()
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								pd.dismiss();
+
+								Toast tConnError = Toast.makeText(appContext, "Sunucu ile baðlantý kurulamadý.", 1000);
+								tConnError.show();
+							}
+						});
+					}
+
+					@Override
+					public void ConnectionFinished(String result)
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								pd.dismiss();
+
+								Toast tConnSuccess = Toast.makeText(appContext, "Oyunuz baþarý ile eklendi.", 1000);
+								tConnSuccess.show();
+
+								RefreshVoteCount();
+							}
+						});
+					}
+				});
+
+				conn.ConnectUsingJsonPost();
+
+				pd.setMessage("Oyunuz kaydediliyor...");
+
+				pd.show();
+			}
+		});
+
+		ibThumbDown.setOnClickListener(new OnClickListener()
+		{
+
+			public void onClick(View arg0)
+			{
+				ServiceConnector conn = new ServiceConnector(ServiceHelper.GetVotingUrl());
+
+				conn.AddParameter("entryId", entry.id.toString());
+
+				conn.AddParameter("up", "false");
+
+				conn.AddListener(new OnServiceConnectionFinishedEvent()
+				{
+
+					@Override
+					public void ExceptionOccured()
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								pd.dismiss();
+
+								Toast tConnError = Toast.makeText(appContext, "Sunucu ile baðlantý kurulamadý.", 1000);
+								tConnError.show();
+							}
+						});
+					}
+
+					@Override
+					public void ConnectionFinished(String result)
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								pd.dismiss();
+
+								Toast tConnSuccess = Toast.makeText(appContext, "Oyunuz baþarý ile eklendi.", 1000);
+								tConnSuccess.show();
+
+								RefreshVoteCount();
+							}
+						});
+					}
+				});
+
+				conn.ConnectUsingJsonPost();
+
+				pd.setMessage("Oyunuz kaydediliyor...");
+
+				pd.show();
+			}
+		});
+
+		if (entry.userName.equalsIgnoreCase(UserHelper.CurrentUser.Username))
+		{
+			btnSolved.setVisibility(View.VISIBLE);
+		} else
+		{
+			btnSolved.setVisibility(View.INVISIBLE);
+		}
+
+		btnSolved.setOnClickListener(new OnClickListener()
+		{
+
+			public void onClick(View arg0)
+			{
+				// TODO Auto-generated method stub
+				ServiceConnector conn = new ServiceConnector(ServiceHelper.GetMarFixedUrl());
+
+				conn.AddParameter("entryId", entry.id.toString());
+
+				conn.AddParameter("value", "true");
+
+				conn.AddListener(new OnServiceConnectionFinishedEvent()
+				{
+
+					@Override
+					public void ExceptionOccured()
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								pd.dismiss();
+
+								Toast tConnError = Toast.makeText(appContext, "Sunucu ile baðlantý kurulamadý.", 1000);
+								tConnError.show();
+							}
+						});
+					}
+
+					@Override
+					public void ConnectionFinished(String result)
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								pd.dismiss();
+
+								Toast tConnSuccess = Toast.makeText(appContext, "Çözüldü olarak iþaretlendi.", 1000);
+								tConnSuccess.show();
+								RefreshVoteCount();
+							}
+						});
+					}
+				});
+
+				conn.ConnectUsingJsonPost();
+
+				pd.setMessage("Kaydediliyor...");
+
+				pd.show();
+			}
+
+		});
+		
+		btnSave.setOnClickListener(new OnClickListener()
+		{
+
+			public void onClick(View arg0)
+			{
+				// TODO Auto-generated method stub
+				ServiceConnector conn = new ServiceConnector(ServiceHelper.GetEditEtryUrl());
+
+				conn.AddParameter("entryId", entry.id.toString());
+				
+				String val = txtExtraData.getText().toString();
+
+				conn.AddParameter("value", val);
+
+				conn.AddListener(new OnServiceConnectionFinishedEvent()
+				{
+
+					@Override
+					public void ExceptionOccured()
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								pd.dismiss();
+
+								Toast tConnError = Toast.makeText(appContext, "Sunucu ile baðlantý kurulamadý.", 1000);
+								tConnError.show();
+							}
+						});
+					}
+
+					@Override
+					public void ConnectionFinished(String result)
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								pd.dismiss();
+
+								Toast tConnSuccess = Toast.makeText(appContext, "Baþarýyla güncellendi.", 1000);
+								tConnSuccess.show();
+							}
+						});
+					}
+				});
+
+				conn.ConnectUsingJsonPost();
+
+				pd.setMessage("Kaydediliyor...");
+
+				pd.show();
+			}
+
+		});
+		
+		lblExtraData.setText(entry.category.extra.key);
+		
+		if (entry.extra != null)
+		{
+			txtExtraData.setText(entry.extra.value);
+		}
+		
+
+		RefreshVoteCount();
+	}
+
+	private void RefreshVoteCount()
+	{
+		ServiceConnector conn = new ServiceConnector(ServiceHelper.GetEntiryDetailsUrl(entry.id));
+
+		conn.SetPostRequest(false);
+
+		conn.AddListener(new OnServiceConnectionFinishedEvent()
+		{
+
+			@Override
+			public void ExceptionOccured()
+			{
+				runOnUiThread(new Runnable()
+				{
+					public void run()
+					{
+						pd.dismiss();
+
+						Toast tConnError = Toast.makeText(appContext, "Oy durumu güncellenirken bir hata oluþtu.", 1000);
+						tConnError.show();
+					}
+				});
+			}
+
+			@Override
+			public void ConnectionFinished(final String result)
+			{
+
+				Type listType = new TypeToken<JSONDataContainer<ListEntry>>()
+				{
+				}.getType();
+
+				JSONDataContainer<ListEntry> data = null;
+
+				data = (JSONDataContainer<ListEntry>) JSONHelper.FromJson(result, listType);
+
+				if (data.data.size() > 0)
+				{
+					final ListEntry entryUpdated = data.data.get(0);
+
+					entry = entryUpdated;
+
+					runOnUiThread(new Runnable()
+					{
+						public void run()
+						{
+							pd.dismiss();
+
+							lblVote.setText(entryUpdated.upVoteCount + " / " + entryUpdated.downVoteCount);
+							
+							if (entry.fixed)
+							{
+								lblCurrentStatus.setText("Çözüldü");
+							} 
+							else
+							{
+								lblCurrentStatus.setText("Çözülmedi");
+							}
+
+							Toast tConnSuccess = Toast.makeText(appContext, "Oy durumu güncellendi.", 1000);
+							tConnSuccess.show();
+						}
+					});
+				}
+
+			}
+		});
+
+		conn.Connect();
+
+		pd.setMessage("Sunucudan son oy durumu sorgulanýyor...");
+
+		pd.show();
+	}
+
 }

@@ -65,24 +65,6 @@
         android:ems="10"
         android:text="-/-" />
 
-    <ImageButton
-        android:id="@+id/ibThumbUp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/lblVote"
-        android:layout_below="@+id/lblVote"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/thumbup" />
-
-    <ImageButton
-        android:id="@+id/ibThumbDown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/ibThumbUp"
-        android:layout_marginLeft="17dp"
-        android:layout_toRightOf="@+id/ibThumbUp"
-        android:src="@drawable/thumbdown" />
-
     <ImageView
         android:id="@+id/imgEntry"
         android:layout_width="wrap_content"
@@ -91,7 +73,89 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/ibThumbUp"
-        android:layout_marginTop="18dp"
-        android:scaleType="fitCenter"/>
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/lblExtraData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lblVote"
+        android:layout_marginTop="16dp"
+        android:layout_toLeftOf="@+id/lblVoteText"
+        android:ems="10"
+        android:text="Ekstra" />
+
+    <ImageButton
+        android:id="@+id/ibThumbUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/lblExtraData"
+        android:layout_below="@+id/lblExtraData"
+        android:layout_marginTop="52dp"
+        android:src="@drawable/thumbup" />
+
+    <ImageButton
+        android:id="@+id/ibThumbDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/ibThumbUp"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/ibThumbUp"
+        android:src="@drawable/thumbdown" />
+
+    <EditText
+        android:id="@+id/txtExtraData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/lblExtraData"
+        android:layout_alignBottom="@+id/lblExtraData"
+        android:layout_alignLeft="@+id/lblUsernameText"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/btnSolved"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ibThumbDown"
+        android:layout_alignTop="@+id/ibThumbDown"
+        android:layout_toLeftOf="@+id/lblVoteText"
+        android:text="Çözüldü"
+        android:textSize="8dp" />
+
+    <Button
+        android:id="@+id/btnSave"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnSolved"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="18dp"
+        android:text="Kaydet"
+        android:textSize="8dp" />
+
+    <TextView
+        android:id="@+id/lblStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnSave"
+        android:layout_alignBottom="@+id/btnSave"
+        android:layout_toLeftOf="@+id/lblVoteText"
+        android:ems="10"
+        android:text="Durum:" />
+
+    <TextView
+        android:id="@+id/lblCurrentStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnSave"
+        android:layout_alignBottom="@+id/btnSave"
+        android:layout_alignLeft="@+id/ibThumbDown"
+        android:layout_marginLeft="21dp"
+        android:ems="10"
+        android:text="-" />
 
 </RelativeLayout>

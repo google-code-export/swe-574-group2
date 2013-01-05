@@ -8,7 +8,7 @@ public class EntryCategory {
 	public Integer id;
 	public String title;
 	public Integer parentReasonId;
-	
+	public ExtraData extra;
 	
 	@Override
 	public String toString() {
