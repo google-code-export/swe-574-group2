@@ -102,6 +102,9 @@ function logOut() {
 
 $(document).ready(function() {
 	
+	$('#txtValue').attr("disabled", "disabled");
+	$('#btnDetail').attr("disabled", "disabled");
+	
 	$("#btnSave").click(function() {
 		$("#spinner").show();
 	});
@@ -214,8 +217,23 @@ $(document).ready(function() {
 		selectChild.change(function() {
 
 			$.getJSON(getExtraDataBySubCategoryIdUrl + selectChild.find(":selected").val(), function(data) {
+				if(data != null)
+				{
 					$('#lblKey').html(data.key);
 					$('#lblThreshold').html(data.boundary + " " + data.key);
+					
+					$('#txtValue').removeAttr("disabled");
+					$('#btnDetail').removeAttr("disabled");
+				}
+				else
+				{
+					$('#lblKey').html('-');
+					$('#lblThreshold').html('-');
+					
+					$('#txtValue').val('');
+					$('#txtValue').attr("disabled", "disabled");
+					$('#btnDetail').attr("disabled", "disabled");
+				}
 			 });
 
 		});
