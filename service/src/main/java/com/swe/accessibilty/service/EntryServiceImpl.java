@@ -195,6 +195,22 @@ public class EntryServiceImpl implements EntryService {
 		
 		return entries;
 	}
+	
+	
+	@Override
+	@Transactional
+	public List<EntryProxy> loadEntriesByUser(String username) {
+		
+		List<EntryProxy> entries = new ArrayList<EntryProxy>();
+		for (Entry entry : entryDao.getEntriesByUser(username)){
+			EntryProxy proxy = new EntryProxy(entry, false);
+		
+			proxy.setImageMeta(config.getImageHost() + "/" + proxy.getImageMeta());
+			entries.add(proxy);
+		}
+		
+		return entries;
+	}
 
 	@Override
 	@Transactional
@@ -203,6 +219,8 @@ public class EntryServiceImpl implements EntryService {
 		entryDao.update(entry);
 		
 	}
+
+	
 
 	
 	

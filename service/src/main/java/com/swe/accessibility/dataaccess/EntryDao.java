@@ -29,6 +29,8 @@ public interface EntryDao {
 	List<Entry> getEntriesByPriority(String priority);
 
 	Entry getByIdFetchExtra(int id);
+
+	List<Entry> getEntriesByUser(String username);
 	
 	
 

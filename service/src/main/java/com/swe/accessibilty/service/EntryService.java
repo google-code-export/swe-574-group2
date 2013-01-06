@@ -45,4 +45,7 @@ public interface EntryService {
 
 	@Transactional
 	public abstract void editEntry(Entry entry);
+
+	@Transactional
+	public abstract List<EntryProxy> loadEntriesByUser(String username);
 }

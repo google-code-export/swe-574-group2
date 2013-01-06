@@ -210,4 +210,34 @@ public class EntryDaoImpl implements EntryDao {
 		
 	}
 
+	@Override
+	public List<Entry> getEntriesByUser(String username) {
+		
+		String queryStr = "SELECT e.id,e.comment,e.coordX,e.coordY,e.upVoteCount,e.downVoteCount,e.imageMeta,e.priority,u.username from Reason r  join EntryReason er on er.ReasonId = r.id join Entry e on er.EntryID = e.id  "
+				+ "join User u on e.submittedBy = u.id where e.username = :username";
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(
+				queryStr);
+		query.setParameter("username", username);
+		
+		Iterator<Object[]> iter = query.list().iterator();
+
+		List<Entry> entries = new ArrayList<Entry>();
+		while (iter.hasNext()) {
+			Object[] arr = iter.next();
+			Entry entr = new Entry();
+			entr.setId((Integer) arr[0]);
+			entr.setComment((String) arr[1]);
+			entr.setCoordX((BigDecimal) arr[2]);
+			entr.setCoordY((BigDecimal) arr[3]);
+			entr.setUpVoteCount((Integer) arr[4]);
+			entr.setDownVoteCount((Integer) arr[5]);
+			entr.setImageMeta((String) arr[6]);
+			entr.setPriority((Integer) arr[7]);
+			entr.setUser(new User(arr[8].toString()));
+
+			entries.add(entr);
+		}
+		return entries;
+	}
+
 }
