@@ -123,8 +123,16 @@ public class EntryController {
 				obj.put("value", value);
 				//Priority setting according to boundary
 				
-				if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 3){
-					priority++;
+				String condition = obj.getString("condition");
+				if (condition.equals("up")){
+					if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 2){
+						priority++;
+					}
+				}
+				else{
+					if (Integer.parseInt(value) < Integer.parseInt(obj.getString("boundary")) && priority < 2){
+						priority++;
+					}
 				}
 			}
 			
@@ -206,11 +214,10 @@ public class EntryController {
 		
 			String extra = null;
 			EntryReason entryReason = null;
-			EntryReason newEntryReason = null;
+			
 			Iterator<EntryReason> iter = entry.getEntryReasons().iterator();
 			if (iter.hasNext()){
 				entryReason = iter.next();
-				newEntryReason = entryReason;
 				extra = entryReason.getExtra();
 			}
 		
@@ -230,10 +237,18 @@ public class EntryController {
 				}
 				obj.put("value", value);
 				//Priority setting according to boundary
-				
-				if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 2){
-					priority++;
+				String condition = obj.getString("condition");
+				if (condition.equals("up")){
+					if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 2){
+						priority++;
+					}
 				}
+				else{
+					if (Integer.parseInt(value) < Integer.parseInt(obj.getString("boundary")) && priority < 2){
+						priority++;
+					}
+				}
+				
 				if (obj != null && entryReason != null)
 					entryReason.setExtra(obj.toString());
 			}
@@ -369,8 +384,16 @@ public class EntryController {
 				obj.put("value", value);
 				//Priority setting according to boundary
 				
-				if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 3){
-					priority++;
+				String condition = obj.getString("condition");
+				if (condition.equals("up")){
+					if (Integer.parseInt(value) > Integer.parseInt(obj.getString("boundary")) && priority < 2){
+						priority++;
+					}
+				}
+				else{
+					if (Integer.parseInt(value) < Integer.parseInt(obj.getString("boundary")) && priority < 2){
+						priority++;
+					}
 				}
 			}
 			
@@ -438,11 +461,7 @@ public class EntryController {
 		 }
 		BufferedImage image = ImageIO.read(iis);
 		
-		//Disable image resizing
-//		int scaledWidth = image.getHeight() / 2;
-//		int scaledHeight = image.getWidth() / 2;
-//		
-//		BufferedImage resizedImage = createResizedCopy(image, scaledWidth, scaledHeight, true);
+
 		String fileURL = UUID.randomUUID().toString() + "." + format;
 		
 		File output = new File(uploadRepo + File.separator + fileURL);
@@ -452,7 +471,7 @@ public class EntryController {
 	}
 
 	@RequestMapping(method={RequestMethod.GET},produces={"application/json"})
-	public  ResponseEntity<EntryList> getEntries(@RequestParam(required=false) String x, @RequestParam(required=false) String y,@RequestParam(required=false) String categoryId,@RequestParam(required=false) String typeId,@RequestParam(required=false) String priority){
+	public  ResponseEntity<EntryList> getEntries(@RequestParam(required=false) String x, @RequestParam(required=false) String y,@RequestParam(required=false) String categoryId,@RequestParam(required=false) String typeId,@RequestParam(required=false) String priority,@RequestParam(required=false) String username){
 		
 		
 		HttpHeaders responseHeaders = makeCORS();
@@ -477,6 +496,8 @@ public class EntryController {
 				result = getByType(typeId);
 			else if (priority != null)
 				result = getByPriority(priority);
+			else if (username != null)
+				result = getByUser(username);
 			else
 				result = getEntries();
 		}catch(ParseException e){
@@ -489,6 +510,9 @@ public class EntryController {
 		return entity;
 	}
 	
+	
+
+
 	
 
 
@@ -511,7 +535,6 @@ public class EntryController {
 	}
 	
 	@RequestMapping(value="/thumbs",method={RequestMethod.POST,RequestMethod.OPTIONS},produces="application/json",headers={"Content-Type=application/json"})
-	
 	public ResponseEntity<UpdateResult> updateVoteCount(Principal principal,@RequestBody ThumbsObject thumbs){
 		
 		UpdateResult result = new UpdateResult();
@@ -529,6 +552,19 @@ public class EntryController {
 		else{
 			try{
 				entryService.updateEntryVote(entry,up,user);
+				
+				//If upvote Count greater than 10 apply the rule
+				int upvoteCount = entry.getUpVoteCount();
+				
+				if (up && (upvoteCount+1) >= 10){
+					
+					int priority = entry.getPriority();
+					if (priority < 2){
+						priority++;
+					}
+					entry.setPriority(priority);
+					entryService.editEntry(entry);
+				}
 				
 				result.setResultId(0);
 				result.setResultStatus("SUCCESS");
@@ -589,6 +625,13 @@ public class EntryController {
 		result.setData(entryService.loadEntries(priority));
 		return result;
 	}
+	
+	private EntryList getByUser(String username) {
+		
+		EntryList result = new EntryList();
+		result.setData(entryService.loadEntriesByUser(username));
+		return result;
+	}
 
 	private  EntryList getEntryByCategory(String categoryId) throws ParseException{
 		
@@ -620,21 +663,21 @@ public class EntryController {
 		return responseHeaders;
 	}
 	
-	private static BufferedImage createResizedCopy(Image originalImage, 
-    		int scaledWidth, int scaledHeight, 
-    		boolean preserveAlpha)
-    {
-    	
-    	int imageType = preserveAlpha ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
-    	BufferedImage scaledBI = new BufferedImage(scaledWidth, scaledHeight, imageType);
-    	Graphics2D g = scaledBI.createGraphics();
-    	if (preserveAlpha) {
-    		g.setComposite(AlphaComposite.Src);
-    	}
-    	g.drawImage(originalImage, 0, 0, scaledWidth, scaledHeight, null); 
-    	g.dispose();
-    	return scaledBI;
-    }
+//	private static BufferedImage createResizedCopy(Image originalImage, 
+//    		int scaledWidth, int scaledHeight, 
+//    		boolean preserveAlpha)
+//    {
+//    	
+//    	int imageType = preserveAlpha ? BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+//    	BufferedImage scaledBI = new BufferedImage(scaledWidth, scaledHeight, imageType);
+//    	Graphics2D g = scaledBI.createGraphics();
+//    	if (preserveAlpha) {
+//    		g.setComposite(AlphaComposite.Src);
+//    	}
+//    	g.drawImage(originalImage, 0, 0, scaledWidth, scaledHeight, null); 
+//    	g.dispose();
+//    	return scaledBI;
+//    }
 	
 	@ExceptionHandler(value=Exception.class)
 	public String handleException(Exception e){
