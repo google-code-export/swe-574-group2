@@ -566,7 +566,9 @@ var logOutUrl = "./j_spring_security_logout";
 					}
 				else
 					{
-						$('#divFixed').hide();
+						//task 46: show isFixed checkbox to all users.
+						$('#divFixed').show();
+						//$('#divFixed').hide();
 					}
 			},
 			error: function(){}
@@ -663,6 +665,7 @@ var logOutUrl = "./j_spring_security_logout";
 					<li><a href="default.html">Ana Sayfa</a></li>
 					<li><a href="about.html">Hakkımızda</a></li>
 					<li id="liNewEntry"><a href="new.html">Yeni Ekle</a></li>
+					<li><a href="report.html">Raporlama</a></li>
 					<li><a id="spnLogin" style="display: none" href="javascript:;">GIRIS</a>
 						<a id="spnLogout" style="display: none" href="javascript:;" onclick="logOut();" >ÇIKIS</a>
 					</li>
@@ -679,9 +682,9 @@ var logOutUrl = "./j_spring_security_logout";
 							<img border="1" width="50%" height="50%" 
 								src="" id="imgEntry">
 							</a>
-						<p style="height: 10px;"></p>
-						<span style="font-weight: bold;">Öncelik:</span>
-						<span id="lblPriority"></span>
+<!-- 						<p style="height: 10px;"></p> -->
+<!-- 						<span style="font-weight: bold;">Öncelik:</span> -->
+<!-- 						<span id="lblPriority"></span> -->
 						<p style="height: 10px;"></p>
 						<span style="font-weight: bold;">Durum:</span>
 						<span id="lblStatus"></span>
