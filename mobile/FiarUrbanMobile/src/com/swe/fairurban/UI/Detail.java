@@ -184,7 +184,7 @@ public class Detail extends Activity
 				// TODO Auto-generated method stub
 				try
 				{
-					URL url = new URL(ServiceHelper.IMAGES_FOLDER + entry.imageMeta);
+					URL url = new URL(entry.imageMeta);
 					final Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 
 					runOnUiThread(new Runnable()
