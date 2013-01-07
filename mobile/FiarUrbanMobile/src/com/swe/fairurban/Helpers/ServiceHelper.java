@@ -2,7 +2,7 @@ package com.swe.fairurban.Helpers;
 
 public class ServiceHelper {
 	
-	private final static String MAIN_SERVICE_HOST = "http://testpalette.com:8080/RestAccessibilty";
+	private final static String MAIN_SERVICE_HOST = "http://swe.cmpe.boun.edu.tr:8180/rest";
 	
 	
 

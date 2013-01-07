@@ -135,7 +135,7 @@ public class ServiceConnector {
 						}
 			        	else {
 			        		HttpGet get = new HttpGet(url);
-			        		
+			        
 			        		resp = hc.execute(get);
 						}
 			        	
@@ -144,7 +144,7 @@ public class ServiceConnector {
 				        
 				        if (resp != null) {
 				            if (resp.getStatusLine().getStatusCode() == 200)
-				                BroadcastConnectionFinished(EntityUtils.toString(resp.getEntity()));
+				                BroadcastConnectionFinished(EntityUtils.toString(resp.getEntity(),"UTF-8"));
 				            else
 				            	BroadcastException();
 				        }
@@ -207,7 +207,7 @@ public class ServiceConnector {
 				        
 				        if (resp != null) {
 				            if (resp.getStatusLine().getStatusCode() == 200)
-				                BroadcastConnectionFinished(EntityUtils.toString(resp.getEntity()));
+				                BroadcastConnectionFinished(EntityUtils.toString(resp.getEntity(),"UTF-8"));
 				            else
 				            	BroadcastException();
 				        }
@@ -255,7 +255,7 @@ public class ServiceConnector {
 	        
 	        if (resp != null) {
 	            if (resp.getStatusLine().getStatusCode() == 200)
-	            	message = EntityUtils.toString(resp.getEntity());
+	            	message = EntityUtils.toString(resp.getEntity(),"UTF-8");
 	          
 	        }
 
